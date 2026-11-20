@@ -73,6 +73,10 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:8px;borde
 @media(max-width:900px){.app{grid-template-columns:1fr}aside{position:sticky;top:0;height:auto;max-height:100vh;z-index:20;padding:12px}aside nav{display:none}aside.open nav{display:block}.menu-btn{display:inline-flex}.logo{margin-bottom:10px}.me{margin-bottom:0}.g3,.g4,.g2{grid-template-columns:1fr}main{padding:18px}}
 
 @media(min-width:520px) and (max-width:900px){.g4{grid-template-columns:repeat(2,1fr)}.ring{width:72px;height:72px}.ring>div{width:56px;height:56px;font-size:15px}}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}.tab{border:1px solid var(--line);background:#fff;border-radius:99px;padding:6px 12px;font-weight:600;font-size:13px;cursor:pointer}.tab.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.chat{max-height:420px;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:10px;background:#f8fafc;border:1px solid var(--line);border-radius:12px}
+.bub{max-width:85%;padding:9px 12px;border-radius:14px;font-size:14px;line-height:1.5}.bub.user{align-self:flex-end;background:#eef2ff;color:#1e1b4b}.bub.assistant{align-self:flex-start;background:#fff;border:1px solid var(--line)}
+.bub pre,.card pre{white-space:pre-wrap}
 </style></head><body><div class="app"><aside id="side"></aside><main id="main"></main></div><div id="toast" class="toast"></div><script>// ===== GLOBAL DATA =====
 const M = [];
 const PHASES = [
@@ -110,21 +114,21 @@ const WEEK_PLAN = [
 ];
 
 const PROJECTS = [
- {id:"p1", name:"Patrimony Copilot (flagship · Java / Spring AI)", weeks:"9-20", icon:"🏠",
+ {id:"p3", name:"Mountain briefing: ski touring & safety (flagship, start this winter)", weeks:"9-18, then improved all season", icon:"🏔️",
+  desc:"Every winter morning: reads the Météo-France avalanche bulletin (BRA, PDF with pictograms) for your massifs, the weather and your saved routes, and writes a short briefing with sources. It informs, it never decides: refusal when data is missing, explicit uncertainty.",
+  use:"Your daily winter briefing in the mountains. Compare its summaries with the official bulletin all season.",
+  steps:["Spring Boot project, CLAUDE.md, ADR-001; scheduled fetch and archive of BRA PDFs for Mont-Blanc and nearby massifs","Text extraction first (danger level, altitudes, aspects), multimodal later with module 14","Weather and snow data tools (deterministic, unit-tested)","Your saved routes (slope aspect, altitude, exposure) and a matching engine in code","Multimodal extraction: pictograms and risk roses (vision), compared with text-only extraction","Ground-truth set: 30 bulletins labelled by hand, extraction accuracy measured","Briefing generator with citations and mandatory disclaimer","Refusal and uncertainty tests (missing bulletin, contradictory data)","Scheduled run + notification (email or phone), MCP server to query it from Claude","Season report: accuracy, failures, what you learned"],
+  senior:["Safety-critical design: grounded, cited, refuses when unsure","Multimodal evals with a hand-labelled set","Clear human-in-the-loop positioning (decision aid only)","Great interview story: 'how I stop an AI from inventing avalanche risk'"]},
+ {id:"p1", name:"Patrimony Copilot (Java / Spring AI)", weeks:"19-30", icon:"🏠",
   desc:"Your own property-investment copilot for a property-holding company and furnished rentals: ask questions on leases and notary acts with exact citations, track rent terms and tax recoveries, compute prorata and indexation, draft tenant letters, and expose it all as an MCP server you use from Claude every week.",
   use:"You use it for every lease question, every new acquisition and every tenant letter. Log your real usage.",
   steps:["Repo, CLAUDE.md, ADR-001 (stack choice), Docker Compose with PGVector","Ingest anonymised leases, acts and insurance documents with metadata","Ask endpoint with citations and 'not found' refusal","Deterministic tools: tax prorata, rent indexation, next term date (unit-tested)","Retrieval test set (40 questions) and recall@5 report","Hybrid search + re-ranking, measured gain","MCP server (Spring AI annotations) used from Claude Desktop","Tenant-letter workflow with human approval","Public README with architecture diagram and results table","3 months of personal usage stats in the README"],
   senior:["Evals gated in CI with published numbers","Permissions: a property's documents never leak to another","All money maths in code, never in the model","Threat model and red-team results documented","Cost per question and p95 latency on a dashboard"]},
- {id:"p2", name:"Personal CFO: budget and bank statements", weeks:"21-30", icon:"💶",
+ {id:"p2", name:"Personal CFO: budget and bank statements", weeks:"31-36", icon:"💶",
   desc:"Import statements from several personal and business banks (PDF/CSV), categorise transactions, track the monthly budget and the automatic-transfer calendar, detect missing or rejected transfers, and produce your monthly review. Built privacy-first.",
   use:"It replaces the manual monthly review of the 5th. Measure time saved.",
   steps:["Parsers for each bank format (PDF and CSV), tested on real anonymised samples","Categorisation with a small model + rules, 300-transaction labelled eval set","Budget engine in code: monthly budget, floors per account, transfer calendar checks","Alerts: missing salary, overspending, account under floor","Privacy: masking advisor, local-model mode (Ollama) compared with Claude on accuracy","Red-team: prompt injection hidden in a transaction label","Monthly review report generated and reviewed by you","Eval report: accuracy, cost, latency per month of statements"],
   senior:["Accuracy ≥ 95% on your labelled set, reported honestly","Sensitive data never leaves your machine in local mode","Deterministic budget rules with tests","Comparison local vs frontier model with a decision record"]},
- {id:"p3", name:"Mountain briefing (ski touring & safety)", weeks:"31-36", icon:"🏔️",
-  desc:"Every winter morning: reads the Météo-France avalanche bulletin (BRA, PDF with pictograms) for your massifs, the weather and your saved routes, and writes a short briefing with sources. It informs, it never decides: refusal when data is missing, explicit uncertainty.",
-  use:"Your daily winter briefing in the mountains. Compare its summaries with the official bulletin all season.",
-  steps:["Fetch and archive BRA PDFs for Mont-Blanc and nearby massifs","Multimodal extraction: danger level, aspects, altitudes, problems (vision on pictograms)","Ground-truth set: 30 bulletins labelled by hand, extraction accuracy measured","Briefing generator with citations and mandatory disclaimer","Refusal and uncertainty tests (missing bulletin, contradictory data)","Scheduled run + notification (email or phone)","Season report: accuracy, failures, what you learned"],
-  senior:["Safety-critical design: grounded, cited, refuses when unsure","Multimodal evals with a hand-labelled set","Clear human-in-the-loop positioning (decision aid only)","Great interview story: 'how I stop an AI from inventing avalanche risk'"]},
  {id:"p4", name:"Property deal analyser (Python)", weeks:"20-24 (alongside module 9)", icon:"📈",
   desc:"Paste a listing (text or PDF): extracts the data, computes yield and cashflow with your lease-by-lease convention, compares with real sale prices from public DVF data, scores the deal and proposes a negotiation price.",
   use:"You run it on every listing you consider. Compare with the analyses you already did.",
@@ -1752,11 +1756,148 @@ resources:[
 coach:["In every interview, tell one story with a metric and one story about a failure you caught with evals.","Your property and freelance experience is a business asset: you speak ROI, cash flow and risk, which most engineers do not.","One talk or workshop per quarter is enough to compound visibility."],
 english:{vocab:[["stakeholder","partie prenante"],["scope","périmètre"],["buy-in","adhésion"],["trade-off","compromis"],["rollout","déploiement"],["break-even","seuil de rentabilité"],["compliance","conformité"],["to pitch","présenter / vendre"]], speak:"Pitch in 2 minutes, in English, why an SME should automate invoice processing with AI: current cost, expected savings, risks and how you measure success."}
 });
+// ===== AI TUTOR (Anthropic API, key stored only in this browser) =====
+const AIK="aiTrack.key", AIM="aiTrack.models";
+const AI_DEF={fast:"claude-haiku-5-5",smart:"claude-sonnet-5-5"};
+function aiKey(){try{return localStorage.getItem(AIK)||"";}catch(e){return "";}}
+function aiModels(){try{return Object.assign({},AI_DEF,JSON.parse(localStorage.getItem(AIM)||"{}"));}catch(e){return AI_DEF;}}
+function aiS(){if(!S.ai)S.ai={};const a=S.ai;["diff","weak","chat","open","xpLog"].forEach(k=>{if(!a[k])a[k]={};});if(!S.cards)S.cards={};return a;}
+function aiXP(n,why){aiS();change(()=>{S.ai.xp=(S.ai.xp||0)+n;},why?why+" +"+n+" XP":"");}
+async function callClaude(system,messages,o){o=o||{};const key=aiKey();if(!key)throw new Error("No API key: add it in Settings.");
+ const m=aiModels();const body={model:o.model||m.smart,max_tokens:o.max||1500,system:[{type:"text",text:system,cache_control:{type:"ephemeral"}}],messages};
+ const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify(body)});
+ const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error((j.error&&j.error.message)||("HTTP "+r.status));
+ return (j.content||[]).filter(c=>c.type==="text").map(c=>c.text).join("\n");}
+function pj(t){const s=t.indexOf("{"),e=t.lastIndexOf("}");if(s<0||e<s)throw new Error("The AI did not return JSON, try again.");return JSON.parse(t.slice(s,e+1));}
+async function askJSON(system,user,o){let t=await callClaude(system+"\n\nAnswer with ONE valid JSON object only, no prose, no code fences.",[{role:"user",content:user}],o);
+ try{return pj(t);}catch(e){t=await callClaude(system+"\n\nAnswer with ONE valid JSON object only.",[{role:"user",content:user},{role:"assistant",content:t.slice(0,4000)},{role:"user",content:"That was not valid JSON. Return only the corrected JSON object."}],o);return pj(t);}}
+function mdLite(t){let h=esc(t);h=h.replace(/```[a-zA-Z]*\n([\s\S]*?)```/g,(m,c)=>`<pre class="copy">${c}</pre>`);
+ h=h.replace(/`([^`\n]+)`/g,"<code>$1</code>").replace(/\*\*([^*\n]+)\*\*/g,"<b>$1</b>").replace(/^#{1,4} (.+)$/gm,"<h4>$1</h4>");
+ h=h.replace(/(^|\n)((?:[-*] .+(?:\n|$))+)/g,(m,a,b)=>a+"<ul>"+b.trim().split("\n").map(l=>"<li>"+l.replace(/^[-*] /,"")+"</li>").join("")+"</ul>");
+ return h.replace(/\n{2,}/g,"<br><br>").replace(/\n/g,"<br>");}
+function strip(h){return String(h).replace(/<[^>]+>/g," ").replace(/&[a-z]+;/g," ").replace(/\s+/g," ").trim();}
+function mctx(m){return `MODULE ${m.id}: ${m.title}\nWhy: ${m.why}\nObjectives: ${m.objectives.join("; ")}\nKey takeaways: ${m.takeaways.join("; ")}\nTheory: ${strip(m.theory).slice(0,9000)}\nExercises: ${m.exercises.map(e=>e.t).join("; ")}`;}
+const LEARNER="The learner is Nicolas, a senior freelance Java/Spring/Angular lead developer (12 years) training to become a senior AI engineer on the JVM in 2027. He is French; the track is in English. Be precise, current (late 2026) and practical; prefer production concerns (evals, security, cost, deterministic code) over theory for its own sake.";
+async function busy(btn,fn){const t=btn.textContent;btn.disabled=true;btn.textContent="⏳ Thinking…";try{await fn();}catch(e){toast("⚠️ "+e.message);}finally{btn.disabled=false;btn.textContent=t;}}
+function noKey(){return `<p class="small">Add your Anthropic API key in <a href="#/settings">Settings</a> to unlock the AI tutor. The key stays in this browser only.</p>`;}
+
+// ---- module tutor card ----
+let aiTab="quiz",aiQ=null,aiOpen=null;
+function aiModule(m){const box=document.getElementById("aiBox");if(!box)return;aiS();
+ const tabs=[["quiz","🎲 Adaptive quiz"],["open","✍️ Explain it back"],["chat","💬 Tutor"],["cards","🃏 Cards from notes"]];
+ let h=`<div class="card mt"><h3>🤖 AI tutor <span class="pill p">level ${S.ai.diff[m.id]||2}/5</span></h3>`;
+ if(!aiKey()){box.innerHTML=h+noKey()+"</div>";return;}
+ h+=`<div class="tabs">${tabs.map(t=>`<button class="tab ${aiTab===t[0]?"on":""}" data-t="${t[0]}">${t[1]}</button>`).join("")}</div><div id="aiPane" class="mt"></div></div>`;
+ box.innerHTML=h;box.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{aiTab=b.dataset.t;aiModule(m);});
+ ({quiz:aiQuizPane,open:aiOpenPane,chat:aiChatPane,cards:aiCardsPane})[aiTab](m,document.getElementById("aiPane"));}
+
+function aiQuizPane(m,el){const d=S.ai.diff[m.id]||2,weak=(S.ai.weak[m.id]||[]).slice(-8);
+ if(!aiQ||aiQ.mid!==m.id){el.innerHTML=`<p class="small muted">Fresh questions every time, generated from this module. Difficulty adapts to your results (now ${d}/5) and targets your weak spots${weak.length?": "+esc(weak.join(", ")):""}. Missed questions go to your Review deck.</p><button class="btn" id="aqGo">Generate 5 questions</button>`;
+  $("#aqGo").onclick=e=>busy(e.target,async()=>{const missed=Object.keys(S.rev).filter(k=>k.startsWith(m.id+":")&&S.rev[k].b<=2).map(k=>{const c=cardOf(k);return c?c.q.q:"";}).filter(Boolean).slice(0,5);
+   const j=await askJSON(`You write multiple-choice questions to train a learner. ${LEARNER}\n${mctx(m)}`,`Write 5 new multiple-choice questions on this module at difficulty ${d}/5 (1 = definitions, 3 = applied scenarios, 5 = tricky production trade-offs and edge cases). ${weak.length?"Prioritise these weak concepts: "+weak.join(", ")+". ":""}${missed.length?"He recently missed: "+missed.join(" | ")+" (test the same concepts differently). ":""}Avoid trivia; prefer realistic scenarios. Exactly 4 options, one correct, plausible distractors, vary the position of the correct answer. JSON: {"questions":[{"q":"...","o":["...","...","...","..."],"a":0,"w":"why the answer is right and the others wrong, 1-2 sentences","concept":"short concept name"}]}`,{model:aiModels().fast,max:2500});
+   aiQ={mid:m.id,qs:(j.questions||[]).filter(x=>x.o&&x.o.length===4),done:false};aiQuizPane(m,el);});return;}
+ el.innerHTML=aiQ.qs.map((it,i)=>`<div class="q" data-aq="${i}"><b>${i+1}. ${esc(it.q)}</b>${it.o.map((o,j)=>`<label class="opt"><input type="radio" name="aq${i}" value="${j}"> ${esc(o)}</label>`).join("")}<div class="why">💬 ${esc(it.w)} <span class="pill">${esc(it.concept||"")}</span></div></div>`).join("")+`<div class="mt"><button class="btn" id="aqChk">Check</button> <button class="btn ghost" id="aqNew">New set</button> <b id="aqSc" style="margin-left:10px"></b></div>`;
+ $("#aqNew").onclick=()=>{aiQ=null;aiQuizPane(m,el);};
+ $("#aqChk").onclick=()=>{if(aiQ.done)return;let ok=0,ans=0;aiQ.qs.forEach((it,i)=>{const sel=el.querySelector(`input[name=aq${i}]:checked`);const box=el.querySelector(`[data-aq="${i}"]`);box.classList.add("shown");
+   box.querySelectorAll(".opt").forEach((o,j)=>{if(j===it.a)o.classList.add("right");else if(sel&&+sel.value===j)o.classList.add("wrong");});
+   if(sel){ans++;if(+sel.value===it.a)ok++;else{const k="c:"+Date.now()+i;S.cards[k]={mid:m.id,q:it.q,o:it.o,a:it.a,w:it.w};S.rev[k]={b:1,d:today()};(S.ai.weak[m.id]=S.ai.weak[m.id]||[]).push(it.concept||it.q.slice(0,40));}}});
+  if(ans<aiQ.qs.length){toast("Answer all questions first");return;}aiQ.done=true;const sc=Math.round(ok/aiQ.qs.length*100);let d=S.ai.diff[m.id]||2;
+  if(sc>=80&&d<5)d++;else if(sc<50&&d>1)d--;S.ai.diff[m.id]=d;S.ai.weak[m.id]=(S.ai.weak[m.id]||[]).slice(-12);
+  $("#aqSc").textContent=`${ok}/${aiQ.qs.length} · next level ${d}/5`;aiXP(ok*5,"🎲");};}
+
+function aiOpenPane(m,el){const hist=(S.ai.open[m.id]||[]).slice(-5);
+ el.innerHTML=`<p class="small muted">The best way to learn: explain it in your own words. You get an open question, write your answer (English or French), and get graded against a senior rubric with what is missing and a follow-up.${hist.length?" Last scores: "+hist.map(x=>x+"/10").join(" · "):""}</p>
+ ${aiOpen&&aiOpen.mid===m.id?`<div class="q"><b>${esc(aiOpen.question)}</b></div><textarea id="aoA" class="mt" placeholder="Your answer...">${esc(aiOpen.answer||"")}</textarea><div class="mt"><button class="btn" id="aoG">Grade my answer</button> <button class="btn ghost" id="aoN">Another question</button></div><div id="aoR" class="mt">${aiOpen.res||""}</div>`:`<button class="btn" id="aoN">Give me a question</button>`}`;
+ $("#aoN").onclick=e=>busy(e.target,async()=>{const d=S.ai.diff[m.id]||2;const j=await askJSON(`You are a demanding but kind professor. ${LEARNER}\n${mctx(m)}`,`Ask ONE open question (difficulty ${d}/5) that checks real understanding of this module: an explanation, a design decision, a trade-off or a debugging scenario. Weak spots to target if relevant: ${(S.ai.weak[m.id]||[]).slice(-5).join(", ")||"none"}. JSON: {"question":"...","rubric":["4 to 6 key points a senior answer must contain"]}`,{model:aiModels().fast,max:800});aiOpen={mid:m.id,question:j.question,rubric:j.rubric||[]};aiOpenPane(m,el);});
+ const g=$("#aoG");if(g)g.onclick=e=>busy(e.target,async()=>{const a=$("#aoA").value.trim();if(a.length<20){toast("Write a real answer first");return;}aiOpen.answer=a;
+  const j=await askJSON(`You grade answers like a senior AI engineering interviewer and teacher. ${LEARNER}\n${mctx(m)}`,`Question: ${aiOpen.question}\nRubric: ${aiOpen.rubric.join("; ")}\nLearner answer: """${a}"""\nGrade strictly but fairly. JSON: {"score":0-10,"verdict":"one sentence","strengths":["..."],"missing":["key points missing or vague"],"misconceptions":["anything wrong"],"model_answer":"a concise senior-level answer (max 150 words)","followup":"one follow-up question that probes the weakest point","weak_concept":"short name of the weakest concept or empty"}`,{max:1500});
+  aiOpen.res=`<div class="card" style="background:#f8fafc"><h3>${j.score}/10 <span class="small muted">${esc(j.verdict||"")}</span></h3>${["strengths","missing","misconceptions"].map(k=>(j[k]||[]).length?`<h4>${k==="strengths"?"✅ Strengths":k==="missing"?"🧩 Missing":"⚠️ Misconceptions"}</h4><ul>${j[k].map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:"").join("")}<h4>📘 Model answer</h4><p class="small">${esc(j.model_answer||"")}</p><h4>➡️ Follow-up</h4><p><b>${esc(j.followup||"")}</b></p></div>`;
+  (S.ai.open[m.id]=S.ai.open[m.id]||[]).push(+j.score||0);if(j.weak_concept&&j.score<7)(S.ai.weak[m.id]=S.ai.weak[m.id]||[]).push(j.weak_concept);
+  if(j.followup)aiOpen={mid:m.id,question:j.followup,rubric:j.missing||[],res:aiOpen.res,answer:""};aiXP(Math.round((+j.score||0)*3),"✍️");aiOpenPane(m,el);});}
+
+function aiChatPane(m,el){const msgs=S.ai.chat[m.id]=S.ai.chat[m.id]||[];
+ el.innerHTML=`<p class="small muted">A Socratic tutor that knows this module: it guides you with questions and hints instead of lecturing. Ask anything, or click "Check my understanding" before marking the module complete.</p>
+ <div class="chat" id="chBox">${msgs.map(x=>`<div class="bub ${x.role}">${x.role==="user"?esc(x.content):mdLite(x.content)}</div>`).join("")||`<div class="small muted">No messages yet.</div>`}</div>
+ <textarea id="chIn" class="mt" style="min-height:70px" placeholder="Ask a question, or explain something and ask the tutor to challenge you..."></textarea>
+ <div class="mt" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="chSend">Send</button><button class="btn ghost" id="chCheck">✅ Check my understanding</button><button class="btn ghost" id="chClr">Clear</button></div>`;
+ const bx=$("#chBox");bx.scrollTop=bx.scrollHeight;
+ const send=async(text,btn)=>busy(btn,async()=>{msgs.push({role:"user",content:text});const r=await callClaude(`You are a Socratic tutor for this module. ${LEARNER}\n${mctx(m)}\nRules: keep replies short (under 180 words) and conversational. Prefer guiding questions and hints over full answers; give the full answer only after he has tried or explicitly asks. Correct misconceptions clearly. Use concrete Java/Spring and production examples. If he writes in English, add at the very end one line "English tip:" with one correction or better phrasing when useful. When asked to check understanding: ask 3 questions one at a time, wait for each answer, then give a verdict "Ready" or "Not yet" with the gaps to review.`,msgs.slice(-24).map(x=>({role:x.role,content:x.content})),{max:900});
+  msgs.push({role:"assistant",content:r});S.ai.chat[m.id]=msgs.slice(-40);save();aiChatPane(m,el);});
+ $("#chSend").onclick=e=>{const t=$("#chIn").value.trim();if(t)send(t,e.target);};
+ $("#chCheck").onclick=e=>send("Check my understanding of this module: ask me 3 questions, one at a time.",e.target);
+ $("#chClr").onclick=()=>{S.ai.chat[m.id]=[];save();aiChatPane(m,el);};}
+
+function aiCardsPane(m,el){const n=(S.notes[m.id]||"").trim();const mine=Object.values(S.cards).filter(c=>c.mid===m.id).length;
+ el.innerHTML=`<p class="small muted">Turns your notes for this module (and your weak spots) into review cards that join your spaced-repetition deck. ${mine} AI card${mine>1?"s":""} for this module so far.</p><button class="btn" id="cgN" ${n.length<30?"disabled":""}>Cards from my notes</button> <button class="btn ghost" id="cgW">Cards from my weak spots</button>${n.length<30?`<p class="small muted mt">Write some notes in "My notes" below first.</p>`:""}<div id="cgR" class="mt"></div>`;
+ const gen=(src,btn)=>busy(btn,async()=>{const j=await askJSON(`You create spaced-repetition cards. ${LEARNER}\n${mctx(m)}`,`Create 6 multiple-choice review cards from this material, testing understanding not wording. Material: """${src}""". JSON: {"cards":[{"q":"...","o":["...","...","...","..."],"a":0,"w":"short explanation"}]}`,{model:aiModels().fast,max:2000});
+  const cs=(j.cards||[]).filter(c=>c.o&&c.o.length===4);cs.forEach((c,i)=>{const k="c:"+Date.now()+i;S.cards[k]=Object.assign({mid:m.id},c);S.rev[k]={b:1,d:today()};});
+  save();renderSide();$("#cgR").innerHTML=`<p>✅ ${cs.length} cards added to your <a href="#/review">Review deck</a>.</p>`;aiXP(cs.length*2,"🃏");});
+ $("#cgN").onclick=e=>gen(n.slice(0,6000),e.target);
+ $("#cgW").onclick=e=>{const w=(S.ai.weak[m.id]||[]).slice(-10);gen(w.length?"Weak concepts: "+w.join(", "):"The key takeaways and objectives of the module",e.target);};}
+
+// ---- interview simulator ----
+let ivSim=null,rec=null;
+function aiInterview(el){if(!el)return;if(!aiKey()){el.innerHTML=`<div class="card mt"><h3>🤖 AI mock interview</h3>${noKey()}</div>`;return;}
+ const I=INTERVIEW,log=(S.ai.ivlog||[]).slice(-5);
+ let h=`<div class="card mt"><h3>🤖 AI mock interview</h3>`;
+ if(!ivSim){h+=`<p class="small muted">A live interviewer in English: it lets you drive, probes vague answers, then scores you (hire / no hire), lists your 3 biggest gaps and corrects your English. Use the mic to answer out loud.${log.length?" Recent: "+log.map(x=>esc(x.t.slice(0,30))+"… "+x.score+"/10").join(" · "):""}</p>
+  <select id="ivP" style="padding:8px;border-radius:10px;border:1px solid var(--line);max-width:100%"><option value="r">🎲 Random design problem</option>${I.design.map((d,i)=>`<option value="d${i}">${esc(d.t)}</option>`).join("")}<option value="b">🗣️ Behavioural round (6 questions)</option></select> <button class="btn" id="ivGo">Start interview</button></div>`;
+  el.innerHTML=h;$("#ivGo").onclick=e=>{const v=$("#ivP").value;let p;if(v==="b")p={t:"Behavioural round",look:["STAR structure","measurable results","ownership","judgement on AI adoption","clear English"],beh:true};else{const i=v==="r"?Math.floor(Math.random()*I.design.length):+v.slice(1);p=I.design[i];}
+   ivSim={p,msgs:[]};ivTurn("Start the interview now.",e.target);};return;}
+ h+=`<p class="small"><b>${esc(ivSim.p.t)}</b></p><div class="chat" id="ivBox">${ivSim.msgs.filter((x,i)=>i>0).map(x=>`<div class="bub ${x.role}">${x.role==="user"?esc(x.content):mdLite(x.content)}</div>`).join("")}</div>
+ <textarea id="ivIn" class="mt" style="min-height:80px" placeholder="Your answer (in English)..."></textarea>
+ <div class="mt" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="ivSend">Send</button><button class="btn ghost" id="ivMic">🎙️ Speak</button><label class="small" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="ivTts" ${S.ai.tts?"checked":""}> 🔊 Read questions aloud</label><button class="btn ok" id="ivEnd">End and score me</button><button class="btn ghost" id="ivQuit">Quit</button></div><div id="ivRes" class="mt"></div></div>`;
+ el.innerHTML=h;const bx=$("#ivBox");bx.scrollTop=bx.scrollHeight;
+ $("#ivTts").onchange=e=>{S.ai.tts=e.target.checked;save();};
+ $("#ivSend").onclick=e=>{const t=$("#ivIn").value.trim();if(t)ivTurn(t,e.target);};
+ $("#ivQuit").onclick=()=>{ivSim=null;aiInterview(el);};
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;const mic=$("#ivMic");
+ if(!SR)mic.style.display="none";else mic.onclick=()=>{if(rec){rec.stop();return;}rec=new SR();rec.lang="en-US";rec.continuous=true;rec.interimResults=false;mic.textContent="⏹️ Stop";
+  rec.onresult=ev=>{for(let i=ev.resultIndex;i<ev.results.length;i++)if(ev.results[i].isFinal)$("#ivIn").value+=(($("#ivIn").value?" ":"")+ev.results[i][0].transcript);};rec.onend=()=>{rec=null;mic.textContent="🎙️ Speak";};rec.start();};
+ $("#ivEnd").onclick=e=>busy(e.target,async()=>{const tr=ivSim.msgs.slice(1).map(x=>(x.role==="user"?"CANDIDATE: ":"INTERVIEWER: ")+x.content).join("\n");
+  const j=await askJSON(`You are a hiring panel for a senior AI engineer role at a European scale-up. ${LEARNER}`,`Problem: ${ivSim.p.t}\nWhat a strong answer covers: ${ivSim.p.look.join("; ")}\nTranscript:\n${tr}\nScore the candidate. JSON: {"decision":"Strong hire|Hire|Lean no hire|No hire","score":0-10,"strengths":["..."],"gaps":["the 3 biggest gaps, each with how to fix it"],"english":["up to 5 English corrections: original -> better"],"next_step":"one concrete thing to practise next"}`,{max:1800});
+  (S.ai.ivlog=S.ai.ivlog||[]).push({t:ivSim.p.t,score:+j.score||0,d:today()});aiXP(20+Math.round((+j.score||0)*3),"🎤");
+  $("#ivRes").innerHTML=`<div class="card" style="background:#f8fafc"><h3>${esc(j.decision||"")} · ${j.score}/10</h3><h4>✅ Strengths</h4><ul>${(j.strengths||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ul><h4>🧩 Gaps to fix</h4><ul>${(j.gaps||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ul><h4>🇬🇧 English</h4><ul>${(j.english||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ul><h4>➡️ Next</h4><p>${esc(j.next_step||"")}</p></div>`;});}
+function ivTurn(text,btn){busy(btn,async()=>{ivSim.msgs.push({role:"user",content:text});const p=ivSim.p;
+ const sys=`You are a senior interviewer at a European AI scale-up, running a ${p.beh?"behavioural interview (ask these one at a time, adapt follow-ups: "+INTERVIEW.behavioural.join(" | ")+")":"45-minute AI system design interview on: "+p.t}. ${LEARNER}\nPrivate checklist of what a strong answer covers (never reveal it): ${p.look.join("; ")}.\nRules: speak English only; one question or remark at a time, under 90 words; let the candidate drive; ask for numbers, trade-offs and failure modes; challenge vague statements; do not teach or give answers during the interview. On "Start the interview now." greet briefly and state the problem${p.beh?"":" with 2 or 3 constraints (scale, users, budget)"}.`;
+ const r=await callClaude(sys,ivSim.msgs.map(x=>({role:x.role,content:x.content})),{max:500});ivSim.msgs.push({role:"assistant",content:r});
+ if(S.ai.tts&&window.speechSynthesis){const u=new SpeechSynthesisUtterance(r.replace(/[*`#]/g,""));u.lang="en-US";speechSynthesis.cancel();speechSynthesis.speak(u);}
+ aiInterview(document.getElementById("ivAI"));});}
+
+// ---- AI coach page: weekly plan + work review ----
+function progressSummary(){const cw=currentWeek();const ms=M.map(m=>`${m.id} ${m.title.slice(0,40)}: ${modPct(m)}%${S.mod[m.id]?" done":""}${S.quiz[m.id]?" quiz "+S.quiz[m.id].best+"%":""}${S.ai&&S.ai.diff&&S.ai.diff[m.id]?" AI level "+S.ai.diff[m.id]:""}`).join("\n");
+ const weak=Object.entries((S.ai&&S.ai.weak)||{}).map(([k,v])=>k+": "+v.slice(-4).join(", ")).join("\n");
+ const pj=PROJECTS.map(p=>`${p.name}: ${p.steps.filter((s,i)=>S.proj[p.id+":"+i]).length}/${p.steps.length} steps`).join("\n");
+ return `Today: ${today()}. Track start: ${S.start||"not set"}. Current week: ${cw||"unknown"} of 48. XP ${xpOf()}, weekly streak ${streak()}.\nReview cards due: ${dueCards().length}.\nModules:\n${ms}\nWeak concepts:\n${weak||"none yet"}\nProjects:\n${pj}\nCertifications logged: ${Object.keys(S.cert||{}).filter(k=>S.cert[k]).join(", ")||"none"}\nProofs logged: ${(S.proofs||[]).length}\nInterview mocks: ${((S.ai&&S.ai.ivlog)||[]).map(x=>x.score).join(", ")||"none"}`;}
+function coach(){aiS();let h=`<div class="hero"><h1>🤖 AI coach</h1><p>Your weekly plan adapted to your real progress, and senior-level reviews of what you build. The tutor, adaptive quizzes and "explain it back" live in each module; the mock interviewer is in Interview prep.</p></div>`;
+ if(!aiKey()){$("#main").innerHTML=h+`<div class="card mt">${noKey()}</div>`;return;}
+ h+=`<div class="card mt"><h3>📅 Plan my week</h3><p class="small muted">Reads your progress (modules, quizzes, weak spots, review deck, projects, streak) and builds a 15-hour plan for the next 7 days.${S.ai.planDate?" Last plan: "+S.ai.planDate:""}</p>
+ <input id="cwN" placeholder="Constraints this week (optional): e.g. only 8 h, ski Saturday, interview on Thursday" style="width:100%;padding:8px;border-radius:10px;border:1px solid var(--line)"><button class="btn mt" id="cwGo">Build my plan</button><div id="cwR" class="mt">${S.ai.plan?mdLite(S.ai.plan):""}</div></div>
+ <div class="card mt"><h3>🔍 Review my work</h3><p class="small muted">Paste code, a README, an ADR, eval results or a CV line. You get a senior review against the project's criteria: score, must-fix, nice-to-have, and how to talk about it in an interview.</p>
+ <select id="rvP" style="padding:8px;border-radius:10px;border:1px solid var(--line)"><option value="">General</option>${PROJECTS.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("")}${M.map(m=>`<option value="${m.id}">Module ${m.id.slice(1)}: ${esc(m.title.slice(0,50))}</option>`).join("")}</select>
+ <textarea id="rvIn" class="mt" style="min-height:180px" placeholder="Paste here (max ~30,000 characters)..."></textarea><button class="btn mt" id="rvGo">Review it</button><div id="rvR" class="mt">${S.ai.rev?mdLite(S.ai.rev):""}</div></div>`;
+ $("#main").innerHTML=h;
+ $("#cwGo").onclick=e=>busy(e.target,async()=>{const r=await callClaude(`You are an expert learning coach and senior AI engineer mentor. ${LEARNER}\nThe track: 22 modules, ~15 h/week over 48 weeks, capstone projects, certifications (AWS AIP-C01 target month 10), English practice, spaced repetition.`,[{role:"user",content:`My progress:\n${progressSummary()}\nConstraints: ${$("#cwN").value||"none"}\nBuild my plan for the next 7 days: day-by-day blocks with hours (total about 15 h unless constrained), what to study, which exercises and project steps, review sessions (due cards), one "explain it back" target, English practice. Be specific to my weak spots and where I am behind. End with 3 bullet "focus of the week" and one warning if I am drifting. Use short markdown.`}],{max:1800});
+  S.ai.plan=r;S.ai.planDate=today();save();$("#cwR").innerHTML=mdLite(r);aiXP(10,"📅");});
+ $("#rvGo").onclick=e=>busy(e.target,async()=>{const t=$("#rvIn").value.trim();if(t.length<40){toast("Paste something to review");return;}const k=$("#rvP").value;const p=PROJECTS.find(x=>x.id===k),m=M.find(x=>x.id===k);
+  const ctx=p?`Project: ${p.name}\n${p.desc}\nSenior criteria: ${(p.senior||[]).join("; ")}`:m?mctx(m):"General AI engineering work.";
+  const r=await callClaude(`You are a principal engineer reviewing work from a senior candidate for AI engineer roles. ${LEARNER}\n${ctx}`,[{role:"user",content:`Review this:\n"""${t.slice(0,30000)}"""\nGive: a score /10 with one-line verdict; "Must fix" (max 5, concrete, with file/line or section when possible); "Nice to have" (max 4); "Senior signals present"; "Missing senior signals" (evals, deterministic logic, security, observability, cost, ADRs, usage metrics as relevant); "How to present it in an interview" (3 bullets, with numbers to collect). Short markdown.`}],{max:2200});
+  S.ai.rev=r;save();$("#rvR").innerHTML=mdLite(r);aiXP(15,"🔍");});}
+
+// ---- settings card ----
+function aiSettingsHTML(){const k=aiKey(),md=aiModels();const opt=(v,c)=>["claude-haiku-5-5","claude-sonnet-5-5","claude-opus-5-5","claude-fable-5-2"].map(x=>`<option ${x===c?"selected":""}>${x}</option>`).join("");
+ return `<div class="card mt"><h3>🤖 AI tutor (Anthropic API)</h3><p class="small">Your key is stored <b>only in this browser</b> (never in the site's code, never in the progress backup) and is sent only to api.anthropic.com. Set a monthly spending limit in the Anthropic Console. Each person using this site uses their own key.</p>
+ <input id="akIn" type="password" placeholder="${k?"Key saved (•••• "+esc(k.slice(-4))+")":"sk-ant-..."}" style="width:100%;padding:8px;border-radius:10px;border:1px solid var(--line)">
+ <div class="grid g2 mt"><label class="small">Fast model (quizzes, cards)<br><select id="amF" style="padding:6px;border-radius:8px">${opt(0,md.fast)}</select></label><label class="small">Smart model (tutor, grading, interviews, coach)<br><select id="amS" style="padding:6px;border-radius:8px">${opt(0,md.smart)}</select></label></div>
+ <div class="mt"><button class="btn" id="akSave">Save</button> <button class="btn ghost" id="akTest">Test</button> <button class="btn ghost" id="akDel">Remove key</button> <span id="akMsg" class="small"></span></div></div>`;}
+function aiSettingsBind(){$("#akSave").onclick=()=>{const v=$("#akIn").value.trim();try{if(v)localStorage.setItem(AIK,v);localStorage.setItem(AIM,JSON.stringify({fast:$("#amF").value,smart:$("#amS").value}));}catch(e){}toast("🤖 AI settings saved");settings();};
+ $("#akDel").onclick=()=>{try{localStorage.removeItem(AIK);}catch(e){}toast("Key removed");settings();};
+ $("#akTest").onclick=e=>busy(e.target,async()=>{const r=await callClaude("Reply with exactly: OK",[{role:"user",content:"ping"}],{model:aiModels().fast,max:10});$("#akMsg").textContent="✅ Connected ("+r.trim().slice(0,20)+")";});}
 // ===== APP =====
 const KEY="aiTrack.public.v1";
 let S=load();
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s)return Object.assign(blank(),s);}catch(e){}return blank();}
-function blank(){return{ex:{},quiz:{},mod:{},speak:{},proj:{},cert:{},proofs:[],iv:{},rev:{},notes:{},start:"",activity:[],badges:{}};}
+function blank(){return{ex:{},quiz:{},mod:{},speak:{},proj:{},cert:{},proofs:[],iv:{},rev:{},ai:{},cards:{},notes:{},start:"",activity:[],badges:{}};}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 const $=s=>document.querySelector(s);
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -1771,6 +1912,7 @@ function xpOf(){let x=0;
  PROJECTS.forEach(p=>{let all=true;p.steps.forEach((s,i)=>{if(S.proj[p.id+":"+i])x+=40;else all=false;});if(all)x+=150;});
  Object.keys(S.cert||{}).forEach(k=>{if(S.cert[k])x+=k==="aws"||k==="cca"?400:(k[0]==="c"?120:30);});
  x+=(S.proofs||[]).length*20;
+ x+=(S.ai&&S.ai.xp)||0;
  return x;}
 function level(x){let i=0;LEVELS.forEach((l,k)=>{if(x>=l[0])i=k;});const cur=LEVELS[i],nxt=LEVELS[i+1];
  return{i,name:cur[1],min:cur[0],next:nxt?nxt[0]:null,nextName:nxt?nxt[1]:null,pct:nxt?Math.round((x-cur[0])/(nxt[0]-cur[0])*100):100};}
@@ -1810,7 +1952,7 @@ function renderSide(){const x=xpOf(),l=level(x),r=location.hash||"#/";
  <div class="me"><div class="lv">Lv ${l.i+1} · ${esc(l.name)}</div><small>${x} XP${l.next?" · "+(l.next-x)+" to "+esc(l.nextName):" · max level"}</small>
  <div class="xpbar"><i style="width:${l.pct}%"></i></div><small>🔥 ${streak()} week streak · ${totalPct()}% done</small><br><button class="menu-btn" onclick="document.getElementById('side').classList.toggle('open')">☰ Menu</button></div><nav>`;
  const L=(href,ic,t)=>`<a href="${href}" class="${r===href?"on":""}">${ic} ${t}</a>`;
- h+=L("#/","🏠","Dashboard")+L("#/roadmap","🗺️","Roadmap")+L("#/projects","📦","Capstone projects")+L("#/review","🔁","Review"+(dueCards().length?" ("+dueCards().length+")":""))+L("#/certs","🎓","Certifications")+L("#/proof","🧾","Proof ledger")+L("#/market","🌍","Market intel")+L("#/interview","🎤","Interview prep (optional)")+L("#/career","💼","Career kit")+L("#/english","🇬🇧","English track")+L("#/badges","🏅","Badges")+L("#/settings","⚙️","Settings & backup");
+ h+=L("#/","🏠","Dashboard")+L("#/roadmap","🗺️","Roadmap")+L("#/projects","📦","Capstone projects")+L("#/coach","🤖","AI coach")+L("#/review","🔁","Review"+(dueCards().length?" ("+dueCards().length+")":""))+L("#/certs","🎓","Certifications")+L("#/proof","🧾","Proof ledger")+L("#/market","🌍","Market intel")+L("#/interview","🎤","Interview prep (optional)")+L("#/career","💼","Career kit")+L("#/english","🇬🇧","English track")+L("#/badges","🏅","Badges")+L("#/settings","⚙️","Settings & backup");
  PHASES.forEach(p=>{h+=`<div class="sec">${p.icon} Phase ${p.n} · ${esc(p.name)}</div>`;
   M.filter(m=>m.phase===p.n).forEach(m=>{const pc=modPct(m);h+=`<a class="mod ${r==="#/m/"+m.id?"on":""}" href="#/m/${m.id}">${m.id.slice(1)} · ${esc(m.title)}<span class="ck">${S.mod[m.id]?"✅":pc?pc+"%":""}</span></a>`;});});
  $("#side").innerHTML=h+"</nav>";}
@@ -1852,6 +1994,7 @@ function moduleView(id){const m=M.find(x=>x.id===id);if(!m){location.hash="#/";r
  <div class="card mt"><h3>🧪 Quiz ${q?`<span class="pill ${q.best>=80?"g":"y"}">best ${q.best}%</span>`:""} <span class="pill p">pass ≥ 80% · +XP</span></h3><div id="quiz">
  ${m.quiz.map((it,i)=>`<div class="q" data-q="${i}"><b>${i+1}. ${esc(it.q)}</b>${it.o.map((o,j)=>`<label class="opt"><input type="radio" name="q${i}" value="${j}"> ${esc(o)}</label>`).join("")}<div class="why">💬 ${esc(it.w)}</div></div>`).join("")}</div>
  <div class="mt"><button class="btn" id="qsub">Check my answers</button> <button class="btn ghost" id="qres">Reset</button> <span id="qscore" class="mt" style="font-weight:700;margin-left:10px"></span></div></div>
+ <div id="aiBox"></div>
  <div class="grid g2 mt"><div class="card res"><h3>🎬 Resources</h3>${m.resources.map(r=>`<a href="${r.u}" target="_blank" rel="noopener"><span class="ico ${r.k}">${r.k==="video"?"▶":r.k==="course"?"🎓":"📘"}</span><span>${esc(r.t)}</span></a>`).join("")}</div>
  <div class="card"><h3>🧭 Coach's corner</h3>${m.coach.map(c=>`<div class="tip">💬<div>${esc(c)}</div></div>`).join("")}</div></div>
  <div class="card mt"><h3>🇬🇧 English corner</h3><p class="small muted">Click a card to flip it.</p><div class="cards">${m.english.vocab.map(v=>`<div class="flip" onclick="this.classList.toggle('on')"><div class="in"><div class="f">${esc(v[0])}</div><div class="b">${esc(v[1])}</div></div></div>`).join("")}</div>
@@ -1871,7 +2014,7 @@ function moduleView(id){const m=M.find(x=>x.id===id);if(!m){location.hash="#/";r
    if(sel){ans++;if(+sel.value===it.a)ok++;}});
   const sc=Math.round(ok/m.quiz.length*100);$("#qscore").textContent=`${ok}/${m.quiz.length} · ${sc}% ${sc>=80?"🎉 passed":"· retry after reviewing"}`;
   if(ans===m.quiz.length){m.quiz.forEach((it,i)=>{const sel=document.querySelector(`input[name=q${i}]:checked`);const k=m.id+":"+i;if(+sel.value!==it.a)S.rev[k]={b:1,d:today()};else if(!S.rev[k])S.rev[k]={b:2,d:addDays(3)};});change(()=>{const old=S.quiz[m.id]||{best:0,tries:0};S.quiz[m.id]={best:Math.max(old.best,sc),tries:old.tries+1,last:sc};},sc===100?"🎯 Perfect score!":sc>=80?"🧪 Quiz passed":"");if(sc===100)burst();}};
- $("#qres").onclick=()=>moduleView(id);}
+ $("#qres").onclick=()=>moduleView(id);aiModule(m);}
 
 function projects(){let h=`<div class="hero"><h1>📦 Capstone projects</h1><p>Projects you will actually use: your property portfolio, your money, your mountain days. Real usage is your strongest proof. Each step = +40 XP, each finished project = +150 XP.</p></div>
  <div class="card mt"><h3>🧠 What makes it senior (and not "generated by Claude Code in a weekend")</h3><ul><li><b>Measured:</b> an eval set and numbers in the README (accuracy, recall, cost, latency).</li><li><b>Deterministic where it matters:</b> money, dates and rules in tested code; the model explains, it does not compute.</li><li><b>Secure by design:</b> threat model, injection tests, approvals enforced in code.</li><li><b>Decided:</b> ADRs explaining trade-offs (model, stack, local vs cloud).</li><li><b>Used:</b> real usage stats over months. Claude Code writes code fast; you own the design, the evals and the judgement.</li></ul></div>`;
@@ -1909,7 +2052,7 @@ function proof(){const P=S.proofs;const kinds=["Certificate","Metric","Repo","Ar
 // ---- spaced repetition (Leitner) ----
 const BOX=[0,1,3,7,14,30];
 function addDays(n){const d=new Date();d.setDate(d.getDate()+n);return d.toISOString().slice(0,10);}
-function cardOf(k){const [mid,qi]=k.split(":");const m=M.find(x=>x.id===mid);return m&&m.quiz[+qi]?{k,m,q:m.quiz[+qi]}:null;}
+function cardOf(k){if(k.startsWith("c:")){const c=(S.cards||{})[k];const m=c&&M.find(x=>x.id===c.mid);return c&&m?{k,m,q:c}:null;}const [mid,qi]=k.split(":");const m=M.find(x=>x.id===mid);return m&&m.quiz[+qi]?{k,m,q:m.quiz[+qi]}:null;}
 function dueCards(){const t=today();return Object.keys(S.rev||{}).filter(k=>S.rev[k].d<=t).map(cardOf).filter(Boolean);}
 let revQ=[],revI=0,revOk=0;
 function review(start){if(start||!revQ.length){revQ=dueCards().sort(()=>Math.random()-.5).slice(0,15);revI=0;revOk=0;}
@@ -1934,7 +2077,8 @@ function interview(){const I=INTERVIEW;const ck=(id)=>!!S.iv[id];
  <div class="grid g2 mt"><div class="card"><h3>🗣️ Behavioural (STAR, with a number)</h3><ol>${I.behavioural.map(b=>`<li>${esc(b)}</li>`).join("")}</ol><p class="small muted">Prepare each answer from your Proof ledger: situation, task, action, result with a metric.</p></div>
  <div class="card"><h3>⏱️ ${esc(I.takehome.t)}</h3><p class="small">${esc(I.takehome.d)}</p><h4>How it is graded</h4><ul class="small">${I.takehome.rubric.map(r=>`<li>${esc(r)}</li>`).join("")}</ul><label class="ex ${ck("th")?"done":""}"><input type="checkbox" data-iv="th" ${ck("th")?"checked":""}><div class="et">Take-home done in 4 hours</div></label></div></div>
  <div class="card mt"><h3>🤖 Mock interview with Claude</h3><p class="small muted">Paste this into Claude (voice mode works well), then log the feedback in your notes.</p><pre class="copy" id="mock">${esc(I.mock)}</pre><label class="ex ${ck("mk")?"done":""}"><input type="checkbox" data-iv="mk" ${ck("mk")?"checked":""}><div class="et">At least 3 mock interviews done</div></label></div>`;
- $("#main").innerHTML=h;
+ h+=`<div id="ivAI"></div>`;
+ $("#main").innerHTML=h;aiInterview(document.getElementById("ivAI"));
  const m=$("#mock");m.onclick=()=>{try{navigator.clipboard.writeText(I.mock);toast("📋 Copied");}catch(e){}};
  document.querySelectorAll("[data-iv]").forEach(c=>c.onchange=()=>{change(()=>{S.iv[c.dataset.iv]=c.checked;},c.checked?"🎤 Logged":"");interview();});}
 
@@ -1980,13 +2124,15 @@ function badges(){let h=`<div class="hero"><h1>🏅 Badges & levels</h1><p>Unloc
 
 function settings(){$("#main").innerHTML=`<div class="hero"><h1>⚙️ Settings & backup</h1><p>Your progress is stored in this browser. Export a backup regularly (for example monthly) and import it if the data is ever lost.</p></div>
  <div class="card mt"><h3>💾 Backup</h3><button class="btn" id="exp">Export progress (JSON)</button> <button class="btn ghost" id="imp">Import progress</button><textarea id="io" class="mt" placeholder="Exported JSON appears here, or paste a backup here and click Import."></textarea></div>
+ ${aiSettingsHTML()}
  <div class="card mt"><h3>🧹 Reset</h3><button class="btn ghost" id="rst">Reset all progress</button></div>`;
  $("#exp").onclick=()=>{$("#io").value=JSON.stringify(S);try{navigator.clipboard.writeText(JSON.stringify(S));toast("📋 Backup copied to clipboard");}catch(e){}};
  $("#imp").onclick=()=>{try{S=Object.assign(blank(),JSON.parse($("#io").value));save();renderSide();toast("✅ Progress imported");}catch(e){toast("❌ Invalid JSON");}};
+ aiSettingsBind();
  $("#rst").onclick=()=>{if(confirm("Reset all progress?")){S=blank();save();renderSide();toast("Progress reset");}};}
 
 function route(){const r=location.hash||"#/";const sd=document.getElementById("side");if(sd)sd.classList.remove("open");renderSide();
- if(r.startsWith("#/m/"))moduleView(r.slice(4));else if(r==="#/roadmap")roadmap();else if(r==="#/projects")projects();else if(r==="#/career")career();else if(r==="#/market")market();else if(r==="#/certs")certs();else if(r==="#/review")review(true);else if(r==="#/interview")interview();else if(r==="#/proof")proof();
+ if(r.startsWith("#/m/"))moduleView(r.slice(4));else if(r==="#/roadmap")roadmap();else if(r==="#/projects")projects();else if(r==="#/career")career();else if(r==="#/market")market();else if(r==="#/certs")certs();else if(r==="#/review")review(true);else if(r==="#/interview")interview();else if(r==="#/coach")coach();else if(r==="#/proof")proof();
  else if(r==="#/english")english();else if(r==="#/badges")badges();else if(r==="#/settings")settings();else dashboard();}
 window.addEventListener("hashchange",route);route();
 </script></body></html>
