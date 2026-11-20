@@ -148,15 +148,15 @@ const PROJECTS = [
 
 const CERTS = {
  free:[
-  {id:"c1", phase:1, name:"Claude Academy certificates: Claude 101, Claude Code, Building with the Claude API, MCP, Agent Skills", why:"Free, official Anthropic courses; prepares the Claude Certified Architect domains.", url:"https://academy.claude.com"},
-  {id:"c2", phase:2, name:"Hugging Face Agents Course certificate", why:"Free, project-based, recognised in the AI community; also trains your Python.", url:"https://huggingface.co/learn/agents-course"},
-  {id:"c3", phase:2, name:"Microsoft Applied Skills (generative AI / agents lab assessment)", why:"Free, lab-based, verifiable credential on Microsoft Learn; good stepping stone if you later take AI-103.", url:"https://learn.microsoft.com/credentials/applied-skills/"},
-  {id:"c4", phase:3, name:"AWS Skill Builder free GenAI courses and badges", why:"Free AWS learning plans; first step of the AIP-C01 preparation.", url:"https://skillbuilder.aws"},
-  {id:"c5", phase:3, name:"Google Skills generative AI badges (optional)", why:"Free, quick; nice-to-have only.", url:"https://www.skills.google"}
+  {id:"c1", phase:1, name:"Claude Academy completion badges: Claude Code in Action, Building with the Claude API, Tool Use, Intro to MCP, MCP Advanced Topics, Intro to Evals, Claude with Amazon Bedrock", why:"Free, official Anthropic courses with completion badges; cover most Claude Certified Architect domains and feed the AWS track (Bedrock).", url:"https://academy.claude.com/courses"},
+  {id:"c2", phase:2, name:"Hugging Face Agents Course certificate (+ MCP Course certificate)", why:"Free. Agents Course completion = Unit 1 + one use-case assignment + a GAIA-based final agent scoring above 30%. The MCP Course (built with Anthropic) adds a second certificate. Trains your Python.", url:"https://huggingface.co/learn/agents-course/unit0/introduction"},
+  {id:"c3", phase:2, name:"Microsoft Applied Skills: Get started developing agents in Microsoft Foundry", why:"Free lab-based assessment (deploy a model, build and test an agent), verifiable on Microsoft Learn; stepping stone to AI-103.", url:"https://learn.microsoft.com/en-us/credentials/applied-skills/get-started-developing-agents-in-microsoft-foundry/"},
+  {id:"c4", phase:3, name:"AWS Skill Builder: AIP-C01 Exam Prep Plan + free micro-credentials (AWS Agentic AI Demonstrated)", why:"Official prep path for the main exam; the practice question set is the first free step.", url:"https://skillbuilder.aws/category/exam-prep/generative-ai-developer-professional-AIP-C01"},
+  {id:"c5", phase:3, name:"Oracle OCI AI Foundations Associate (free exam, optional)", why:"Free exam in 2026, quick; low signal, only if you want an extra line. Google GenAI Leader (USD 99) is business-level: skip.", url:"https://blogs.oracle.com/oracleuniversity/oci-certification-learning-paths-and-exams-2026-updates-now-available"}
  ],
  aws:{
   name:"AWS Certified Generative AI Developer – Professional (AIP-C01)",
-  facts:"65 scored questions (+10 unscored), multiple choice and multiple response, pass mark 750/1000, about 3 hours. Paid exam (check current price on AWS). Target: 2+ years building production apps, 1 year hands-on GenAI.",
+  facts:"75 questions (65 scored + 10 unscored), multiple choice and multiple response, pass mark 750/1000, 180 minutes (+30 min on request for non-native English speakers, ask before booking). USD 300 / EUR 256, Pearson VUE online or test centre. No prerequisite; AI Practitioner, Solutions Architect or ML Engineer Associate help. Target: 2+ years building production apps, 1 year hands-on GenAI.",
   domains:[
    ["Foundation model integration, data management and compliance","31%","m03, m06, m13"],
    ["Implementation and integration","26%","m05, m07, m08, m14"],
@@ -166,7 +166,7 @@ const CERTS = {
   ],
   plan:[
    {id:"a1", w:"Months 1-9", t:"Do the track: it already covers every domain conceptually, with Spring AI instead of AWS SDKs."},
-   {id:"a2", w:"Month 8", t:"Run the lease copilot on Bedrock (module 13): Knowledge Bases, Guardrails, Agents, model invocation, IAM."},
+   {id:"a2", w:"Month 8", t:"Run the lease copilot on Bedrock (module 13): Knowledge Bases, Guardrails, Bedrock Agents and AgentCore (runtime, gateway/MCP, memory, observability), model invocation, IAM."},
    {id:"a3", w:"Month 9", t:"AWS Skill Builder: official exam prep plan for AIP-C01 and the free GenAI learning paths."},
    {id:"a4", w:"Month 10 (weeks 1-2)", t:"Read the official exam guide line by line; list every AWS service in scope; fill gaps with 20 h of AWS docs and hands-on."},
    {id:"a5", w:"Month 10 (week 3)", t:"Official practice question set / pretest, then 2 full practice exams. Target ≥ 80% before booking."},
@@ -175,8 +175,8 @@ const CERTS = {
  },
  cca:{
   name:"Claude Certified Architect – Foundations (Anthropic)",
-  facts:"Reported: ~60 questions, 120 minutes, pass 720/1000. Domains reported by candidates: agentic architecture and orchestration (largest, ~27%), Claude Code configuration and workflows (~20%), prompt engineering and structured output (~20%), tool and MCP integration, context management. Key idea often tested: programmatic enforcement over prompt-based enforcement.",
-  access:"Exams are currently reserved to organisations in the Claude Partner Network (work email on a partner company domain). Sources disagree on whether a one-person company can join.",
+  facts:"Official: multiple choice and scenario-based multiple response, 120 minutes, closed book, pass 720/1000, USD 125 (since 30 June 2026), Pearson VUE online or test centre, Credly badge valid 12 months with free renewal, retakes paid. Part of a family of four (Associate, Developer Foundations, Architect Foundations, Architect Professional). Unofficial (third-party guides, to confirm with the official exam guide): about 60 questions; domains agentic architecture and orchestration (largest, ~27%), Claude Code configuration and workflows (~20%), prompt engineering and structured output (~20%), tool and MCP integration, context management. Key idea often tested: programmatic enforcement over prompt-based enforcement.",
+  access:"Reserved to employees of Claude Partner Network organisations; registration requires an email on a recognised company domain (personal emails rejected). Joining the network is free (form on claude.com/partners). The route for a one-person company is not officially documented; some solo consultants report being accepted. Select tier and above: 50% off the exam.",
   steps:[
    {id:"k1", t:"Check the official eligibility on claude.com/partners (Partner Network, services track) for a one-person consultancy."},
    {id:"k2", t:"Create a professional domain and email for your company (e.g. name@yourcompany.com): needed for partner registration and exam checkout."},
@@ -266,10 +266,13 @@ const MARKET = {
   ["Security, guardrails, governance", "frequent in finance", "NeMo Guardrails, content safety, audit, approval workflows.", "m11, m13"]
  ],
  trends:[
-  "Fastest-growing AI job title in 2026: Forward Deployed Engineer (postings up more than tenfold): engineers who sit with customers, scope AI use cases and ship them to production. It rewards exactly your mix: senior engineering + client-facing consulting.",
+  "Forward Deployed Engineer is the breakout AI job title of 2026 (recruiter data shows postings multiplied several times; treat exact multiples with caution): engineers who sit with customers, scope AI use cases and ship them to production. OpenAI, Anthropic, Databricks, Palantir and Mistral (Paris, sovereign institutions) all hire for it. It rewards exactly your mix: senior engineering + client-facing consulting.",
+  "US software-dev postings are up about 15% since early 2025 while total postings fell; 71% of the increase comes from senior roles and 37% from jobs with AI in the title (Indeed Hiring Lab, July 2026). AI engineer is #1 on LinkedIn Jobs on the Rise 2026 (US).",
+  "Coding agents are now mainstream: in the JetBrains 2026 survey, Claude Code use at work went from about 18% to 39% of developers in six months. The differentiator moves from writing code to specifying, reviewing, testing and securing it.",
+  "Hiring managers want proof: 60% say they want to test or see AI skills rather than trust a CV (Resume Genius survey, 2026). Repos with eval suites, deployed systems and metrics beat certificate collections.",
   "The 2026 AI engineer is a product engineer fluent in LLM APIs and evals, not an ML researcher.",
   "Interview loops add an AI system design round (RAG, agents, evals) and often a take-home build.",
-  "Junior hiring is down sharply; senior engineers who orchestrate AI and own quality are in demand.",
+  "Junior hiring is down sharply (UK entry-level software hiring -27%, French junior IT offers down strongly); senior engineers who orchestrate AI and own quality are in demand.",
   "Agents moved from demos to production: tool design, approvals, tracing and cost control are expected.",
   "Multimodal (documents, images, speech) is part of mainstream certifications (Microsoft AI-103)."
  ],
@@ -277,25 +280,66 @@ const MARKET = {
   "Java + AI roles exist in Zurich and Geneva (banks, consultancies): typically 5+ years Java/Spring plus LLM integration, RAG and prompt engineering; Spring AI explicitly listed in some postings.",
   "Tools seen in Swiss postings: LangChain, Langfuse, NeMo Guardrails, Spring AI, Azure AI services; fine-tuning occasionally requested.",
   "Zurich roles often require German + English; Geneva and Lausanne are more often French + English.",
-  "Example published range (Zurich AI engineer, salaried): CHF 110,000 to 140,000 per year.",
+  "Michael Page Salary Report 2027 (Nov 2026): AI Engineer CHF 95k-150k base, ML Engineer 90k-145k, Java/.NET dev 90k-150k, Solution Architect 140k-190k. AI salaries rising while the rest is flat; employers also weigh communication, stakeholder management and local experience.",
+  "Caution: ICT unemployment rose in 2026 and IT graduate unemployment doubled. The premium goes to AI + architecture/lead profiles, not to the title alone.",
   "Freelance option from the French Alps: invoice Swiss clients through your own company, remote with occasional on-site days (check VAT and social security with your accountant)."
  ],
+ france:[
+  "Overall hiring is at a low: only 6% of French companies plan to hire a cadre in Q4 2026, a record low (Apec, 17 Nov 2026). IT services and consulting are down. Expect longer sales cycles for missions.",
+  "Freelance AI demand is the bright spot (Malt Tech Trends 2026): AI is the #2 requested skill, 22% of mission requests need AI, agent skills +60% in a year, SME demand more than doubled.",
+  "Mission mix on Malt: 45% LLM integration and orchestration, 35% RAG, 15% agents, 7% MLOps. That is exactly modules 3 to 8 plus your Java background.",
+  "Azure OpenAI usage +500% among freelancers: French large accounts are Azure-first. Knowing Azure AI Foundry (AI-103 content) is a plus even with an AWS certification.",
+  "AI-regulation skills +380% and fractional CTO / Chief AI Officer +23%: AI Act literacy and advisory work are sellable.",
+  "Day rates: no reliable, methodical source proves an 'AI premium' yet. Observed: Java + AI tech-lead missions around 600-650 €/day in Île-de-France; GenAI specialists quoted higher by some barometers. Sell outcomes (production, evals, compliance), not the AI label.",
+  "Sovereign AI: Mistral partners with the Ministry of the Armed Forces, Sopra Steria and Orange Cyberdefense; public sector and defence clients ask for EU-hosted models. Keep one Mistral/open-weight option in your projects."
+ ],
+ shifts:[
+  ["Protocols","MCP (spec 2026-07-28, stateless) for agent↔tools, A2A v1.0 for agent↔agent, Agent Skills as an open standard adopted by most coding agents; MCP, AGENTS.md and Skills now under the Linux Foundation's Agentic AI Foundation."],
+  ["Coding agents","Claude Code, Codex, Cursor: agents write a large share of code. Value moves to specs, CLAUDE.md/AGENTS.md, hooks, review, tests and security of the agent itself."],
+  ["Context engineering","Compaction, context editing, memory, tool search, programmatic tool calling, prompt caching: managing the context window is now a core skill."],
+  ["Evals and observability","Evals merge with runtime guardrails; OpenTelemetry GenAI conventions (still in development) become the tracing standard; Anthropic's API emits OTel spans."],
+  ["Security","OWASP Top 10 for LLM Applications 2026 (August 2026) and OWASP Top 10 for Agentic Applications; prompt injection still number one."],
+  ["Regulation","EU AI Omnibus in force 27 July 2026: high-risk obligations delayed to Dec 2027 / Aug 2028; transparency duties from Aug 2026."],
+  ["Models","Frontier models with 1M context, adaptive thinking and effort control; sampling parameters disappear from APIs; small and open-weight models for routing, privacy and cost."]
+ ],
+ cv:[
+  "One flagship repo with an eval suite and published numbers beats ten tutorial clones.",
+  "Deployed and used: real users or real personal usage, monitoring, cost per request.",
+  "Failure handling shown: refusals, guardrails, injection tests, human approval.",
+  "Architecture decisions written down (ADRs, design doc), plus one article per project.",
+  "One serious certification (AWS AIP-C01) + Claude Academy badges; not a collection.",
+  "Business framing: hours saved, euros, compliance. Communication and stakeholder management weigh as much as tech in Swiss and French senior roles.",
+  "Noise: tool lists without outcomes, generic AI certificates, vibe-coded demos without tests."
+ ],
  certs:[
-  {name:"AWS Certified Generative AI Developer – Professional (AIP-C01)", fit:"Best match for this track", body:"Domains: FM integration, data management and compliance 31% · Implementation and integration 26% · AI safety, security and governance 20% · Operational efficiency and optimisation 12% · Testing, validation and troubleshooting 11%. 65 scored questions (+10 unscored), pass 750/1000. Target: 2+ years building production apps, 1 year hands-on GenAI. Out of scope: model training.", url:"https://docs.aws.amazon.com/aws-certification/latest/ai-professional-01/ai-professional-01.html"},
-  {name:"Microsoft AI-103 · Azure AI Apps and Agents Developer Associate", fit:"If your target clients are Azure shops", body:"Skills measured (April 2026): Plan and manage an Azure AI solution 25-30% · Implement generative AI and agentic solutions 30-35% · Computer vision 10-15% · Text analysis 10-15% · Information extraction 10-15%. Built on Microsoft Foundry; Python experience expected; pass 700. Replaces AI-102 (retired June 2026). Renew yearly with a free online assessment.", url:"https://learn.microsoft.com/credentials/certifications/resources/study-guides/ai-103"},
-  {name:"Anthropic · Claude Certified Architect – Foundations", fit:"Strong signal, but access restricted", body:"Reported domains: agentic architecture and orchestration (~27%, largest), Claude Code configuration and workflows (~20%), prompt engineering and structured output (~20%), plus tool/MCP integration and context management. About 60 questions, 120 minutes. Currently reserved to Claude Partner Network organisations. Claude Academy courses (free) cover the same ground.", url:"https://academy.claude.com"}
+  {name:"AWS Certified Generative AI Developer – Professional (AIP-C01)", fit:"Best match for this track", body:"Domains: FM integration, data management and compliance 31% · Implementation and integration 26% · AI safety, security and governance 20% · Operational efficiency and optimisation 12% · Testing, validation and troubleshooting 11%. 75 questions (65 scored), 180 minutes, pass 750/1000, USD 300 / EUR 256. Target: 2+ years building production apps, 1 year hands-on GenAI. Out of scope: model training.", url:"https://docs.aws.amazon.com/aws-certification/latest/ai-professional-01/ai-professional-01.html"},
+  {name:"Microsoft AI-103 · Azure AI Apps and Agents Developer Associate", fit:"If your target clients are Azure shops", body:"Skills measured (April 2026): Plan and manage an Azure AI solution 25-30% · Implement generative AI and agentic solutions 30-35% · Computer vision 10-15% · Text analysis 10-15% · Information extraction 10-15%. Built on Microsoft Foundry; Python experience expected; pass 700. 120 minutes, offered in French, free practice assessment. Replaces AI-102 (retired 30 June 2026). Renew yearly with a free online assessment.", url:"https://learn.microsoft.com/credentials/certifications/resources/study-guides/ai-103"},
+  {name:"Anthropic · Claude Certified Architect – Foundations", fit:"Strong signal, but access restricted", body:"Official: 120 minutes, pass 720/1000, USD 125, Pearson VUE, Credly badge valid 12 months. Unofficial domain weights: agentic architecture and orchestration (largest, ~25-27%), Claude Code configuration (~20%), prompt engineering and structured output (~20%), tools/MCP, context management. Reserved to employees of Claude Partner Network organisations (company email domain required). Claude Academy courses (free) cover the same ground.", url:"https://anthropic-partners.skilljar.com/page/faq-certifications"},
+  {name:"Databricks Generative AI Engineer Associate", fit:"Optional, if a client is on Databricks", body:"USD 200, 90 minutes, 45 scored questions, Python. Domains: design 14%, data preparation 14%, application development 30%, assembling and deploying 22%, governance 8%, evaluation and monitoring 12%. Valid 2 years.", url:"https://www.databricks.com/learn/certification/genai-engineer-associate"}
  ],
  mapping:"This track covers every domain of the AWS AIP-C01 exam (via Spring AI instead of only AWS SDKs) and most of AI-103's generative and agentic part. Gaps to fill with official prep if you choose a certification: AWS service names and Bedrock specifics (≈20 h), or Azure Foundry, vision and speech services (≈25 h).",
  sources:[
+  ["Apec: Q4 2026 cadre hiring barometer (17 Nov 2026)","https://www.apec.fr/tendances-emploi-cadre/recrutement-et-pratiques-rh/recrutement-de-cadres-l-attentisme-gagne-de-plus-en-plus-d-entreprises.html"],
+  ["Le Monde Informatique: Malt Tech Trends 2026, agentic skills demand +60% (Apr 2026)","https://www.lemondeinformatique.fr/applications-developpement/2026-04-16-la-demande-en-competence-agentique-bondit-de-60-en-france"],
+  ["Indeed Hiring Lab: AI and job postings, from destruction to creation (Jul 2026)","https://hiringlab.indeed.com/2026/07/08/ai-and-job-postings-from-destruction-to-creation/"],
+  ["Netzwoche: Swiss IT salaries, AI professionals rising (Nov 2026)","https://www.netzwoche.ch/news/2026-11-13/schweizer-it-loehne-steigen-besonders-jene-der-ki-profis"],
+  ["JetBrains: how much code developers let agents write (Aug 2026)","https://blog.jetbrains.com/research/2026/08/how-much-code-do-developers-really-let-agents-write/"],
+  ["Stack Overflow Developer Survey 2026","https://stackoverflow.blog/2026/10/06/the-results-of-the-2026-developer-survey-are-here/"],
+  ["Built In: how to show AI skills on a resume","https://builtin.com/articles/show-ai-skills-resume"],
+  ["UK gov: snapshot of entry-level hiring (2026)","https://www.gov.uk/government/publications/entry-level-hiring-in-the-uk-a-snapshot/a-snapshot-of-entry-level-hiring-in-the-uk"],
+  ["Bitkom: IT labour market 2026 (Germany)","https://www.bitkom.org/sites/main/files/2026-09/bitkom-studienbericht-arbeitsmarkt-it-fachkraefte-2026.pdf"],
+  ["White & Case: EU AI Omnibus enters into force","https://www.whitecase.com/insight-alert/eu-ai-omnibus-enters-force-amending-ai-act"],
+  ["OWASP Top 10 for LLM Applications 2026","https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/"],
+  ["MCP spec 2026-07-28 announcement","https://blog.modelcontextprotocol.io/posts/2026-07-28/"],
+  ["Spring AI 2.0 GA","https://spring.io/blog/2026/06/12/spring-ai-2-0-0-GA-available-now/"],
+  ["Paraform: forward deployed engineer demand","https://www.paraform.com/blog/forward-deployed-engineer-demand-quadrupled"],
   ["Fortune: forward deployed engineers, fast-growing six-figure job (Sept 2026)","https://fortune.com/2026/09/03/forward-deployed-engineers-fast-growing-six-figure-silicon-valley-job-integrate-ai-with-customers-tech-careers-palantir/"],
   ["LinkUp job data: the AI hiring shift","https://www.linkup.com/insights/blog/inside-the-ai-revolution-linkup-job-data-shows-steady-hiring"],
   ["Paraform: what is a forward deployed AI engineer","https://www.paraform.com/blog/forward-deployed-ai-engineer"],
-  ["Claude Partner Network requirements (secondary source)","https://docs.bswen.com/blog/2026-03-21-claude-partner-network-requirements/"],
+  ["Anthropic partner certifications FAQ (official)","https://anthropic-partners.skilljar.com/page/faq-certifications"],
+  ["Claude Partner Network","https://claude.com/partners"],
   ["3,449 AI engineer postings analysis (DEV, May 2026)","https://dev.to/gnana_6392e836fd500a957dc/ai-engineer-skills-companies-want-in-2026-3449-posting-analysis-5f9l"],
-  ["What 1,000+ job descriptions reveal about the AI engineer role","https://alexeyondata.substack.com/p/what-1000-job-descriptions-reveal"],
-  ["Heavybit: So you want to be an AI engineer?","https://heavybit.com/library/article/so-you-want-to-be-an-ai-engineer"],
-  ["Swiss example: Java Gen AI Engineer (aijobs.net)","https://aijobs.net/job/java-gen-ai-engineer-switzerland-277050/"],
-  ["Swiss example: AI Engineer GenAI & RAG, Zurich","https://aijobs.net/job/ai-engineer-genai-rag-zurich-switzerland-123199/"],
+    ["Heavybit: So you want to be an AI engineer?","https://heavybit.com/library/article/so-you-want-to-be-an-ai-engineer"],
   ["AWS AIP-C01 official exam guide","https://docs.aws.amazon.com/aws-certification/latest/ai-professional-01/ai-professional-01.html"],
   ["Microsoft AI-103 official study guide","https://learn.microsoft.com/credentials/certifications/resources/study-guides/ai-103"],
   ["Claude Academy","https://academy.claude.com"]
@@ -314,9 +358,9 @@ objectives:[
 ],
 theory:`
 <h4>1. Tokens, not words</h4>
-<p>An LLM never sees text. It sees <b>tokens</b>: sub-word chunks (roughly 3 to 4 characters of English, often fewer for French or code). Everything is priced, limited and computed in tokens: the <b>context window</b> (what the model can read at once), the output limit, latency and cost. Practical rule: 1,000 tokens is about 750 English words. French and JSON are more expensive than plain English.</p>
+<p>An LLM never sees text. It sees <b>tokens</b>: sub-word chunks (roughly 3 to 4 characters of English, often fewer for French or code). Everything is priced, limited and computed in tokens: the <b>context window</b> (what the model can read at once), the output limit, latency and cost. Practical rule: 1,000 tokens is about 750 English words, but tokenizers differ by model (Claude models since 4.7 use a newer tokenizer that produces about 30% more tokens for the same text): always count with the target model. French and JSON are more expensive than plain English.</p>
 <h4>2. Next-token prediction</h4>
-<p>At its core the model does one thing: given all previous tokens, it outputs a probability distribution over the next token. Generation is a loop: pick a token, append it, predict again. <b>Temperature</b> reshapes the distribution (0 = almost deterministic, higher = more diverse). Consequence: the model has no separate "truth database". When the right continuation is unlikely or absent from training data, it still produces a fluent one. That is a hallucination.</p>
+<p>At its core the model does one thing: given all previous tokens, it outputs a probability distribution over the next token. Generation is a loop: pick a token, append it, predict again. <b>Temperature</b> reshapes the distribution (0 = almost deterministic, higher = more diverse). Note: current Claude models fix sampling on the API side and reject custom temperature/top_p values; you control behaviour through prompts, schemas and the effort setting. Open-weight models still expose temperature. Consequence: the model has no separate "truth database". When the right continuation is unlikely or absent from training data, it still produces a fluent one. That is a hallucination.</p>
 <h4>3. Embeddings and attention</h4>
 <p>Each token becomes a vector (an <b>embedding</b>) that encodes meaning by position in a high-dimensional space: similar meanings end up close. The <b>transformer</b> stacks layers of <b>self-attention</b>: every token looks at every other token in the context and decides what is relevant to it. This is why prompt structure matters: clearly delimited sections and explicit references make attention's job easier. Attention cost grows with context length, which is why long contexts are slower and more expensive.</p>
 <h4>4. How a model is built</h4>
@@ -324,7 +368,7 @@ theory:`
 <li><b>Pre-training</b>: predict the next token on a huge corpus. Produces raw knowledge and language ability, with a knowledge cut-off date.</li>
 <li><b>Instruction tuning</b>: train on (instruction, good answer) pairs so the model follows requests.</li>
 <li><b>Preference training</b> (RLHF, RLAIF, constitutional methods at Anthropic): optimise toward answers humans or a written set of principles judge better: helpful, honest, harmless.</li>
-<li><b>Reasoning training</b>: models such as Claude can "think" before answering (extended thinking). More test-time compute usually means better results on hard tasks, at higher cost and latency.</li>
+<li><b>Reasoning training</b>: models such as Claude can "think" before answering. Current Claude models use <b>adaptive thinking</b> tuned with an <b>effort</b> parameter (low to max); manual thinking budgets only exist on older models. More test-time compute usually means better results on hard tasks, at higher cost and latency.</li>
 </ul>
 <h4>5. Failure modes you must recognise</h4>
 <ul>
@@ -346,16 +390,16 @@ exercises:[
 {t:"Token intuition", d:"Use Anthropic's token counting endpoint (or the Console) on: a French lease paragraph, the same text in English, a 50-line Java class and a JSON payload. Write down the ratios and what they imply for cost.", h:2},
 {t:"Watch and summarise", d:"Watch Karpathy's 'Intro to Large Language Models' and 3Blue1Brown's 'But what is a GPT?'. Write a one-page summary in English as if explaining to a CTO.", h:4},
 {t:"Hallucination lab", d:"Ask Claude 10 questions about obscure facts (a small French commune's budget, a minor library's API). Classify answers: correct, refused, hallucinated. Then repeat with the source document pasted in. Measure the difference.", h:3},
-{t:"Temperature experiment", d:"Through the API, generate the same product description 5 times at temperature 0 and 5 times at 1. Compare variability. Decide which settings fit extraction vs creative tasks.", h:2},
+{t:"Variability experiment", d:"Run the same extraction prompt 5 times on a current Claude model, then 5 times with structured outputs (JSON schema). Compare consistency. Then try temperature 0 vs 1 on an open-weight model via Ollama (current Claude models reject sampling parameters).", h:2},
 {t:"Teach it back", d:"Record yourself (5 minutes, English) explaining tokens, attention and hallucination with no slides. Listen back and note unclear parts.", h:2}
 ],
 quiz:[
 {q:"Why is a French prompt usually more expensive than the same English prompt?", o:["Models charge more for non-English languages","French text is split into more tokens","French requires a larger model","The API adds a translation step"], a:1, w:"Tokenisers are optimised for English; French and accented text produce more tokens for the same meaning."},
 {q:"What is a hallucination, mechanically?", o:["A bug in the API","The model reading a corrupted file","A fluent but unsupported continuation produced because it is statistically plausible","Random noise added on purpose"], a:2, w:"The model generates likely text; when the truth is absent, the most likely text can be wrong but fluent."},
-{q:"You must extract fields from invoices into JSON. Best default temperature?", o:["0 or very low","0.7","1.0","It does not matter"], a:0, w:"Extraction needs consistency; low temperature reduces variability."},
+{q:"You must extract invoice fields into JSON on a current Claude model. Best way to get consistent output?", o:["Set temperature to 0","Structured outputs (JSON schema) plus validation in code","Set top_p to 1","Ask politely for JSON"], a:1, w:"Current Claude models reject custom sampling parameters; consistency comes from schemas, examples and validation."},
 {q:"In a 150-page context, where should the key instructions and the question go?", o:["Buried in the middle","Question at the end, long documents first","Only in the system prompt, never repeated","It never matters"], a:1, w:"Long documents first and the question last tends to work best; middle content is used less reliably."},
 {q:"What does preference training (RLHF / constitutional) mainly add?", o:["New factual knowledge","Faster inference","Behaviour aligned with what is judged helpful, honest and harmless","A larger context window"], a:2, w:"Knowledge comes from pre-training; preference training shapes behaviour."},
-{q:"Extended thinking generally:", o:["Reduces cost","Improves hard reasoning at the price of more tokens and latency","Removes hallucinations completely","Is only for images"], a:1, w:"More test-time compute helps on hard problems but costs more and is slower."}
+{q:"More thinking (higher effort) generally:", o:["Reduces cost","Improves hard reasoning at the price of more tokens and latency","Removes hallucinations completely","Is only for images"], a:1, w:"More test-time compute helps on hard problems but costs more and is slower."}
 ],
 resources:[
 {k:"video", t:"Andrej Karpathy: Intro to Large Language Models (1h)", u:"https://www.youtube.com/watch?v=zjkBMFhNj_g"},
@@ -379,7 +423,7 @@ title:"Prompt engineering for Claude, at a professional level",
 why:"A good prompt is a specification. You already write specs; now you write them for a model.",
 objectives:[
 "Write system prompts that define role, context, rules and output format",
-"Use Claude-specific techniques: XML tags, multishot examples, step-by-step thinking, prefilling, long-context ordering",
+"Use Claude-specific techniques: XML tags, multishot examples, step-by-step thinking, long-context ordering",
 "Get reliable structured output (JSON) and handle failures",
 "Iterate on prompts with a test set instead of intuition"
 ],
@@ -391,7 +435,7 @@ theory:`
 <h4>3. Examples (multishot)</h4>
 <p>3 to 5 diverse, realistic examples are the most powerful lever for format and tone. Make them varied (cover edge cases) and wrap them in <code>&lt;example&gt;</code> tags. Bad examples are copied faithfully, so curate them.</p>
 <h4>4. Let it think</h4>
-<p>For multi-step reasoning, ask for reasoning before the answer (in <code>&lt;thinking&gt;</code> tags you can strip), or use <b>extended thinking</b> in the API. Ask for the final answer in a separate tag. For simple extraction, thinking only adds cost.</p>
+<p>For multi-step reasoning, ask for reasoning before the answer (in <code>&lt;thinking&gt;</code> tags you can strip), or raise the <b>effort</b> level (adaptive thinking) in the API. Ask for the final answer in a separate tag. For simple extraction, thinking only adds cost.</p>
 <h4>5. Long context</h4>
 <p>Put long documents at the top, instructions and question at the bottom. Ask the model to first extract relevant quotes into <code>&lt;quotes&gt;</code>, then answer from them. This reduces hallucination and gives you citations for free.</p>
 <h4>6. Controlling output</h4>
@@ -399,7 +443,7 @@ theory:`
 <li>Say what to do, not only what to avoid ("write in flowing prose paragraphs" beats "no bullet points").</li>
 <li>Match the style of your prompt to the style you want back.</li>
 <li>For JSON: give the schema, an example, and validate on your side. Prefer native structured output / tool schemas when available (next module).</li>
-<li>Prefilling the assistant turn (e.g. starting with <code>{</code>) forces a format on models and APIs that support it.</li>
+<li>Prefilling the assistant turn (starting the answer with <code>{</code>) was a classic trick; Claude 4.6+ models reject it. Use structured outputs or strict tool use instead.</li>
 </ul>
 <h4>7. Prompt chaining</h4>
 <p>Split complex jobs into steps: extract, then analyse, then write. Each step is easier to test and debug. This is the bridge to agents (module 7).</p>
@@ -418,7 +462,7 @@ exercises:[
 {t:"Lease extractor v0", d:"Build a prompt that extracts from a commercial lease: parties, rent, indexation index, payment frequency, who pays property tax (TF/TEOM), duration. Output strict JSON. Test on 3 anonymised leases.", h:5},
 {t:"Quotes-then-answer", d:"On a 40-page document, compare a direct question vs 'extract relevant quotes in <quotes>, then answer in <answer>'. Count unsupported claims in each.", h:3},
 {t:"Prompt test set", d:"Create a spreadsheet of 20 inputs with expected outputs for the extractor. Score v0, then v1 after improvements. Keep both prompts in Git.", h:4},
-{t:"Anthropic tutorial", d:"Complete chapters 1 to 6 of Anthropic's interactive prompt engineering tutorial (GitHub 'anthropics/courses').", h:5}
+{t:"Anthropic tutorial", d:"Complete the Claude Academy courses 'Claude 101' and 'Building with the Claude API' (prompting chapters), and earn the completion badges.", h:5}
 ],
 quiz:[
 {q:"Main purpose of XML tags in a Claude prompt?", o:["Make the prompt look professional","Separate instructions from data and make outputs parseable","Reduce token count","Enable images"], a:1, w:"Tags give clear boundaries for the model and machine-readable outputs for you."},
@@ -430,7 +474,7 @@ quiz:[
 ],
 resources:[
 {k:"doc", t:"Anthropic: Prompt engineering overview", u:"https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/overview"},
-{k:"course", t:"Anthropic courses on GitHub (prompt engineering interactive tutorial, real-world prompting)", u:"https://github.com/anthropics/courses"},
+{k:"course", t:"Claude Academy: free official courses with completion badges", u:"https://academy.claude.com/courses"},
 {k:"course", t:"Claude Academy (free official courses)", u:"https://academy.claude.com"},
 {k:"video", t:"Andrej Karpathy: How I use LLMs", u:"https://www.youtube.com/watch?v=EWvNQjAaOHw"},
 {k:"video", t:"Search: Anthropic 'prompting 101' talk (YouTube, Anthropic channel)", u:"https://www.youtube.com/@anthropic-ai/search?query=prompting"}
@@ -440,7 +484,7 @@ coach:[
 "In interviews, never say 'I'm good at prompting'. Say 'I took extraction accuracy from 72% to 95% on a 30-case test set by restructuring the prompt'.",
 "Your French business documents (leases, notary acts) are a goldmine of realistic test data. Anonymise them and use them throughout the track."
 ],
-english:{vocab:[["system prompt","instructions de cadrage"],["few-shot / multishot","avec quelques exemples"],["prefill","pré-remplir le début de la réponse"],["ground truth","réponse de référence"],["edge case","cas limite"],["to iterate","itérer"],["parseable","exploitable par un programme"],["boilerplate","code ou texte répétitif"]], speak:"Describe, in English, how you would turn a vague request like 'summarise our contracts' into a reliable, testable prompt."}
+english:{vocab:[["system prompt","instructions de cadrage"],["few-shot / multishot","avec quelques exemples"],["structured output","sortie structurée (schéma JSON)"],["ground truth","réponse de référence"],["edge case","cas limite"],["to iterate","itérer"],["parseable","exploitable par un programme"],["boilerplate","code ou texte répétitif"]], speak:"Describe, in English, how you would turn a vague request like 'summarise our contracts' into a reliable, testable prompt."}
 });
 
 M.push({
@@ -449,19 +493,19 @@ title:"The Claude API and platform",
 why:"Production AI is API work: models, costs, limits, caching, batching and tools.",
 objectives:[
 "Call the Messages API from Java and from the command line, with streaming",
-"Choose a model by quality, latency and cost (Opus, Sonnet, Haiku families)",
+"Choose a model by quality, latency and cost (Fable, Opus, Sonnet, Haiku lines; Opus as the usual default, Haiku for routing and classification)",
 "Use tool use, structured outputs, prompt caching, batches, citations and files",
 "Estimate and control the cost of a feature before building it"
 ],
 theory:`
 <h4>1. The Messages API</h4>
-<p>A request = model + system prompt + list of messages (user/assistant turns) + parameters (max tokens, temperature, tools, thinking). The API is <b>stateless</b>: you send the whole conversation every time. Memory, history and sessions are your application's job. Responses can be <b>streamed</b> (server-sent events) for better perceived latency.</p>
+<p>A request = model + system prompt + list of messages (user/assistant turns) + parameters (max tokens, tools, thinking/effort, output format). The API is <b>stateless</b>: you send the whole conversation every time. Memory, history and sessions are your application's job. Responses can be <b>streamed</b> (server-sent events) for better perceived latency.</p>
 <h4>2. Picking a model</h4>
 <p>Families: the largest model for the hardest reasoning and agentic coding, the mid-size model as the default workhorse, the smallest for fast, cheap, high-volume tasks (classification, routing, extraction). Pricing is per million input and output tokens; output is several times more expensive than input. Always check the current models page: names and prices change.</p>
 <h4>3. Tool use (function calling)</h4>
 <p>You describe tools with a name, a description and a JSON Schema. The model answers with a <code>tool_use</code> block (which tool, which arguments); <b>your code executes it</b> and returns a <code>tool_result</code>; the model continues. This loop is the basis of every agent. Tool descriptions are prompts: precise names, when to use, what each parameter means. Anthropic also offers server-side tools (web search, code execution) that run on their side.</p>
 <h4>4. Structured outputs</h4>
-<p>To get guaranteed-valid JSON, define a schema (via a tool or the structured output feature when available) instead of hoping the model follows text instructions. Still validate on your side: a valid shape can carry wrong values.</p>
+<p>To get guaranteed-valid JSON, define a schema with <b>structured outputs</b> (<code>output_config.format</code> with a JSON schema) or strict tool use; don't rely on forcing a tool choice, which recent models reject instead of hoping the model follows text instructions. Still validate on your side: a valid shape can carry wrong values.</p>
 <h4>5. Prompt caching</h4>
 <p>Mark a long, stable prefix (system prompt, documents, tool definitions) as cacheable. Later calls reuse it at a fraction of the input price and with lower latency. Design prompts with the <b>stable part first, variable part last</b> to benefit. For a RAG assistant over the same contract set, this can cut costs dramatically.</p>
 <h4>6. Batch processing</h4>
@@ -489,7 +533,7 @@ quiz:[
 {q:"The Messages API keeps conversation history:", o:["On Anthropic's servers automatically","Nowhere: you resend it on each request","Only with streaming","Only for 24 hours"], a:1, w:"The API is stateless; your app manages history."},
 {q:"In tool use, who executes the function?", o:["Claude","Anthropic's servers for all tools","Your application (except server-side tools)","The browser"], a:2, w:"Client tools run in your code; the model only requests them."},
 {q:"Best structure for prompt caching?", o:["Variable user question first, documents last","Stable content (system, docs, tools) first, variable part last","Random order","Caching only works with images"], a:1, w:"The cache matches on the prefix, so stable content must come first."},
-{q:"You must classify 50,000 archived emails, no urgency. Best option?", o:["Largest model, synchronous","Batch API with a small model","Streaming","Extended thinking on every email"], a:1, w:"Batch is discounted and asynchronous; a small model is enough for classification."},
+{q:"You must classify 50,000 archived emails, no urgency. Best option?", o:["Largest model, synchronous","Batch API with a small model","Streaming","Maximum effort on every email"], a:1, w:"Batch is discounted and asynchronous; a small model is enough for classification."},
 {q:"A JSON schema guarantees:", o:["Correct values","A valid shape, not correct content","Zero cost","No need for tests"], a:1, w:"Validate business rules yourself."},
 {q:"Why might a French bank require Claude via a cloud provider?", o:["It is always cheaper","Contractual, security and EU data-residency requirements","Better accuracy","Anthropic is unavailable in France"], a:1, w:"Large enterprises buy through their existing cloud contracts and compliance frameworks."}
 ],
@@ -541,14 +585,14 @@ theory:`
 <li><b>Hooks</b>: deterministic automation on lifecycle events (e.g. run the formatter after each edit, block edits to a protected folder). Use hooks for rules that must <i>always</i> happen, not prompts.</li>
 <li><b>MCP servers</b>: connections to external systems (databases, Jira, browsers, internal APIs).</li>
 <li><b>Plugins and marketplaces</b>: package skills, hooks, subagents and MCP servers to share across a team.</li>
-<li><b>Custom slash commands</b> for repeatable prompts.</li>
+<li><b>Skills</b> (also invocable as /slash commands) for repeatable workflows.</li>
 </ul>
 <h4>5. Permissions and safety</h4>
 <p>Allow-list safe commands (build, test, git status), require approval for risky ones, never put secrets in prompts or CLAUDE.md, and run fully autonomous modes only in sandboxes or containers. Review every diff that touches security, data migrations or money.</p>
 <h4>6. Parallelism and automation</h4>
 <p>Run several sessions on separate git worktrees for independent tasks. Headless mode (<code>claude -p</code>) lets scripts and CI call Claude Code: automated code review on pull requests, migration scripts, documentation generation. The Claude Agent SDK exposes the same engine to build your own agents.</p>
 <h4>7. Where it shines and where it does not</h4>
-<p>Shines: boilerplate, tests, refactors with good coverage, migrations, exploring unknown code, scripts, documentation. Weak spots: vague requirements, large cross-cutting changes without tests, subtle performance or concurrency issues, anything you cannot verify. Your value is in the specification and the verification.</p>`,
+<p>Shines: boilerplate, tests, refactors with good coverage, migrations, exploring unknown code, scripts, documentation. Weak spots: vague requirements, large cross-cutting changes without tests, subtle performance or concurrency issues, anything you cannot verify. Your value is in the specification and the verification.</p><h4>Security of coding agents</h4><p>A coding agent reads your repo, issues and MCP servers, so all of them are injection surfaces. Run it sandboxed (devcontainer), keep permission modes tight, use hooks as policy (block secrets, dangerous commands, force tests), scan for secrets, and vet every plugin, skill and MCP server like a dependency (supply chain). Agent Skills are now an open standard shared by most coding agents, and AGENTS.md/CLAUDE.md files are read by all of them.</p>`,
 takeaways:[
 "Explore, plan, implement, verify, commit. Never skip plan and verify.",
 "CLAUDE.md for always, skills for on-demand, hooks for must-happen, subagents for isolation, MCP for external systems.",
@@ -556,6 +600,7 @@ takeaways:[
 "Measure your speed-up honestly; it is a sales argument."
 ],
 exercises:[
+ {t:"Harden your coding agent", d:"Run Claude Code in a devcontainer, add a PreToolUse hook that blocks secrets and destructive commands, and plant a malicious instruction in a README to verify it is not obeyed. Document the setup.", h:3},
 {t:"CLAUDE.md for a Spring project", d:"Write a CLAUDE.md for one of your Spring Boot repositories (build, test, module map, conventions, forbidden actions). Compare task quality before and after on 3 identical tasks.", h:3},
 {t:"Your first skill and subagent", d:"Create a skill 'spring-rest-endpoint' (your team conventions with an example) and a subagent 'reviewer' that checks security, tests and naming. Use both on a real feature.", h:5},
 {t:"Hooks", d:"Add a hook that runs the formatter and unit tests after edits, and one that blocks changes to src/main/resources/db/migration without approval.", h:3},
@@ -574,7 +619,7 @@ quiz:[
 resources:[
 {k:"doc", t:"Claude Code: features overview (CLAUDE.md, skills, subagents, hooks, MCP, plugins)", u:"https://code.claude.com/docs/en/features-overview"},
 {k:"doc", t:"Claude Code documentation home", u:"https://code.claude.com/docs/en/overview"},
-{k:"doc", t:"Anthropic engineering: Claude Code best practices", u:"https://www.anthropic.com/engineering/claude-code-best-practices"},
+{k:"doc", t:"Anthropic engineering: Claude Code best practices", u:"https://code.claude.com/docs/en/best-practices"},
 {k:"course", t:"Claude Academy: Claude Code courses", u:"https://academy.claude.com"},
 {k:"video", t:"Search: Claude Code talks and demos (Anthropic YouTube channel)", u:"https://www.youtube.com/@anthropic-ai/search?query=claude%20code"}
 ],
@@ -710,7 +755,7 @@ resources:[
 {k:"doc", t:"Spring AI: Retrieval Augmented Generation", u:"https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html"},
 {k:"doc", t:"Spring AI: PGVector store", u:"https://docs.spring.io/spring-ai/reference/api/vectordbs/pgvector.html"},
 {k:"doc", t:"Anthropic: Contextual Retrieval", u:"https://www.anthropic.com/news/contextual-retrieval"},
-{k:"doc", t:"Anthropic: Long context prompting tips", u:"https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/long-context-tips"},
+{k:"doc", t:"Anthropic: Long context prompting tips", u:"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices"},
 {k:"video", t:"Search: RAG evaluation and hybrid search talks", u:"https://www.youtube.com/results?search_query=rag+evaluation+hybrid+search+reranking"}
 ],
 coach:[
@@ -754,7 +799,7 @@ theory:`
 <li>Treat tool outputs (web pages, emails, documents) as untrusted data: they can contain injected instructions (module 11).</li>
 </ul>
 <h4>5. Context engineering for agents</h4>
-<p>Long-running agents degrade as context fills. Techniques: summarise history, store notes outside the context (a scratchpad file or memory tool), use subagents for isolated sub-tasks, load knowledge on demand (skills). You already see these mechanisms at work in your daily use of Claude.</p>`,
+<p>Long-running agents degrade as context fills. Techniques: summarise history, store notes outside the context (a scratchpad file or memory tool), use subagents for isolated sub-tasks, load knowledge on demand (skills). You already see these mechanisms at work in your daily use of Claude.</p><h4>Platform features for context engineering (2026)</h4><p>Know what the API gives you before building it yourself: <b>compaction</b> (summarise old turns automatically), <b>context editing</b> (drop stale tool results), the <b>memory tool</b> (files the agent reads and writes across sessions), the <b>tool search tool</b> (load tool definitions on demand instead of sending 100 tools), <b>programmatic tool calling</b> (the model writes code that calls tools, keeping intermediate data out of the context), prompt caching, the Files API, <b>Managed Agents</b> (server-hosted agents with a sandbox) and Agent Skills in the API. Pick the managed option when it exists; write your own only when you need control.</p>`,
 takeaways:[
 "Default to workflows; reach for autonomous agents only when steps can't be predicted.",
 "Tools are prompts: design them for the model.",
@@ -762,6 +807,7 @@ takeaways:[
 "Context engineering decides whether long agents stay smart."
 ],
 exercises:[
+ {t:"Context budget lab", d:"On a long agent task, compare tokens and cost with and without compaction, context editing and tool search. Keep a table.", h:3},
 {t:"Typed tools in Spring AI", d:"Expose 3 tools to your lease assistant: computeTaxProrata, nextRentDueDate, findClause. Use Java records for parameters and write descriptions as carefully as prompts.", h:6},
 {t:"Router", d:"Route questions: factual lookup (small model + RAG), calculation (tool), legal interpretation (large model + disclaimer). Measure cost saved vs always using the large model.", h:6},
 {t:"Evaluator-optimiser", d:"Generate a tenant letter (new landlord introduction), have a second call critique it against a checklist, iterate max 3 times.", h:6},
@@ -780,7 +826,7 @@ resources:[
 {k:"doc", t:"Anthropic: Effective context engineering for AI agents", u:"https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"},
 {k:"doc", t:"Anthropic: Writing effective tools for agents", u:"https://www.anthropic.com/engineering/writing-tools-for-agents"},
 {k:"doc", t:"Spring AI: Tool calling", u:"https://docs.spring.io/spring-ai/reference/api/tools.html"},
-{k:"doc", t:"Claude Agent SDK overview", u:"https://docs.claude.com/en/docs/agent-sdk/overview"}
+{k:"doc", t:"Claude Agent SDK overview", u:"https://code.claude.com/docs/en/agent-sdk/overview"}
 ],
 coach:[
 "Your daily life with Claude (banking flows with approvals, scheduled checks, verification steps) is a live case study of human-in-the-loop design. Use it in interviews.",
@@ -804,19 +850,19 @@ theory:`
 <h4>1. Why MCP</h4>
 <p>Before MCP, every AI app needed custom integrations for every tool. MCP is an open protocol: a system exposes <b>tools</b> (actions), <b>resources</b> (readable data) and <b>prompts</b> (templates) once, and any MCP-compatible client (Claude Desktop, Claude Code, IDEs, your own agent) can use them.</p>
 <h4>2. Architecture</h4>
-<p>A <b>host</b> (e.g. Claude Desktop) runs <b>clients</b>, each connected to a <b>server</b>. Transports: stdio for local processes, Streamable HTTP for remote servers (with a stateless mode for scalable deployments). Messages follow JSON-RPC.</p>
+<p>A <b>host</b> (e.g. Claude Desktop) runs <b>clients</b>, each connected to a <b>server</b>. Transports: stdio for local processes, Streamable HTTP for remote servers. Since spec revision 2026-07-28 the protocol is stateless by design: no handshake or session, every request carries its version and capabilities, so servers scale behind a plain load balancer. Messages follow JSON-RPC. Spring AI 2.1 (MCP Java SDK 2.2+) brings support for this revision; 2.0.x targets the earlier spec.</p>
 <h4>3. MCP in Spring AI 2.x</h4>
 <p>Spring AI 2.0 ships the official MCP Java SDK and annotations such as <code>@McpTool</code>, <code>@McpResource</code> and <code>@McpPrompt</code> to expose Spring beans, with WebMVC/WebFlux transports, Micrometer tracing and security integrations. It also provides MCP clients so your Spring app can consume other servers' tools.</p>
 <h4>4. Security is the hard part</h4>
 <ul>
-<li>Authenticate clients (OAuth 2.x, API keys) and authorise per tool.</li>
+<li>Authenticate clients with OAuth 2.1 (the MCP server is a resource server; validate the issuer, prefer Client ID Metadata Documents over dynamic client registration) and authorise per tool.</li>
 <li>Validate every input as if it came from the internet.</li>
 <li>Expose narrow, business-level tools, never raw SQL or shell.</li>
 <li>Beware "tool poisoning": malicious tool descriptions or outputs from third-party servers. Only install servers you trust and review them.</li>
 <li>Log and rate-limit.</li>
 </ul>
 <h4>5. Enterprise opportunity</h4>
-<p>Many companies want "our assistant can read our ERP / tickets / contracts". A Java developer who can wrap an internal API as a secure MCP server in days, with tests and observability, is exactly what they need.</p>`,
+<p>Many companies want "our assistant can read our ERP / tickets / contracts". A Java developer who can wrap an internal API as a secure MCP server in days, with tests and observability, is exactly what they need.</p><h4>MCP, A2A and the Agentic AI Foundation</h4><p>MCP connects an agent to tools and data; <b>A2A</b> (Agent2Agent, v1.0, Linux Foundation) connects agents to other agents across vendors (agent cards, tasks, streaming). MCP, AGENTS.md and Agent Skills are now governed by the Linux Foundation's Agentic AI Foundation. Note: Java is not a Tier 1 MCP SDK (TypeScript, Python, Go, C# are), so Spring AI support may lag the spec by a few months; check versions before promising a feature.</p>`,
 takeaways:[
 "Expose once, use from any MCP client.",
 "Tools act, resources inform, prompts guide.",
@@ -824,6 +870,7 @@ takeaways:[
 "Security and narrow tool design are where you add value."
 ],
 exercises:[
+ {t:"A2A hello world", d:"Expose one of your agents with an A2A agent card and call it from a second agent. Write half a page on when you would use A2A vs MCP.", h:3},
 {t:"Lease MCP server", d:"Expose your lease assistant as an MCP server: tools findClause, computeTaxProrata, nextRentDueDate; resource 'lease summary'. Use Spring AI annotations.", h:8},
 {t:"Connect it", d:"Use it from Claude Desktop and from Claude Code. Note what the model understands well and badly from your tool descriptions; improve them.", h:4},
 {t:"Secure it", d:"Add API-key or OAuth auth, per-tool authorisation and request logging. Write tests proving an unauthorised client cannot call computeTaxProrata.", h:8},
@@ -832,7 +879,7 @@ exercises:[
 ],
 quiz:[
 {q:"In MCP, a 'resource' is:", o:["An action with side effects","Readable data exposed to the model","A user","A transport"], a:1, w:"Resources inform; tools act."},
-{q:"Best transport for a remote, scalable MCP server?", o:["stdio","Streamable HTTP (possibly stateless)","FTP","Email"], a:1, w:"stdio is for local processes."},
+{q:"Best transport for a remote, scalable MCP server?", o:["stdio","Streamable HTTP","FTP","Email"], a:1, w:"stdio is for local processes; Streamable HTTP is the remote transport and is stateless by design since spec 2026-07-28."},
 {q:"A third-party MCP server's tool description contains hidden instructions. This risk is called:", o:["Caching","Tool poisoning / prompt injection","Routing","Batching"], a:1, w:"Treat third-party descriptions and outputs as untrusted."},
 {q:"Which tool should you NOT expose?", o:["getInvoiceStatus(id)","executeSql(query)","createDraftLetter(tenantId)","listOverdueRents()"], a:1, w:"Raw SQL is far too powerful and dangerous."},
 {q:"Main value of MCP for an enterprise?", o:["Cheaper tokens","Integrate a system once and use it from many AI clients","Faster GPUs","Replace REST APIs"], a:1, w:"Standardised integration."}
@@ -878,7 +925,7 @@ theory:`
 <li>Evaluation and observability tools: promptfoo, Langfuse, OpenTelemetry-based tracing.</li>
 </ul>
 <h4>4. Choosing as an advisor</h4>
-<p>Decide on requirements, not hype: data sensitivity, existing stack, team skills, budget, latency, required quality. Document the trade-off in a short decision record (ADR).</p>`,
+<p>Decide on requirements, not hype: data sensitivity, existing stack, team skills, budget, latency, required quality. Document the trade-off in a short decision record (ADR).</p><h4>Reading TypeScript</h4><p>Most MCP servers, the Agent SDK samples and many agent tools are TypeScript-first. You don't need to master it, but reading and running a TS MCP server removes one more filter in postings.</p>`,
 takeaways:[
 "Spring AI for Spring shops, LangChain4j for others: know both.",
 "Read Python fluently enough to port ideas.",
@@ -886,6 +933,7 @@ takeaways:[
 "Decisions go in ADRs with explicit trade-offs."
 ],
 exercises:[
+ {t:"Read and run a TypeScript MCP server", d:"Clone an official TypeScript MCP server, run it, add one tool, and connect it to Claude Desktop.", h:4},
 {t:"LangChain4j port", d:"Re-implement your extraction service with LangChain4j AI Services in a small Quarkus or plain Java app. Write a comparison ADR.", h:6},
 {t:"Python reading", d:"Clone a Python RAG example from Anthropic's cookbook, run it, and port one technique (e.g. contextual retrieval) to your Java project.", h:5},
 {t:"Python sprint", d:"Rebuild your lease extractor in Python: Anthropic SDK + Pydantic validation + a FastAPI endpoint + pytest. Aim for idiomatic code (type hints, virtualenv/uv). Put it in the portfolio as a \"polyglot\" proof.", h:10},
@@ -942,7 +990,7 @@ theory:`
 <h4>5. Evals in the delivery pipeline</h4>
 <p>Run a fast eval subset on every pull request that touches prompts or AI code, the full set nightly or before releases. Fail the build below a threshold. Store results to compare versions. Tools like promptfoo or Langfuse help; a JUnit-based harness also works perfectly in Java shops.</p>
 <h4>6. Online evaluation</h4>
-<p>In production, collect user feedback (thumbs up/down, corrections), sample conversations for review, and feed failures back into the dataset. Quality management is continuous.</p>`,
+<p>In production, collect user feedback (thumbs up/down, corrections), sample conversations for review, and feed failures back into the dataset. Quality management is continuous.</p><h4>Evaluating agents, not just answers</h4><p>For agents, also measure the <b>trajectory</b>: right tools called with right arguments, task completed, number of steps, cost and latency per task. Report reliability as <b>pass@k</b> (succeeds at least once in k tries) and <b>pass^k</b> (succeeds every time in k tries): production needs the second. Keep scripted scenarios with expected end states (e.g. a lease updated correctly) and run them in CI.</p>`,
 takeaways:[
 "No eval set, no quality claim.",
 "Code checks first, LLM judges with calibrated rubrics second, humans as reference.",
@@ -950,6 +998,7 @@ takeaways:[
 "Production failures feed the dataset."
 ],
 exercises:[
+ {t:"Agent evals with pass^k", d:"Write 20 scripted scenarios for the rent-indexation agent with expected end states. Run each 5 times and report pass@5, pass^5, steps and cost per task.", h:4},
 {t:"Golden dataset", d:"Build 50 cases for the lease assistant: 30 normal, 10 edge, 5 'should refuse', 5 adversarial. Store in JSON/CSV in the repo.", h:8},
 {t:"JUnit eval harness", d:"Write a JUnit 5 harness that runs the dataset, applies code-based graders and outputs a report (pass rate, cost, latency). Tag it so it is excluded from normal unit tests.", h:10},
 {t:"LLM judge", d:"Add a faithfulness judge with a rubric. Label 30 answers yourself and compute agreement with the judge. Iterate on the rubric until agreement is high.", h:8},
@@ -990,7 +1039,7 @@ objectives:[
 ],
 theory:`
 <h4>1. The threat landscape</h4>
-<p>The OWASP Top 10 for LLM Applications lists the main risks: prompt injection, sensitive information disclosure, supply chain issues, data and model poisoning, improper output handling, excessive agency, system prompt leakage, vector/embedding weaknesses, misinformation and unbounded consumption. Learn the list; security teams use it.</p>
+<p>The OWASP Top 10 for LLM Applications lists the main risks: prompt injection (still number one), sensitive information disclosure, excessive agency, supply chain, data and model poisoning, unbounded consumption, misinformation, hidden context exposure (formerly system prompt leakage), vector and embedding weaknesses, improper output handling. The 2026 edition (August 2026) replaced the 2025 one; check the official PDF for the exact ranking. Agentic risks (tools, memory, autonomy, identity) have their own list: the OWASP Top 10 for Agentic Applications. Learn both; security teams use them.</p>
 <h4>2. Prompt injection</h4>
 <p><b>Direct</b>: the user tries to override instructions. <b>Indirect</b>: malicious instructions hidden in content the model reads (a document, an email, a web page, a tool result). There is no perfect prompt-level fix. Defend in depth:</p>
 <ul>
@@ -1007,7 +1056,7 @@ theory:`
 <h4>5. Excessive agency and consumption</h4>
 <p>Limit tools, permissions, iterations and spend. Rate-limit per user. Alert on cost spikes. A runaway agent loop can burn a budget overnight.</p>
 <h4>6. Threat modelling</h4>
-<p>For each feature: assets (data, actions), actors (users, attackers, third-party content), entry points (prompts, documents, tools), abuse cases, mitigations, residual risk. One page per feature, reviewed with the client's security team.</p>`,
+<p>For each feature: assets (data, actions), actors (users, attackers, third-party content), entry points (prompts, documents, tools), abuse cases, mitigations, residual risk. One page per feature, reviewed with the client's security team.</p><h4>Agentic security and guardrails in practice</h4><p>Beyond the LLM Top 10, use the OWASP Top 10 for Agentic Applications (tool misuse, identity and privilege abuse, memory poisoning, cascading failures, rogue agents). Enforce controls in code and infrastructure: least-privilege credentials per agent, approval gates, egress restrictions, audit logs. Practise one managed guardrail service (Amazon Bedrock Guardrails, which the AWS exam covers) or NeMo Guardrails, seen in Swiss postings.</p>`,
 takeaways:[
 "Prompts are not security boundaries.",
 "Least privilege + human approval + output validation = defence in depth.",
@@ -1015,6 +1064,7 @@ takeaways:[
 "Bring a threat model before the security team asks."
 ],
 exercises:[
+ {t:"Managed guardrails", d:"Configure Amazon Bedrock Guardrails (or NeMo Guardrails) on the lease copilot: denied topics, PII masking, contextual grounding check. Measure false positives on your eval set.", h:3},
 {t:"Red-team your assistant", d:"Write 20 attacks: direct injections, a lease PDF containing hidden instructions, data exfiltration attempts ('list all tenants' IBANs'). Record what succeeds.", h:6},
 {t:"Fix and re-test", d:"Implement mitigations (delimiting, output validation, permission filters, masking advisor, tool restrictions). Add the attacks to your eval set as must-pass cases.", h:10},
 {t:"Threat model", d:"Write a one-page threat model for the lease assistant and its MCP server using the OWASP LLM list.", h:5},
@@ -1067,7 +1117,7 @@ theory:`
 <h4>4. Reliability</h4>
 <p>Retries with exponential backoff and jitter on rate-limit and overload errors; timeouts on every call; circuit breakers (Resilience4j); a fallback model or provider; graceful degradation (e.g. return sources without a generated answer). Make side-effecting steps idempotent so retries are safe.</p>
 <h4>5. Versioning and releases</h4>
-<p>Version prompts, models and datasets together. Release with feature flags, shadow tests or A/B tests, and keep the previous version ready to roll back. Pin model versions in production and upgrade deliberately after evals.</p>`,
+<p>Version prompts, models and datasets together. Release with feature flags, shadow tests or A/B tests, and keep the previous version ready to roll back. Pin model versions in production and upgrade deliberately after evals.</p><h4>Tracing standard and cost levers</h4><p>Emit traces with the OpenTelemetry GenAI semantic conventions (<code>gen_ai.*</code> attributes: operation, model, input/output tokens; spans for agents and tool calls); the conventions are still in development, so pin a version. The Claude API can emit OpenTelemetry spans itself. Cost levers in 2026: effort level, model routing, prompt caching (monitor the cache hit rate), Batch API combined with caching, per-tenant budgets, and remember that tokenizers differ between models when you compare prices.</p>`,
 takeaways:[
 "Trace everything, with privacy in mind.",
 "Unit cost is a design input.",
@@ -1075,6 +1125,7 @@ takeaways:[
 "Pin versions, gate upgrades with evals, keep rollback ready."
 ],
 exercises:[
+ {t:"OpenTelemetry GenAI traces", d:"Instrument the copilot with gen_ai.* spans (model, tokens, tool calls), export to Jaeger or Langfuse, and build a cost-per-question and cache-hit-rate panel.", h:3},
 {t:"Tracing", d:"Add OpenTelemetry tracing to the lease assistant; view a full agent run (retrieval, tools, model calls) in Jaeger or Grafana Tempo.", h:8},
 {t:"Cost dashboard", d:"Compute cost per request from token metrics and build a dashboard with daily spend per user and per feature.", h:6},
 {t:"Resilience", d:"Add Resilience4j retry, timeout and circuit breaker around model calls, plus a fallback to a smaller model. Test with a fake failing provider.", h:8},
@@ -1090,7 +1141,7 @@ quiz:[
 ],
 resources:[
 {k:"doc", t:"Spring AI: Observability", u:"https://docs.spring.io/spring-ai/reference/observability/index.html"},
-{k:"doc", t:"OpenTelemetry: GenAI semantic conventions", u:"https://opentelemetry.io/docs/specs/semconv/gen-ai/"},
+{k:"doc", t:"OpenTelemetry: GenAI semantic conventions", u:"https://github.com/open-telemetry/semantic-conventions-genai"},
 {k:"doc", t:"Resilience4j", u:"https://resilience4j.readme.io"},
 {k:"doc", t:"Anthropic: Reducing latency", u:"https://docs.claude.com/en/docs/test-and-evaluate/strengthen-guardrails/reduce-latency"}
 ],
@@ -1125,7 +1176,7 @@ theory:`
 </ul>
 <p>Prepare a standard one-page answer per provider, citing official documentation.</p>
 <h4>3. EU AI Act essentials</h4>
-<p>Risk-based regulation: <b>prohibited practices</b> (already banned since February 2025), <b>high-risk systems</b> (e.g. AI used in hiring, credit scoring, critical infrastructure, education) with heavy obligations, <b>transparency duties</b> (users must know they interact with AI; AI-generated content marking), and obligations for general-purpose AI model providers. In May 2026 EU legislators reached a provisional "Digital Omnibus" deal postponing high-risk obligations (to December 2027 for stand-alone systems and August 2028 for AI in regulated products). Check the Official Journal for the final status before advising a client. Most business assistants are not high-risk, but you must be able to say why.</p>
+<p>Risk-based regulation: <b>prohibited practices</b> (already banned since February 2025), <b>high-risk systems</b> (e.g. AI used in hiring, credit scoring, critical infrastructure, education) with heavy obligations, <b>transparency duties</b> (users must know they interact with AI; AI-generated content marking), and obligations for general-purpose AI model providers. The AI Omnibus (Regulation (EU) 2026/1744, in force since 27 July 2026) postponed high-risk obligations: Annex III stand-alone systems from 2 December 2027, AI in regulated products (Annex I) from 2 August 2028. GPAI obligations apply since August 2025, prohibitions and AI literacy since February 2025, transparency duties from August 2026 (grace period to 2 December 2026 for marking AI-generated content of systems already on the market). Most business assistants are not high-risk, but you must be able to say why.</p>
 <h4>4. GDPR for AI features</h4>
 <p>Legal basis, purpose limitation, minimisation, retention, data subject rights, impact assessment (DPIA) when risk is high, processor contracts with model providers. The CNIL publishes practical AI guidance in French: use it with French clients.</p>
 <h4>5. The compliance-ready project file</h4>
@@ -1152,7 +1203,7 @@ quiz:[
 ],
 resources:[
 {k:"doc", t:"Spring AI: Amazon Bedrock Converse API", u:"https://docs.spring.io/spring-ai/reference/api/chat/bedrock-converse.html"},
-{k:"doc", t:"Claude on Amazon Bedrock", u:"https://docs.claude.com/en/api/claude-on-amazon-bedrock"},
+{k:"doc", t:"Claude on Amazon Bedrock", u:"https://platform.claude.com/docs/en/build-with-claude/claude-in-amazon-bedrock"},
 {k:"doc", t:"EU AI Act official text (EUR-Lex)", u:"https://eur-lex.europa.eu/eli/reg/2024/1689/oj"},
 {k:"doc", t:"European Commission: AI Act policy page", u:"https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai"},
 {k:"doc", t:"CNIL: Intelligence artificielle", u:"https://www.cnil.fr/fr/intelligence-artificielle"},
@@ -1339,7 +1390,7 @@ quiz:[
 {q:"Best opening line for an executive?", o:["Our RAG pipeline uses hybrid retrieval with re-ranking","This could cut invoice processing time by 60% within 6 weeks, and here is how we'll measure it","AI is the future","Transformers have attention layers"], a:1, w:"Outcomes, timeline, measurement."}
 ],
 resources:[
-{k:"doc", t:"Anthropic: Building trusted AI in the enterprise (use cases and guides)", u:"https://www.anthropic.com/learn"},
+{k:"doc", t:"Claude customer stories (real enterprise use cases)", u:"https://claude.com/customers"},
 {k:"video", t:"Search: AI use case prioritisation framework", u:"https://www.youtube.com/results?search_query=ai+use+case+prioritization+framework"}
 ],
 coach:[
@@ -1397,7 +1448,7 @@ quiz:[
 resources:[
 {k:"doc", t:"Free-Work (French IT freelance missions)", u:"https://www.free-work.com"},
 {k:"doc", t:"Malt (freelance platform)", u:"https://www.malt.fr"},
-{k:"doc", t:"LinkedIn: profile best practices", u:"https://www.linkedin.com/help/linkedin/answer/a554351"}
+{k:"doc", t:"LinkedIn: profile best practices", u:"https://www.linkedin.com/help/linkedin/answer/112133"}
 ],
 coach:[
 "Don't oversell the Spring Boot 4 migration or generic buzzwords; lead with AI-in-production results, as you prefer a sober tone.",
@@ -1557,9 +1608,9 @@ theory:`
 <h4>5. Certification</h4>
 <p>Pick ONE, aligned with target clients (see the Market intel page for the full comparison):</p>
 <ul>
-<li><b>AWS Certified Generative AI Developer – Professional (AIP-C01)</b>: FM integration, data and compliance 31%, implementation and integration 26%, safety, security and governance 20%, operational efficiency 12%, testing and troubleshooting 11%. 65 scored questions, pass 750/1000. The closest match to this track.</li>
-<li><b>Microsoft AI-103, Azure AI Apps and Agents Developer</b> (successor of AI-102, retired June 2026): Foundry, generative and agentic solutions 30-35%, planning and management 25-30%, plus vision, text and information extraction. Python-based.</li>
-<li><b>Anthropic Claude Certified Architect – Foundations</b>: agentic architecture is the biggest domain (~27%), then Claude Code configuration and prompt/structured output; currently reserved to Claude Partner Network organisations. Claude Academy course certificates are free and open to all.</li>
+<li><b>AWS Certified Generative AI Developer – Professional (AIP-C01)</b>: FM integration, data and compliance 31%, implementation and integration 26%, safety, security and governance 20%, operational efficiency 12%, testing and troubleshooting 11%. 75 questions (65 scored), 180 minutes, pass 750/1000, USD 300. The closest match to this track.</li>
+<li><b>Microsoft AI-103, Azure AI Apps and Agents Developer</b> (successor of AI-102, retired June 2026): Foundry, generative and agentic solutions 30-35%, planning and management 25-30%, plus vision, text and information extraction. Python-based, pass 700, available in French. Free practice assessment on Microsoft Learn.</li>
+<li><b>Anthropic Claude Certified Architect – Foundations</b>: official facts: 120 minutes, closed book, pass 720/1000, USD 125, Pearson VUE, Credly badge valid 12 months (free renewal). Domain weights circulate only in unofficial guides (agentic architecture the largest). Reserved to employees of Claude Partner Network organisations, with an email on the company domain. Claude Academy courses are free and open to all, with completion badges.</li>
 </ul>
 <h4>6. The next 12 months after the track</h4>
 <p>Quarterly review: missions, rate, skills, content, pipeline. Refresh your evals of the latest models each quarter and post the results; it keeps you visibly current.</p>`,
@@ -1627,7 +1678,7 @@ quiz:[
  {q:"What best proves the value of an AI feature to a sponsor?",o:["The model name","A measured before/after on their real process","A long feature list","A benchmark leaderboard"],a:1,w:"A before/after metric on their own process is the only proof that matters to a buyer."}
 ],
 resources:[
- {k:"doc",t:"EU AI Act: high-level summary (official explorer)",u:"https://artificialintelligenceact.eu/high-level-summary/"},
+ {k:"doc",t:"EU AI Act: official European Commission page",u:"https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai"},
  {k:"doc",t:"Fortune: forward deployed engineers (Sept 2026)",u:"https://fortune.com/2026/09/03/forward-deployed-engineers-fast-growing-six-figure-silicon-valley-job-integrate-ai-with-customers-tech-careers-palantir/"},
  {k:"doc",t:"Anthropic: Building effective agents",u:"https://www.anthropic.com/engineering/building-effective-agents"},
  {k:"doc",t:"CNIL: AI and GDPR recommendations",u:"https://www.cnil.fr/fr/intelligence-artificielle"},
@@ -1776,7 +1827,7 @@ function certs(){const C=CERTS,cs=S.cert;const ck=(id,txt,xp,extra)=>{const c=!!
  <div class="card mt"><h3>🟣 ${esc(C.cca.name)} <span class="pill y">Access to unlock</span></h3><p class="small muted">${esc(C.cca.facts)}</p><p class="small"><b>Access:</b> ${esc(C.cca.access)}</p>
  ${C.cca.steps.map(s=>ck(s.id,esc(s.t),30)).join("")}${ck("cca","🏆 Exam passed",400)}
  <p class="small"><a href="https://claude.com/partners" target="_blank" rel="noopener">Claude Partner Network →</a> · <a href="https://academy.claude.com" target="_blank" rel="noopener">Claude Academy →</a></p></div>
- <div class="card mt"><h3>❌ Deliberately skipped</h3><p class="small">Paid generic "AI" certificates from course platforms, prompt-engineering certificates, and data-science certs (TensorFlow, ML Specialty): low signal for an AI engineer profile. Microsoft AI-103 only if a target client is Azure-first.</p></div>`;
+ <div class="card mt"><h3>❌ Deliberately skipped</h3><p class="small">Paid generic "AI" certificates from course platforms, prompt-engineering certificates, and data-science certs (TensorFlow, ML Specialty): low signal for an AI engineer profile. Microsoft AI-103 only if a target client is Azure-first (frequent in French large accounts); Databricks GenAI Engineer only for Databricks clients.</p></div>`;
  $("#main").innerHTML=h;document.querySelectorAll("[data-c]").forEach(c=>c.onchange=()=>{change(()=>{S.cert[c.dataset.c]=c.checked;},c.checked?"🎓 Logged":"");certs();});}
 
 function proof(){const P=S.proofs;const kinds=["Certificate","Metric","Repo","Article","Talk","Client result","Testimonial","PR merged"];
@@ -1784,16 +1835,19 @@ function proof(){const P=S.proofs;const kinds=["Certificate","Metric","Repo","Ar
  <div class="card mt"><h3>➕ Add a proof</h3><div class="grid g4"><select id="pk" style="padding:8px;border-radius:10px;border:1px solid var(--line)">${kinds.map(k=>`<option>${k}</option>`).join("")}</select>
  <input id="pt" placeholder="What (e.g. recall@5 = 0.91 on 40 questions)" style="padding:8px;border-radius:10px;border:1px solid var(--line);grid-column:span 2"><input id="pu" placeholder="Link (optional)" style="padding:8px;border-radius:10px;border:1px solid var(--line)"></div>
  <button class="btn mt" id="padd">Add proof</button></div>
- <div class="card mt"><h3>📚 ${P.length} proof${P.length>1?"s":""}</h3>${P.length?`<table><tr><th>Date</th><th>Type</th><th>Proof</th><th></th></tr>${P.slice().reverse().map((p,ri)=>{const i=P.length-1-ri;return `<tr><td class="small">${p.d}</td><td><span class="pill">${esc(p.k)}</span></td><td>${p.u?`<a href="${esc(p.u)}" target="_blank" rel="noopener">${esc(p.t)}</a>`:esc(p.t)}</td><td><button class="btn ghost" data-del="${i}" style="padding:4px 10px">✕</button></td></tr>`;}).join("")}</table>`:`<p class="muted">Nothing yet. Your first one: the Claude Academy certificate.</p>`}</div>
+ <div class="card mt"><h3>📚 ${P.length} proof${P.length>1?"s":""}</h3>${P.length?`<table><tr><th>Date</th><th>Type</th><th>Proof</th><th></th></tr>${P.slice().reverse().map((p,ri)=>{const i=P.length-1-ri;return `<tr><td class="small">${p.d}</td><td><span class="pill">${esc(p.k)}</span></td><td>${p.u?`<a href="${esc(p.u)}" target="_blank" rel="noopener">${esc(p.t)}</a>`:esc(p.t)}</td><td><button class="btn ghost" data-del="${i}" style="padding:4px 10px">✕</button></td></tr>`;}).join("")}</table>`:`<p class="muted">Nothing yet. Your first one: a Claude Academy completion badge.</p>`}</div>
  <div class="card mt"><h3>✍️ Turn proofs into CV lines</h3><p class="small">Formula: <b>action verb + what you built + measured result + context</b>. Example: "Built a RAG copilot over 120 lease and notary documents (Spring AI, PGVector); recall@5 0.91, cost 0.4 cents per question, used weekly for 6 months."</p></div>`;
  $("#main").innerHTML=h;
  $("#padd").onclick=()=>{const t=$("#pt").value.trim();if(!t)return;change(()=>{S.proofs.push({d:today(),k:$("#pk").value,t,u:$("#pu").value.trim()});},"🧾 +20 XP");proof();};
  document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{change(()=>{S.proofs.splice(+b.dataset.del,1);});proof();});}
 
-function market(){const K=MARKET;let h=`<div class="hero"><h1>🌍 Market intel</h1><p>What international AI engineer postings ask for, what Swiss employers want, and what each certification actually covers. Snapshot: ${K.updated}. Refresh it every quarter.</p></div>
+function market(){const K=MARKET;let h=`<div class="hero"><h1>🌍 Market intel</h1><p>What postings and the tech press say in the US, France, Switzerland and the rest of Europe, the tech shifts to master, and what each certification actually covers. Snapshot: ${K.updated}. Refresh it every quarter.</p></div>
  <div class="card mt"><h3>📊 Most requested skills in AI engineer postings</h3><table><tr><th>Skill</th><th>Share of postings</th><th>Comment</th><th>Where in the track</th></tr>${K.demand.map(d=>`<tr><td><b>${esc(d[0])}</b></td><td>${esc(d[1])}</td><td class="small">${esc(d[2])}</td><td><span class="pill">${esc(d[3])}</span></td></tr>`).join("")}</table><p class="small muted">Percentages vary by sample and method; treat them as directional.</p></div>
  <div class="grid g2 mt"><div class="card"><h3>🧭 Trends from markets ahead of France</h3><ul>${K.trends.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div>
  <div class="card"><h3>🇨🇭 Switzerland</h3><ul>${K.swiss.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div></div>
+ <div class="grid g2 mt"><div class="card"><h3>🇫🇷 France</h3><ul>${K.france.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div>
+ <div class="card"><h3>✅ What makes a senior AI CV stand out</h3><ul>${K.cv.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div></div>
+ <div class="card mt"><h3>⚡ Tech shifts of 2026 to master</h3><table>${K.shifts.map(d=>`<tr><td style="width:170px"><b>${esc(d[0])}</b></td><td class="small">${esc(d[1])}</td></tr>`).join("")}</table></div>
  <div class="card mt"><h3>🎓 Certifications compared</h3>${K.certs.map(c=>`<div class="ex" style="display:block"><div class="et">${esc(c.name)} <span class="pill g">${esc(c.fit)}</span></div><div class="small muted" style="margin-top:6px">${esc(c.body)}</div><a class="small" href="${c.url}" target="_blank" rel="noopener">Official page →</a></div>`).join("")}
  <h4>How this track maps to them</h4><p>${esc(K.mapping)}</p></div>
  <div class="card mt res"><h3>🔗 Sources</h3>${K.sources.map(s=>`<a href="${s[1]}" target="_blank" rel="noopener"><span class="ico doc">📘</span><span>${esc(s[0])}</span></a>`).join("")}</div>`;
