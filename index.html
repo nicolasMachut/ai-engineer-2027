@@ -96,7 +96,8 @@ const BASELINE = {
   "Production AI on the JVM: Spring AI, RAG, agents, MCP with tests and observability",
   "Evaluation, security and cost engineering for LLM features (the true senior skills)",
   "Public proof: portfolio repos, articles, talks",
-  "Spoken English under interview pressure"
+  "Spoken English under interview pressure (written level already certified: TOEIC 900 in 2015)",
+  "Data foundations for AI: SQL with vector search, ingestion pipelines, data quality"
  ]
 };
 
@@ -344,6 +345,32 @@ const MARKET = {
   ["Microsoft AI-103 official study guide","https://learn.microsoft.com/credentials/certifications/resources/study-guides/ai-103"],
   ["Claude Academy","https://academy.claude.com"]
  ]
+};
+
+const INTERVIEW = {
+ intro:"Optional, outside the track: use it whenever an interview is coming. AI engineer loops in 2026 usually include an AI system design round, a coding or take-home build, and behavioural questions on judgement and impact. Practise out loud, in English, with a timer.",
+ design:[
+  {id:"d1", t:"Design a document assistant over 50,000 contracts for a property manager with 200 clients.", look:["Multi-tenant permissions enforced in retrieval","Ingestion: incremental, deletions, parsing quality","Hybrid search + re-ranking, citations, refusal when not found","Eval set and metrics (recall@k, faithfulness), CI gate","Cost per question, caching, latency budget","GDPR: data location, retention, processor agreement"]},
+  {id:"d2", t:"Design an agent that processes supplier invoices end to end (extraction, matching with purchase orders, booking).", look:["Structured outputs + validation in code","Deterministic matching rules, the model only for the fuzzy part","Confidence thresholds and human approval queue","Idempotence and audit trail","Accuracy metrics per field, cost per invoice, ROI"]},
+  {id:"d3", t:"Your RAG assistant is wrong 15% of the time in production. How do you find out why and fix it?", look:["Collect failures with traces, label root causes","Separate retrieval failures from generation failures","Fix the biggest bucket first (parsing, chunking, missing docs, prompt)","Add the failures to the eval set, prevent regressions","Report before/after numbers"]},
+  {id:"d4", t:"Cut the LLM bill by 60% without losing quality.", look:["Measure first: cost per feature, per tenant, per request","Model routing (small model for easy cases), effort level","Prompt caching, batching for offline work","Shorter contexts: better retrieval, context editing","Prove quality is unchanged with the eval suite"]},
+  {id:"d5", t:"Design a customer-support assistant for a bank in the EU.", look:["AI Act: transparency, risk classification, logging","GDPR and data residency, PII masking","Guardrails, grounded answers only, escalation to a human","Prompt injection and data exfiltration defences","Monitoring, complaint handling, evals per intent"]},
+  {id:"d6", t:"Expose an internal ERP to Claude for 500 employees through MCP, securely.", look:["Remote MCP server, OAuth 2.1, per-user identity","Least privilege per tool, read vs write tools","Human approval for write actions","Audit log, rate limits, cost limits","Versioning and rollout of tools, evals of tool descriptions"]},
+  {id:"d7", t:"Roll out a coding agent to a 40-developer Java team and prove it works.", look:["Baseline metrics before rollout (lead time, review time, defects)","CLAUDE.md/AGENTS.md, skills, hooks as policy","Security: sandboxing, secrets, supply chain of plugins","Training and champions","Measured before/after, honest about costs"]},
+  {id:"d8", t:"Ingest 10,000 scanned PDFs per day (forms, tables, handwriting) into a structured database.", look:["Classification, then type-specific extraction","Vision models vs OCR + layout parsers, measured","Validation rules and confidence scores, human review","Throughput, batching, retries, cost per page","Ground-truth set and accuracy per field"]},
+  {id:"d9", t:"A new model version is released. How do you upgrade without regressions?", look:["Eval suite as a gate, shadow or A/B runs","Prompt adaptation (behaviour differs between models)","Cost and latency comparison (tokenizers differ)","Gradual rollout, rollback plan","Monitoring after release"]},
+  {id:"d10", t:"Post-mortem: an agent with email access sent internal data to an external address after reading a malicious email.", look:["Indirect prompt injection, lethal trifecta (private data + untrusted content + exfiltration)","Fix with capabilities, not prompts: no external send without approval","Egress allow-lists, least privilege","Injection tests in CI","Blameless write-up, detection and response"]}
+ ],
+ behavioural:[
+  "Tell me about an AI feature you shipped: what was the measurable impact?",
+  "Tell me about a time the AI was wrong in a way that mattered. What did you change?",
+  "A stakeholder wants a chatbot by next month. You think the use case is wrong. What do you do?",
+  "How do you decide between building with an LLM and writing deterministic code?",
+  "How do you keep up with a field that changes every month?",
+  "Why are you moving from classic Java lead work to AI engineering?"
+ ],
+ takehome:{t:"Timeboxed take-home (4 hours)", d:"Build a small API that answers questions over 20 provided documents with citations, plus an eval set of 15 questions, a results table and a README explaining trade-offs and what you would do with more time. Use your own documents to practise.", rubric:["Works end to end and is easy to run","Citations and refusal when the answer is not in the documents","Eval set with honest numbers","Clean code and tests on the deterministic parts","README: decisions, limits, next steps (often weighted as much as the code)"]},
+ mock:"You are a senior interviewer for an AI engineer role at a European scale-up. Run a 45-minute AI system design interview in English with me. Pick one problem, let me drive, ask probing follow-up questions on retrieval, evals, security, cost and trade-offs, interrupt me when I am vague, and at the end give a structured score (hire / no hire) with the 3 biggest gaps and how to fix them. Also correct my English mistakes at the end."
 };
 // ===== PHASE 1 : FOUNDATIONS =====
 M.push({
@@ -957,6 +984,44 @@ coach:[
 "French public sector and some banks ask about European or sovereign options. Have a calm, factual answer ready."
 ],
 english:{vocab:[["trade-off","compromis"],["open-weight model","modèle aux poids publics"],["ADR (Architecture Decision Record)","note de décision d'architecture"],["to port","porter (adapter du code)"],["landscape","paysage, écosystème"],["sovereign cloud","cloud souverain"]], speak:"In English, recommend Spring AI or LangChain4j to a client and justify it in one minute."}
+});
+
+// m22 inserted right after m06 in the track order
+M.splice(M.findIndex(x=>x.id==="m06")+1,0,{
+id:"m22", phase:2, weeks:"14 (alongside module 6)", hours:15,
+title:"Data foundations for AI: SQL, pipelines and data quality",
+why:"A RAG or an agent is only as good as its data. Postings ask for SQL and pipelines next to LLM skills, and most production failures come from bad, stale or leaking data, not from the model.",
+objectives:["Write the SQL an AI engineer needs: CTEs, window functions, JSON, full-text and vector queries in PostgreSQL","Build an idempotent, incremental ingestion pipeline with change detection","Measure and enforce data quality: duplicates, freshness, completeness, PII","Design metadata and permissions for retrieval","Version and manage evaluation datasets like code"],
+theory:`<h4>1. SQL for AI engineers</h4><p>You already know SQL from Java projects; the AI-specific part is combining it with retrieval. In PostgreSQL: <b>CTEs</b> and <b>window functions</b> for analytics (latest version of a document, ranking), <b>JSONB</b> for flexible metadata, <b>full-text search</b> (tsvector) for keyword retrieval and <b>pgvector</b> for similarity (distance operators, HNSW or IVFFlat indexes). Hybrid search is often one SQL query with a metadata filter, a keyword score and a vector score fused together.</p>
+<h4>2. Ingestion pipelines</h4><p>Production ingestion is <b>idempotent</b> (re-running gives the same result), <b>incremental</b> (only new or changed documents, detected with content hashes or timestamps) and <b>observable</b> (counts, failures, duration). Steps: fetch, parse, clean, chunk, enrich metadata, embed, upsert, delete what disappeared at the source. Deletion is the step everyone forgets, and it is a GDPR issue.</p>
+<h4>3. Parsing is a data-quality problem</h4><p>PDF tables, scans, headers and footers, multi-column layouts: parsing errors silently poison retrieval. Compare parsers (plain text extraction, layout-aware tools such as Docling, or a vision model) on a sample of your real documents and measure the result, exactly like an eval.</p>
+<h4>4. Data quality checks</h4><p>Check before indexing: duplicates and near-duplicates, empty or tiny chunks, encoding problems, language, freshness (last update per source), completeness (expected documents present), and <b>PII</b> (detect and mask or exclude). Automate the checks in the pipeline and fail loudly.</p>
+<h4>5. Metadata and permissions</h4><p>Design metadata for filtering and access control from day one: tenant, source, document type, date, version, confidentiality level, owner. Permission filtering must happen in the retrieval query, never after generation.</p>
+<h4>6. Datasets as code</h4><p>Evaluation sets, labelled samples and prompts are versioned in Git (or a dataset tool) with a changelog. Every eval result points to a dataset version, so you can compare runs honestly.</p>`,
+takeaways:["Bad data beats a good model every time","Idempotent, incremental, observable: the three rules of ingestion","Delete at the source means delete in the index","Filter permissions in the query, not in the answer","Version your datasets like code"],
+exercises:[
+ {t:"SQL drills on your own data", d:"In PostgreSQL, load your anonymised lease metadata and write 10 queries: latest version per document (window function), rent per property (CTE), JSONB filters, a full-text query and a pgvector similarity query with a metadata filter.", h:3},
+ {t:"Hybrid search in one query", d:"Write a single SQL query fusing a full-text score and a vector score (reciprocal rank fusion) with a tenant filter. Compare results with pure vector search on 10 questions.", h:3},
+ {t:"Incremental ingestion job", d:"Build the Patrimony Copilot ingestion job: content hash for change detection, upsert, deletion of removed documents, run report (added/updated/deleted/failed). Run it twice and prove it is idempotent.", h:4},
+ {t:"Parser comparison", d:"Parse 15 of your real documents (with tables and one scan) with two parsers. Score extraction quality by hand and record the decision in an ADR.", h:3},
+ {t:"Quality gate", d:"Add automated checks before indexing: duplicates, empty chunks, PII detection, freshness. The pipeline fails with a clear message when a check fails.", h:2}
+],
+quiz:[
+ {q:"A document was removed from the source system but the assistant still quotes it. Root cause?",o:["The model memorised it","The ingestion pipeline does not propagate deletions","Temperature too high","Chunk size too small"],a:1,w:"Ingestion must handle deletions; otherwise the index keeps stale or legally deleted data."},
+ {q:"What makes an ingestion job idempotent?",o:["It runs fast","Running it twice with the same input gives the same index state","It uses a vector database","It runs every night"],a:1,w:"Idempotence allows safe retries and re-runs, typically via content hashes and upserts."},
+ {q:"Where should tenant permissions be enforced in a RAG system?",o:["In the system prompt","In the retrieval query (metadata filter)","After generation, by filtering the answer","In the UI only"],a:1,w:"If unauthorised chunks reach the model, they can leak; filter at retrieval time."},
+ {q:"Best way to choose a PDF parser for your project?",o:["Pick the most popular library","Measure extraction quality on a sample of your real documents","Use the LLM for everything","Avoid PDFs"],a:1,w:"Parsing quality depends on your documents; measure it like any eval."},
+ {q:"Why version evaluation datasets?",o:["To save disk space","So every eval result can be compared against a known dataset version","Because Git requires it","To hide failures"],a:1,w:"Without dataset versions, score changes can come from the data rather than from your system."}
+],
+resources:[
+ {k:"doc",t:"PostgreSQL tutorial: window functions",u:"https://www.postgresql.org/docs/current/tutorial-window.html"},
+ {k:"doc",t:"PostgreSQL: full-text search",u:"https://www.postgresql.org/docs/current/textsearch.html"},
+ {k:"doc",t:"pgvector (indexes, distance operators, hybrid search)",u:"https://github.com/pgvector/pgvector"},
+ {k:"doc",t:"Docling: layout-aware document parsing",u:"https://github.com/docling-project/docling"},
+ {k:"doc",t:"Spring AI: ETL pipeline (document readers, transformers, writers)",u:"https://docs.spring.io/spring-ai/reference/api/etl-pipeline.html"}
+],
+coach:["You have a real edge here: years of Java back-ends mean you already think in transactions, idempotence and migrations. Say it in interviews.","Most RAG demos skip deletions, permissions and parsing quality. Showing them in your README instantly signals production experience."],
+english:{vocab:[["idempotent","idempotent (même résultat si relancé)"],["upsert","insérer ou mettre à jour"],["data lineage","traçabilité des données"],["stale data","données obsolètes"],["to backfill","rattraper l'historique"],["near-duplicate","quasi-doublon"]],speak:"Explain to a client in 2 minutes why their chatbot quoted a contract that was cancelled last month, and how you will make sure it never happens again."}
 });
 // ===== PHASE 3 : PRODUCTION-GRADE AI =====
 M.push({
@@ -1691,7 +1756,7 @@ english:{vocab:[["stakeholder","partie prenante"],["scope","périmètre"],["buy-
 const KEY="aiTrack.public.v1";
 let S=load();
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s)return Object.assign(blank(),s);}catch(e){}return blank();}
-function blank(){return{ex:{},quiz:{},mod:{},speak:{},proj:{},cert:{},proofs:[],notes:{},start:"",activity:[],badges:{}};}
+function blank(){return{ex:{},quiz:{},mod:{},speak:{},proj:{},cert:{},proofs:[],iv:{},rev:{},notes:{},start:"",activity:[],badges:{}};}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 const $=s=>document.querySelector(s);
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -1745,7 +1810,7 @@ function renderSide(){const x=xpOf(),l=level(x),r=location.hash||"#/";
  <div class="me"><div class="lv">Lv ${l.i+1} · ${esc(l.name)}</div><small>${x} XP${l.next?" · "+(l.next-x)+" to "+esc(l.nextName):" · max level"}</small>
  <div class="xpbar"><i style="width:${l.pct}%"></i></div><small>🔥 ${streak()} week streak · ${totalPct()}% done</small><br><button class="menu-btn" onclick="document.getElementById('side').classList.toggle('open')">☰ Menu</button></div><nav>`;
  const L=(href,ic,t)=>`<a href="${href}" class="${r===href?"on":""}">${ic} ${t}</a>`;
- h+=L("#/","🏠","Dashboard")+L("#/roadmap","🗺️","Roadmap")+L("#/projects","📦","Capstone projects")+L("#/certs","🎓","Certifications")+L("#/proof","🧾","Proof ledger")+L("#/market","🌍","Market intel")+L("#/career","💼","Career kit")+L("#/english","🇬🇧","English track")+L("#/badges","🏅","Badges")+L("#/settings","⚙️","Settings & backup");
+ h+=L("#/","🏠","Dashboard")+L("#/roadmap","🗺️","Roadmap")+L("#/projects","📦","Capstone projects")+L("#/review","🔁","Review"+(dueCards().length?" ("+dueCards().length+")":""))+L("#/certs","🎓","Certifications")+L("#/proof","🧾","Proof ledger")+L("#/market","🌍","Market intel")+L("#/interview","🎤","Interview prep (optional)")+L("#/career","💼","Career kit")+L("#/english","🇬🇧","English track")+L("#/badges","🏅","Badges")+L("#/settings","⚙️","Settings & backup");
  PHASES.forEach(p=>{h+=`<div class="sec">${p.icon} Phase ${p.n} · ${esc(p.name)}</div>`;
   M.filter(m=>m.phase===p.n).forEach(m=>{const pc=modPct(m);h+=`<a class="mod ${r==="#/m/"+m.id?"on":""}" href="#/m/${m.id}">${m.id.slice(1)} · ${esc(m.title)}<span class="ck">${S.mod[m.id]?"✅":pc?pc+"%":""}</span></a>`;});});
  $("#side").innerHTML=h+"</nav>";}
@@ -1805,7 +1870,7 @@ function moduleView(id){const m=M.find(x=>x.id===id);if(!m){location.hash="#/";r
    box.querySelectorAll(".opt").forEach((o,j)=>{o.classList.remove("right","wrong");if(j===it.a)o.classList.add("right");else if(sel&&+sel.value===j)o.classList.add("wrong");});
    if(sel){ans++;if(+sel.value===it.a)ok++;}});
   const sc=Math.round(ok/m.quiz.length*100);$("#qscore").textContent=`${ok}/${m.quiz.length} · ${sc}% ${sc>=80?"🎉 passed":"· retry after reviewing"}`;
-  if(ans===m.quiz.length){change(()=>{const old=S.quiz[m.id]||{best:0,tries:0};S.quiz[m.id]={best:Math.max(old.best,sc),tries:old.tries+1,last:sc};},sc===100?"🎯 Perfect score!":sc>=80?"🧪 Quiz passed":"");if(sc===100)burst();}};
+  if(ans===m.quiz.length){m.quiz.forEach((it,i)=>{const sel=document.querySelector(`input[name=q${i}]:checked`);const k=m.id+":"+i;if(+sel.value!==it.a)S.rev[k]={b:1,d:today()};else if(!S.rev[k])S.rev[k]={b:2,d:addDays(3)};});change(()=>{const old=S.quiz[m.id]||{best:0,tries:0};S.quiz[m.id]={best:Math.max(old.best,sc),tries:old.tries+1,last:sc};},sc===100?"🎯 Perfect score!":sc>=80?"🧪 Quiz passed":"");if(sc===100)burst();}};
  $("#qres").onclick=()=>moduleView(id);}
 
 function projects(){let h=`<div class="hero"><h1>📦 Capstone projects</h1><p>Projects you will actually use: your property portfolio, your money, your mountain days. Real usage is your strongest proof. Each step = +40 XP, each finished project = +150 XP.</p></div>
@@ -1841,6 +1906,38 @@ function proof(){const P=S.proofs;const kinds=["Certificate","Metric","Repo","Ar
  $("#padd").onclick=()=>{const t=$("#pt").value.trim();if(!t)return;change(()=>{S.proofs.push({d:today(),k:$("#pk").value,t,u:$("#pu").value.trim()});},"🧾 +20 XP");proof();};
  document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{change(()=>{S.proofs.splice(+b.dataset.del,1);});proof();});}
 
+// ---- spaced repetition (Leitner) ----
+const BOX=[0,1,3,7,14,30];
+function addDays(n){const d=new Date();d.setDate(d.getDate()+n);return d.toISOString().slice(0,10);}
+function cardOf(k){const [mid,qi]=k.split(":");const m=M.find(x=>x.id===mid);return m&&m.quiz[+qi]?{k,m,q:m.quiz[+qi]}:null;}
+function dueCards(){const t=today();return Object.keys(S.rev||{}).filter(k=>S.rev[k].d<=t).map(cardOf).filter(Boolean);}
+let revQ=[],revI=0,revOk=0;
+function review(start){if(start||!revQ.length){revQ=dueCards().sort(()=>Math.random()-.5).slice(0,15);revI=0;revOk=0;}
+ const total=Object.keys(S.rev).length,mast=Object.values(S.rev).filter(r=>r.b>=5).length;
+ let h=`<div class="hero"><h1>🔁 Review</h1><p>Spaced repetition: questions you missed come back tomorrow, then after 3, 7, 14 and 30 days as long as you get them right. Ten minutes, a few times a week, is enough to keep everything fresh.</p></div>
+ <div class="grid g3 mt"><div class="card stat"><b>${dueCards().length}</b><span>due today</span></div><div class="card stat"><b>${total}</b><span>cards in your deck</span></div><div class="card stat"><b>${mast}</b><span>mastered (30-day box)</span></div></div>`;
+ if(!revQ.length||revI>=revQ.length){h+=`<div class="card mt"><h3>${revQ.length?`✅ Session done: ${revOk}/${revQ.length}`:"Nothing due right now"}</h3><p class="muted">Cards enter the deck when you submit a module quiz. ${total?"Come back tomorrow.":"Start with module 1."}</p>${dueCards().length?`<button class="btn" id="rgo">Start a new session</button>`:""}</div>`;
+  $("#main").innerHTML=h;const g=$("#rgo");if(g)g.onclick=()=>review(true);return;}
+ const c=revQ[revI];
+ h+=`<div class="card mt"><div class="small muted">Card ${revI+1}/${revQ.length} · Module ${c.m.id.slice(1)} · ${esc(c.m.title)} · box ${S.rev[c.k].b}</div><div class="q" id="rq"><b>${esc(c.q.q)}</b>${c.q.o.map((o,j)=>`<label class="opt" data-j="${j}">${esc(o)}</label>`).join("")}<div class="why">${esc(c.q.w)}</div></div><div class="mt" id="rnext"></div></div>`;
+ $("#main").innerHTML=h;
+ document.querySelectorAll("#rq .opt").forEach(o=>o.onclick=()=>{if($("#rq").classList.contains("shown"))return;const j=+o.dataset.j,ok=j===c.q.a;$("#rq").classList.add("shown");
+  document.querySelectorAll("#rq .opt").forEach((x,jj)=>{if(jj===c.q.a)x.classList.add("right");else if(jj===j)x.classList.add("wrong");});
+  const r=S.rev[c.k];if(ok){revOk++;r.b=Math.min(5,r.b+1);}else r.b=1;r.d=addDays(BOX[r.b]);
+  change(()=>{},ok?"🔁 Correct · next in "+BOX[r.b]+" d":"↩️ Back to box 1");
+  $("#rnext").innerHTML=`<button class="btn" id="rn">${revI+1<revQ.length?"Next card →":"Finish"}</button>`;$("#rn").onclick=()=>{revI++;review();};});}
+
+function interview(){const I=INTERVIEW;const ck=(id)=>!!S.iv[id];
+ let h=`<div class="hero"><h1>🎤 Interview prep</h1><p>${esc(I.intro)}</p></div>
+ <div class="card mt"><h3>🏗️ AI system design (10 problems)</h3><p class="small muted">For each: 5 min clarifying questions, 25 min design out loud, 10 min trade-offs and metrics. Then open the checklist and score yourself.</p>
+ ${I.design.map(d=>`<div class="ex" style="display:block"><label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer"><input type="checkbox" data-iv="${d.id}" ${ck(d.id)?"checked":""}><span class="et">${esc(d.t)}</span></label><details style="margin:8px 0 0 30px"><summary class="small" style="cursor:pointer">What a strong answer covers</summary><ul class="small">${d.look.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></details></div>`).join("")}</div>
+ <div class="grid g2 mt"><div class="card"><h3>🗣️ Behavioural (STAR, with a number)</h3><ol>${I.behavioural.map(b=>`<li>${esc(b)}</li>`).join("")}</ol><p class="small muted">Prepare each answer from your Proof ledger: situation, task, action, result with a metric.</p></div>
+ <div class="card"><h3>⏱️ ${esc(I.takehome.t)}</h3><p class="small">${esc(I.takehome.d)}</p><h4>How it is graded</h4><ul class="small">${I.takehome.rubric.map(r=>`<li>${esc(r)}</li>`).join("")}</ul><label class="ex ${ck("th")?"done":""}"><input type="checkbox" data-iv="th" ${ck("th")?"checked":""}><div class="et">Take-home done in 4 hours</div></label></div></div>
+ <div class="card mt"><h3>🤖 Mock interview with Claude</h3><p class="small muted">Paste this into Claude (voice mode works well), then log the feedback in your notes.</p><pre class="copy" id="mock">${esc(I.mock)}</pre><label class="ex ${ck("mk")?"done":""}"><input type="checkbox" data-iv="mk" ${ck("mk")?"checked":""}><div class="et">At least 3 mock interviews done</div></label></div>`;
+ $("#main").innerHTML=h;
+ const m=$("#mock");m.onclick=()=>{try{navigator.clipboard.writeText(I.mock);toast("📋 Copied");}catch(e){}};
+ document.querySelectorAll("[data-iv]").forEach(c=>c.onchange=()=>{change(()=>{S.iv[c.dataset.iv]=c.checked;},c.checked?"🎤 Logged":"");interview();});}
+
 function market(){const K=MARKET;let h=`<div class="hero"><h1>🌍 Market intel</h1><p>What postings and the tech press say in the US, France, Switzerland and the rest of Europe, the tech shifts to master, and what each certification actually covers. Snapshot: ${K.updated}. Refresh it every quarter.</p></div>
  <div class="card mt"><h3>📊 Most requested skills in AI engineer postings</h3><table><tr><th>Skill</th><th>Share of postings</th><th>Comment</th><th>Where in the track</th></tr>${K.demand.map(d=>`<tr><td><b>${esc(d[0])}</b></td><td>${esc(d[1])}</td><td class="small">${esc(d[2])}</td><td><span class="pill">${esc(d[3])}</span></td></tr>`).join("")}</table><p class="small muted">Percentages vary by sample and method; treat them as directional.</p></div>
  <div class="grid g2 mt"><div class="card"><h3>🧭 Trends from markets ahead of France</h3><ul>${K.trends.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div>
@@ -1870,6 +1967,7 @@ function career(){const C=CAREER;let h=`<div class="hero"><h1>💼 Career kit</h
  $("#main").innerHTML=h;document.querySelectorAll("pre.copy").forEach(p=>p.onclick=()=>{try{navigator.clipboard.writeText(p.textContent);toast("📋 Copied");}catch(e){toast("Select and copy manually");}});}
 
 function english(){const all=M.flatMap(m=>m.english.vocab.map(v=>[...v,m.id]));let h=`<div class="hero"><h1>🇬🇧 English track</h1><p>The whole track is in English on purpose. Add this routine and you will be interview-ready for remote, international and Swiss clients by month 9.</p></div>
+ <div class="card mt"><h3>📜 Certified level</h3><p class="small">TOEIC 900/990 (2015), roughly C1. ETS only reports scores for 2 years, so for Swiss or international applications that require a recent certificate, retake a test (TOEIC or Linguaskill, about 2 hours) a few weeks before applying. Until then, list it on your CV as "TOEIC 900 (2015)" and prove spoken English in interviews.</p></div>
  <div class="card mt"><h3>📆 Routine</h3><ul>${ENGLISH_ROUTINE.map(r=>`<li>${esc(r)}</li>`).join("")}</ul></div>
  <div class="card mt"><h3>🎙️ Speaking prompts done: ${Object.values(S.speak).filter(Boolean).length}/${M.length}</h3><ol>${M.map(m=>`<li>${S.speak[m.id]?"✅":"⬜"} <a href="#/m/${m.id}">${esc(m.english.speak)}</a></li>`).join("")}</ol></div>
  <div class="card mt"><h3>🃏 All flashcards (${all.length})</h3><div class="cards">${all.map(v=>`<div class="flip" onclick="this.classList.toggle('on')"><div class="in"><div class="f">${esc(v[0])}</div><div class="b">${esc(v[1])}</div></div></div>`).join("")}</div></div>`;
@@ -1888,7 +1986,7 @@ function settings(){$("#main").innerHTML=`<div class="hero"><h1>⚙️ Settings 
  $("#rst").onclick=()=>{if(confirm("Reset all progress?")){S=blank();save();renderSide();toast("Progress reset");}};}
 
 function route(){const r=location.hash||"#/";const sd=document.getElementById("side");if(sd)sd.classList.remove("open");renderSide();
- if(r.startsWith("#/m/"))moduleView(r.slice(4));else if(r==="#/roadmap")roadmap();else if(r==="#/projects")projects();else if(r==="#/career")career();else if(r==="#/market")market();else if(r==="#/certs")certs();else if(r==="#/proof")proof();
+ if(r.startsWith("#/m/"))moduleView(r.slice(4));else if(r==="#/roadmap")roadmap();else if(r==="#/projects")projects();else if(r==="#/career")career();else if(r==="#/market")market();else if(r==="#/certs")certs();else if(r==="#/review")review(true);else if(r==="#/interview")interview();else if(r==="#/proof")proof();
  else if(r==="#/english")english();else if(r==="#/badges")badges();else if(r==="#/settings")settings();else dashboard();}
 window.addEventListener("hashchange",route);route();
 </script></body></html>
