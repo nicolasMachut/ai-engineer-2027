@@ -1703,7 +1703,7 @@ function renderSide(){const x=xpOf(),l=level(x),r=location.hash||"#/";
 function dashboard(){const x=xpOf(),l=level(x),cw=currentWeek(),tp=totalPct();
  const next=M.find(m=>!S.mod[m.id]);const doneEx=Object.values(S.ex).filter(Boolean).length,totEx=M.reduce((a,m)=>a+m.exercises.length,0);
  const hrs=M.reduce((a,m)=>a+m.exercises.reduce((b,e,i)=>b+(S.ex[m.id+":"+i]?e.h:0),0),0);
- let h=`<div class="hero"><h1>Your path to Senior AI Engineer, 2027</h1><p>12 months · ~15 h/week · 20 modules · 6 capstone projects. From strong Java lead to the AI engineer companies fight for: theory, hands-on, quizzes, English and career, all in one place.</p></div>
+ let h=`<div class="hero"><h1>Your path to Senior AI Engineer, 2027</h1><p>12 months · ~15 h/week · ${M.length} modules · ${PROJECTS.length} capstone projects · certification plan. From strong Java lead to the AI engineer companies fight for: theory, hands-on, quizzes, English and career, all in one place.</p></div>
  <div class="grid g4 mt"><div class="card" style="display:flex;gap:14px;align-items:center"><div class="ring" style="--p:${tp}"><div>${tp}%</div></div><div class="stat"><b>${tp}%</b><span>track completed</span></div></div>
  <div class="card stat"><b>Lv ${l.i+1}</b><span>${esc(l.name)} · ${x} XP</span><div class="xpbar" style="background:#eef0f6"><i style="width:${l.pct}%"></i></div></div>
  <div class="card stat"><b>🔥 ${streak()}</b><span>week streak</span></div>
