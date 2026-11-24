@@ -77,6 +77,11 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:8px;borde
 .chat{max-height:420px;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:10px;background:#f8fafc;border:1px solid var(--line);border-radius:12px}
 .bub{max-width:85%;padding:9px 12px;border-radius:14px;font-size:14px;line-height:1.5}.bub.user{align-self:flex-end;background:#eef2ff;color:#1e1b4b}.bub.assistant{align-self:flex-start;background:#fff;border:1px solid var(--line)}
 .bub pre,.card pre{white-space:pre-wrap}
+.trbtn{position:fixed;z-index:70;display:none;border:0;border-radius:99px;padding:6px 12px;font-family:inherit;font-size:13px;font-weight:700;background:#0f172a;color:#fff;box-shadow:0 6px 16px rgba(15,23,42,.25);cursor:pointer}.trbtn.on{display:block}.trbtn:hover{background:var(--brand)}
+.trpop{position:fixed;z-index:71;display:none;width:min(460px,calc(100vw - 16px));max-height:min(60vh,440px);overflow:auto;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 36px rgba(15,23,42,.2);padding:12px 14px;font-size:14px;line-height:1.55}.trpop.on{display:block}
+.trh{display:flex;align-items:center;gap:6px;margin-bottom:6px}.trh .trc{margin-left:auto}.trc,.trx{border:0;background:none;cursor:pointer;font-size:14px;color:var(--muted);padding:2px 6px;border-radius:6px}.trc:hover,.trx:hover{background:#f1f5f9}
+.trsrc{font-size:12px;color:var(--muted);border-left:3px solid var(--line);padding-left:8px;margin-bottom:8px}
+.langbtn{position:fixed;top:12px;right:14px;z-index:45;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:21px;line-height:1;cursor:pointer;box-shadow:var(--sh);display:grid;place-items:center;padding:0}.langbtn:hover{transform:scale(1.08)}.langbtn.busy{animation:lgp 1s ease-in-out infinite}@keyframes lgp{50%{opacity:.35}}
 </style></head><body><div class="app"><aside id="side"></aside><main id="main"></main></div><div id="toast" class="toast"></div><script>// ===== GLOBAL DATA =====
 const M = [];
 const PHASES = [
@@ -1893,6 +1898,86 @@ function aiSettingsHTML(){const k=aiKey(),md=aiModels();const opt=(v,c)=>["claud
 function aiSettingsBind(){$("#akSave").onclick=()=>{const v=$("#akIn").value.trim();try{if(v)localStorage.setItem(AIK,v);localStorage.setItem(AIM,JSON.stringify({fast:$("#amF").value,smart:$("#amS").value}));}catch(e){}toast("🤖 AI settings saved");settings();};
  $("#akDel").onclick=()=>{try{localStorage.removeItem(AIK);}catch(e){}toast("Key removed");settings();};
  $("#akTest").onclick=e=>busy(e.target,async()=>{const r=await callClaude("Reply with exactly: OK",[{role:"user",content:"ping"}],{model:aiModels().fast,max:10});$("#akMsg").textContent="✅ Connected ("+r.trim().slice(0,20)+")";});}
+
+// ---- select-to-translate: select any text, get a French translation ----
+const TR_CACHE=new Map();let trSel="",trRect=null,trN=0,trDown=false,trT=null,trT2=null;
+const TR_SYS="Tu traduis en français, pour un développeur senior français qui suit une formation d'AI engineer en anglais. Règles : traduction naturelle et précise, pas mot à mot. Garde en anglais les termes techniques que les développeurs français emploient tels quels (RAG, embeddings, prompt, token, fine-tuning, agent, eval, pipeline...), avec si utile la traduction entre parenthèses à la première occurrence. Conserve le code, les noms propres et les chiffres. Réponds uniquement avec la traduction, sans introduction. Si le texte contient des expressions idiomatiques ou des termes clés délicats, ajoute après une ligne vide une liste de 3 points maximum au format \"- terme : explication courte\". Pour un mot seul ou une expression courte, donne la traduction puis le sens dans ce contexte en une phrase. N'utilise jamais de tiret cadratin.";
+function trEl(id){return document.getElementById(id);}
+function trUI(){if(trEl("trBtn"))return;
+ const b=document.createElement("button");b.id="trBtn";b.className="trbtn";b.type="button";b.textContent="🇫🇷 Traduire";b.title="Traduire la sélection (Alt+T)";document.body.appendChild(b);
+ const p=document.createElement("div");p.id="trPop";p.className="trpop";p.setAttribute("role","dialog");p.setAttribute("aria-label","Traduction");document.body.appendChild(p);
+ b.addEventListener("mousedown",e=>e.preventDefault());b.addEventListener("click",trRun);}
+function trHide(){["trBtn","trPop"].forEach(id=>{const e=trEl(id);if(e)e.classList.remove("on");});}
+function trPlace(el,r,below){const w=el.offsetWidth,h=el.offsetHeight;let x=r.left+r.width/2-w/2,y=below?r.bottom+8:r.top-h-8;
+ if(below&&y+h>innerHeight-8)y=r.top-h-8;if(!below&&y<8)y=r.bottom+8;
+ x=Math.max(8,Math.min(x,innerWidth-w-8));y=Math.max(8,Math.min(y,innerHeight-h-8));el.style.left=x+"px";el.style.top=y+"px";}
+function trCheck(){const b=trEl("trBtn");if(!b)return;const s=window.getSelection();const t=s&&s.rangeCount?s.toString().replace(/\s+/g," ").trim():"";
+ if(t.length<2){b.classList.remove("on");return;}
+ const n=s.anchorNode,a=n&&(n.nodeType===1?n:n.parentElement);if(a&&a.closest("input,textarea,#trPop,#trBtn"))return;
+ const r=s.getRangeAt(0).getBoundingClientRect();if(!r.width&&!r.height)return;
+ trSel=t.slice(0,3000);trRect=r;b.classList.add("on");trPlace(b,r,false);}
+function trFmt(t){return mdLite(t.replace(/\s*—\s*/g,", "));}
+async function trRun(){const t=trSel;if(!t)return;const id=++trN,p=trEl("trPop");trEl("trBtn").classList.remove("on");
+ const show=body=>{if(id!==trN)return;p.innerHTML=`<div class="trh"><b>🇫🇷 Traduction</b><button type="button" class="trc" title="Copier">📋</button><button type="button" class="trx" aria-label="Fermer">✕</button></div><div class="trsrc">${esc(t.length>280?t.slice(0,280)+"…":t)}</div><div class="trout">${body}</div>`;
+  p.classList.add("on");trPlace(p,trRect,true);p.querySelector(".trx").onclick=trHide;
+  p.querySelector(".trc").onclick=()=>{try{navigator.clipboard.writeText(p.querySelector(".trout").innerText);toast("📋 Copié");}catch(e){}};};
+ if(!aiKey()){show(`Ajoute ta clé Anthropic dans <a href="#/settings">Settings</a> pour activer la traduction.`);return;}
+ if(TR_CACHE.has(t)){show(trFmt(TR_CACHE.get(t)));return;}
+ show(`<span class="muted">⏳ Traduction…</span>`);
+ const h=document.querySelector("main h1");const ctx=h?h.textContent.trim():"";
+ try{const r=(await callClaude(TR_SYS,[{role:"user",content:`${ctx?"Page : "+ctx+"\n\n":""}Texte à traduire :\n"""${t}"""`}],{model:aiModels().fast,max:1500})).trim();
+  TR_CACHE.set(t,r);show(trFmt(r));}catch(e){show(`⚠️ ${esc(e.message)}`);}}
+(function(){trUI();const later=()=>{clearTimeout(trT);trT=setTimeout(trCheck,30);};
+ document.addEventListener("mousedown",e=>{trDown=true;if(!e.target.closest("#trPop,#trBtn"))trHide();});
+ document.addEventListener("mouseup",()=>{trDown=false;later();});
+ document.addEventListener("keyup",e=>{if(e.shiftKey||e.key==="Shift")later();});
+ document.addEventListener("selectionchange",()=>{if(trDown)return;clearTimeout(trT2);trT2=setTimeout(trCheck,350);});
+ document.addEventListener("keydown",e=>{if(e.key==="Escape")trHide();else if(e.altKey&&e.code==="KeyT"){const s=window.getSelection();if(s&&s.toString().trim()){e.preventDefault();trCheck();trRun();}}});
+ window.addEventListener("scroll",()=>{const b=trEl("trBtn");if(b)b.classList.remove("on");},{passive:true,capture:true});
+ window.addEventListener("hashchange",trHide);})();
+
+// ---- whole-site EN/FR switch: AI translation of what is displayed, cached in this browser ----
+const LGK="aiTrack.lang",LGC="aiTrack.frCache";let LG_CACHE=null,lgBusy=0,lgT=null,lgWarned=false;const lgFly=new Set();
+const LG_SKIP="script,style,textarea,pre,code,kbd,.notr,.bub,#ivAI,#trPop,#trBtn,#langBtn,#toast";
+const LG_BLK="p,li,h1,h2,h3,h4,td,th,.why,.et,label,small,div";
+const LG_INL=new Set(["B","I","EM","STRONG","CODE","A","SPAN","BR","SMALL","U","SUB","SUP"]);
+const LG_SYS="You translate the interface and course content of an English learning website for a senior French developer. Translate each item of the JSON array \"t\" from English to natural, precise French. Items may contain HTML: keep every tag and attribute exactly as is and translate only the visible text. Keep in English the technical terms French developers use as is (RAG, embeddings, prompt, token, fine-tuning, agent, eval, pipeline, cloud...). Keep emojis, numbers, code, product and certification names, URLs and [bracket] placeholders unchanged. If an item is already French or untranslatable, return it unchanged. Never use an em dash. Return {\"t\":[...]} with exactly the same number of items, in the same order.";
+function lang(){try{return localStorage.getItem(LGK)||"en";}catch(e){return "en";}}
+function lgCache(){if(!LG_CACHE){try{LG_CACHE=JSON.parse(localStorage.getItem(LGC)||"{}");}catch(e){LG_CACHE={};}}return LG_CACHE;}
+function lgSave(){try{localStorage.setItem(LGC,JSON.stringify(LG_CACHE));}catch(e){}}
+function lgSafe(h){return h.replace(/<\s*\/?\s*(script|iframe|object|embed|style)[^>]*>/gi,"").replace(/\son\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi,"").replace(/\s*—\s*/g,", ");}
+function lgInline(el){for(const d of el.querySelectorAll("*")){if(!LG_INL.has(d.tagName)||d.id||[...d.attributes].some(a=>a.name.startsWith("data-")||a.name.startsWith("on")))return false;}return true;}
+function lgMarked(n,stop){for(let p=n;p&&p!==stop;p=p.parentElement)if(p.__lgb||p.__fr)return true;return false;}
+function lgCollect(root){const blocks=[],texts=[];
+ root.querySelectorAll(LG_BLK).forEach(el=>{if(el.__fr||el.closest(LG_SKIP)||lgMarked(el.parentElement,root))return;
+  if(!/[A-Za-z]{2,}/.test(el.textContent)||!lgInline(el))return;el.__lgb=1;blocks.push(el);});
+ const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;
+ while((n=w.nextNode())){const t=n.nodeValue.trim();if(!t||n.__fr||!/[A-Za-z]{2,}/.test(t))continue;const pe=n.parentElement;
+  if(!pe||pe.closest(LG_SKIP)||lgMarked(pe,null))continue;texts.push(n);}
+ blocks.forEach(el=>el.__lgb=0);return {blocks,texts};}
+function lgApply(it,f){if(it.el){it.el.innerHTML=lgSafe(f);it.el.__fr=1;}else{const v=it.n.nodeValue;it.n.nodeValue=v.match(/^\s*/)[0]+f.replace(/\s*—\s*/g,", ")+v.match(/\s*$/)[0];it.n.__fr=1;}}
+function lgFlag(){const b=document.getElementById("langBtn");if(!b)return;const fr=lang()==="fr";b.textContent=fr?"🇬🇧":"🇫🇷";
+ b.title=lgBusy?"Traduction en cours…":(fr?"Switch to English":"Passer le site en français");b.classList.toggle("busy",lgBusy>0);}
+function lgRun(){if(lang()!=="fr")return;const C=lgCache(),todo=[];
+ ["main","side"].map(id=>document.getElementById(id)).filter(Boolean).forEach(r=>{const {blocks,texts}=lgCollect(r);
+  blocks.forEach(el=>{const s=el.innerHTML.trim();todo.push({k:"h:"+s,src:s,el});});texts.forEach(n=>{const s=n.nodeValue.trim();todo.push({k:"t:"+s,src:s,n});});});
+ const miss=[];todo.forEach(it=>{const f=C[it.k];if(f!=null)lgApply(it,f);else if(!lgFly.has(it.k))miss.push(it);});
+ if(!miss.length)return;
+ if(!aiKey()){if(!lgWarned){toast("🇫🇷 Ajoute ta clé Anthropic dans Settings pour traduire le site");lgWarned=true;}return;}
+ const uniq=[...new Map(miss.map(it=>[it.k,it])).values()],batches=[];let cur=[],len=0;
+ uniq.forEach(it=>{if(cur.length&&(cur.length>=40||len+it.src.length>7000)){batches.push(cur);cur=[];len=0;}cur.push(it);len+=it.src.length;lgFly.add(it.k);});if(cur.length)batches.push(cur);
+ lgBusy++;lgFlag();
+ (async()=>{try{for(let i=0;i<batches.length;i+=3){await Promise.all(batches.slice(i,i+3).map(async b=>{
+   try{const j=await askJSON(LG_SYS,JSON.stringify({t:b.map(x=>x.src)}),{model:aiModels().fast,max:8000});const out=j.t||[];
+    if(out.length===b.length)b.forEach((x,k)=>{if(typeof out[k]==="string")C[x.k]=out[k];});}
+   catch(e){if(!lgWarned){toast("⚠️ Traduction : "+e.message);lgWarned=true;}}
+   finally{b.forEach(x=>lgFly.delete(x.k));}}));lgSave();lgRun();}}
+  finally{lgBusy--;lgFlag();}})();}
+function lgToggle(){const to=lang()==="fr"?"en":"fr";try{localStorage.setItem(LGK,to);}catch(e){}lgWarned=false;document.documentElement.lang=to;lgFlag();
+ if(typeof route==="function")route();lgRun();}
+(function(){const b=document.createElement("button");b.id="langBtn";b.className="langbtn";b.type="button";b.onclick=lgToggle;document.body.appendChild(b);
+ document.documentElement.lang=lang();lgFlag();const mo=new MutationObserver(()=>lgRun());
+ ["main","side"].forEach(id=>{const e=document.getElementById(id);if(e)mo.observe(e,{childList:true,subtree:true});});})();
 // ===== APP =====
 const KEY="aiTrack.public.v1";
 let S=load();
