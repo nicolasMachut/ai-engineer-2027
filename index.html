@@ -82,6 +82,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:8px;borde
 .trh{display:flex;align-items:center;gap:6px;margin-bottom:6px}.trh .trc{margin-left:auto}.trc,.trx{border:0;background:none;cursor:pointer;font-size:14px;color:var(--muted);padding:2px 6px;border-radius:6px}.trc:hover,.trx:hover{background:#f1f5f9}
 .trsrc{font-size:12px;color:var(--muted);border-left:3px solid var(--line);padding-left:8px;margin-bottom:8px}
 .langbtn{position:fixed;top:12px;right:14px;z-index:45;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:21px;line-height:1;cursor:pointer;box-shadow:var(--sh);display:grid;place-items:center;padding:0}.langbtn:hover{transform:scale(1.08)}.langbtn.busy{animation:lgp 1s ease-in-out infinite}@keyframes lgp{50%{opacity:.35}}
+.exl{display:block;font-size:13px;margin-top:4px;width:fit-content}
 </style></head><body><div class="app"><aside id="side"></aside><main id="main"></main></div><div id="toast" class="toast"></div><script>// ===== GLOBAL DATA =====
 const M = [];
 const PHASES = [
@@ -424,7 +425,7 @@ takeaways:[
 ],
 exercises:[
 {t:"Token intuition", d:"Use Anthropic's token counting endpoint (or the Console) on: a French lease paragraph, the same text in English, a 50-line Java class and a JSON payload. Write down the ratios and what they imply for cost.", h:2},
-{t:"Watch and summarise", d:"Watch Karpathy's 'Intro to Large Language Models' and 3Blue1Brown's 'But what is a GPT?'. Write a one-page summary in English as if explaining to a CTO.", h:4},
+{t:"Watch and summarise", d:"Watch Karpathy's 'Deep Dive into LLMs like ChatGPT' (chapters: pretraining data, tokenization, neural network I/O, post-training, hallucinations, reinforcement learning, DeepSeek-R1; about 2h), then Raschka's 'From Conventional LLMs to Reasoning Models to Agents' (ACM, Aug 2026). Write a one-page summary in English as if explaining to a CTO: how a model is trained, why it hallucinates, what changed with reasoning models.", h:4, u:[{t:"Karpathy: Deep Dive into LLMs like ChatGPT",u:"https://www.youtube.com/watch?v=7xTGNNLPyMI",y:"2025-02"},{t:"Raschka: From Conventional LLMs to Reasoning Models to Agents",u:"https://www.youtube.com/watch?v=yFW1pXa41mk",y:"2026-09"},{t:"3Blue1Brown: But what is a GPT? (optional visual support)",u:"https://www.youtube.com/watch?v=wjZofJX0v4M",y:"2024-04"}]},
 {t:"Hallucination lab", d:"Ask Claude 10 questions about obscure facts (a small French commune's budget, a minor library's API). Classify answers: correct, refused, hallucinated. Then repeat with the source document pasted in. Measure the difference.", h:3},
 {t:"Variability experiment", d:"Run the same extraction prompt 5 times on a current Claude model, then 5 times with structured outputs (JSON schema). Compare consistency. Then try temperature 0 vs 1 on an open-weight model via Ollama (current Claude models reject sampling parameters).", h:2},
 {t:"Teach it back", d:"Record yourself (5 minutes, English) explaining tokens, attention and hallucination with no slides. Listen back and note unclear parts.", h:2}
@@ -438,10 +439,11 @@ quiz:[
 {q:"More thinking (higher effort) generally:", o:["Reduces cost","Improves hard reasoning at the price of more tokens and latency","Removes hallucinations completely","Is only for images"], a:1, w:"More test-time compute helps on hard problems but costs more and is slower."}
 ],
 resources:[
-{k:"video", t:"Andrej Karpathy: Intro to Large Language Models (1h)", u:"https://www.youtube.com/watch?v=zjkBMFhNj_g"},
-{k:"video", t:"3Blue1Brown: But what is a GPT? Visual intro to transformers", u:"https://www.youtube.com/watch?v=wjZofJX0v4M"},
-{k:"video", t:"3Blue1Brown: Attention in transformers, step-by-step", u:"https://www.youtube.com/watch?v=eMlx5fFNoYc"},
-{k:"video", t:"Andrej Karpathy: Deep Dive into LLMs like ChatGPT (3h, optional deep dive)", u:"https://www.youtube.com/watch?v=7xTGNNLPyMI"},
+{k:"video", y:"2025-02", t:"Andrej Karpathy: Deep Dive into LLMs like ChatGPT (3h30, watch the chapters listed in the exercise)", u:"https://www.youtube.com/watch?v=7xTGNNLPyMI"},
+{k:"video", y:"2026-09", t:"Sebastian Raschka (ACM): From Conventional LLMs to Reasoning Models to Agents (1h)", u:"https://www.youtube.com/watch?v=yFW1pXa41mk"},
+{k:"video", y:"2024-04", t:"3Blue1Brown: But what is a GPT? Visual intro to transformers", u:"https://www.youtube.com/watch?v=wjZofJX0v4M"},
+{k:"video", y:"2024-04", t:"3Blue1Brown: Attention in transformers, step-by-step", u:"https://www.youtube.com/watch?v=eMlx5fFNoYc"},
+{k:"video", y:"2023-11", t:"Optional classic: Andrej Karpathy, Intro to Large Language Models (1h). Good mental model, but predates reasoning models and agents", u:"https://www.youtube.com/watch?v=zjkBMFhNj_g"},
 {k:"doc", t:"Anthropic: Claude models overview", u:"https://docs.claude.com/en/docs/about-claude/models/overview"},
 {k:"doc", t:"Anthropic: Token counting", u:"https://docs.claude.com/en/docs/build-with-claude/token-counting"}
 ],
@@ -498,7 +500,7 @@ exercises:[
 {t:"Lease extractor v0", d:"Build a prompt that extracts from a commercial lease: parties, rent, indexation index, payment frequency, who pays property tax (TF/TEOM), duration. Output strict JSON. Test on 3 anonymised leases.", h:5},
 {t:"Quotes-then-answer", d:"On a 40-page document, compare a direct question vs 'extract relevant quotes in <quotes>, then answer in <answer>'. Count unsupported claims in each.", h:3},
 {t:"Prompt test set", d:"Create a spreadsheet of 20 inputs with expected outputs for the extractor. Score v0, then v1 after improvements. Keep both prompts in Git.", h:4},
-{t:"Anthropic tutorial", d:"Complete the Claude Academy courses 'Claude 101' and 'Building with the Claude API' (prompting chapters), and earn the completion badges.", h:5}
+{t:"Anthropic tutorial", d:"Complete the Claude Academy courses 'Claude 101' and 'Building with the Claude API' (prompting chapters), and earn the completion badges.", h:5, u:[{t:"Claude Academy: all free courses",u:"https://academy.claude.com/courses"}]}
 ],
 quiz:[
 {q:"Main purpose of XML tags in a Claude prompt?", o:["Make the prompt look professional","Separate instructions from data and make outputs parseable","Reduce token count","Enable images"], a:1, w:"Tags give clear boundaries for the model and machine-readable outputs for you."},
@@ -512,8 +514,8 @@ resources:[
 {k:"doc", t:"Anthropic: Prompt engineering overview", u:"https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/overview"},
 {k:"course", t:"Claude Academy: free official courses with completion badges", u:"https://academy.claude.com/courses"},
 {k:"course", t:"Claude Academy (free official courses)", u:"https://academy.claude.com"},
-{k:"video", t:"Andrej Karpathy: How I use LLMs", u:"https://www.youtube.com/watch?v=EWvNQjAaOHw"},
-{k:"video", t:"Search: Anthropic 'prompting 101' talk (YouTube, Anthropic channel)", u:"https://www.youtube.com/@anthropic-ai/search?query=prompting"}
+{k:"video", y:"2025-02", t:"Andrej Karpathy: How I use LLMs", u:"https://www.youtube.com/watch?v=EWvNQjAaOHw"},
+{k:"video", y:"2026-05", t:"Code w/ Claude 2026 London: The prompting playbook (prompting for agentic systems, 45 min)", u:"https://claude.com/code-with-claude/session/ldn-the-prompting-playbook"}
 ],
 coach:[
 "You already prompt Claude daily with long, precise briefs. That is real skill; now make it explicit and measurable so you can sell it.",
@@ -642,7 +644,7 @@ exercises:[
 {t:"Hooks", d:"Add a hook that runs the formatter and unit tests after edits, and one that blocks changes to src/main/resources/db/migration without approval.", h:3},
 {t:"Headless code review in CI", d:"Wire 'claude -p' (or the GitHub Action) to review pull requests on a personal repo with a strict review prompt. Evaluate on 5 PRs: useful comments vs noise.", h:5},
 {t:"Measured speed-up", d:"Pick 4 comparable tasks. Do 2 by hand and 2 with Claude Code. Log time, defects found later and your confidence. Write the result honestly.", h:6},
-{t:"Claude Code course", d:"Take the 'Claude Code' courses on Claude Academy and read the features overview page end to end.", h:4}
+{t:"Claude Code course", d:"Take the 'Claude Code' courses on Claude Academy and read the features overview page end to end.", h:4, u:[{t:"Claude Academy courses",u:"https://academy.claude.com/courses"},{t:"Claude Code: features overview",u:"https://code.claude.com/docs/en/features-overview"}]}
 ],
 quiz:[
 {q:"A rule that MUST run after every file edit (e.g. formatting) belongs in:", o:["CLAUDE.md","A hook","A prompt reminder","A subagent"], a:1, w:"Hooks are deterministic; prompts can be ignored."},
@@ -657,7 +659,8 @@ resources:[
 {k:"doc", t:"Claude Code documentation home", u:"https://code.claude.com/docs/en/overview"},
 {k:"doc", t:"Anthropic engineering: Claude Code best practices", u:"https://code.claude.com/docs/en/best-practices"},
 {k:"course", t:"Claude Academy: Claude Code courses", u:"https://academy.claude.com"},
-{k:"video", t:"Search: Claude Code talks and demos (Anthropic YouTube channel)", u:"https://www.youtube.com/@anthropic-ai/search?query=claude%20code"}
+{k:"video", y:"2026-05", t:"Code w/ Claude 2026: What's new in Claude Code (20 min)", u:"https://claude.com/code-with-claude/session/sf-whats-new-in-claude-code"},
+{k:"video", y:"2026-05", t:"Code w/ Claude 2026: How we Claude Code (how Anthropic engineers use it day to day)", u:"https://claude.com/code-with-claude/session/ldn-ext-how-we-claude-code"}
 ],
 coach:[
 "This is your strongest differentiator: you already work agentically every day. Turn it into a documented, repeatable method for Java teams.",
@@ -720,7 +723,7 @@ resources:[
 {k:"doc", t:"Spring AI reference documentation", u:"https://docs.spring.io/spring-ai/reference/"},
 {k:"doc", t:"Spring AI 2.0 GA announcement", u:"https://spring.io/blog/2026/06/12/spring-ai-2-0-0-GA-available-now/"},
 {k:"doc", t:"Spring AI examples (GitHub)", u:"https://github.com/spring-projects/spring-ai-examples"},
-{k:"video", t:"Search: Spring AI talks (Spring I/O, Devoxx, SpringOne)", u:"https://www.youtube.com/results?search_query=spring+ai+2.0+talk"},
+{k:"video", y:"2026-04", t:"Spring I/O 2026: The Spring AI Ecosystem in 2026, From Foundations to Agents (Pollack, Tzolov)", u:"https://2026.springio.net/sessions/the-spring-ai-ecosystem-in-2026-from-foundations-to-agents/"},
 {k:"doc", t:"Anthropic chat in Spring AI", u:"https://docs.spring.io/spring-ai/reference/api/chat/anthropic-chat.html"}
 ],
 coach:[
@@ -792,7 +795,7 @@ resources:[
 {k:"doc", t:"Spring AI: PGVector store", u:"https://docs.spring.io/spring-ai/reference/api/vectordbs/pgvector.html"},
 {k:"doc", t:"Anthropic: Contextual Retrieval", u:"https://www.anthropic.com/news/contextual-retrieval"},
 {k:"doc", t:"Anthropic: Long context prompting tips", u:"https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices"},
-{k:"video", t:"Search: RAG evaluation and hybrid search talks", u:"https://www.youtube.com/results?search_query=rag+evaluation+hybrid+search+reranking"}
+{k:"video", y:"2025-07", t:"Hamel Husain series: Beyond Naive RAG (hybrid search, IR evals, late interaction)", u:"https://hamel.dev/notes/llm/rag/beyond-naive-rag.html"}
 ],
 coach:[
 "Your capstone 'lease assistant' is born here. Make the README excellent: problem, architecture diagram, measured results table.",
@@ -848,7 +851,7 @@ exercises:[
 {t:"Router", d:"Route questions: factual lookup (small model + RAG), calculation (tool), legal interpretation (large model + disclaimer). Measure cost saved vs always using the large model.", h:6},
 {t:"Evaluator-optimiser", d:"Generate a tenant letter (new landlord introduction), have a second call critique it against a checklist, iterate max 3 times.", h:6},
 {t:"Bounded agent with approval", d:"Build an agent that prepares a rent-indexation notice: reads lease, fetches index value (mock API), computes new rent, drafts letter, then STOPS for human approval before 'sending'. Log every step.", h:12},
-{t:"Read and summarise", d:"Read Anthropic's 'Building effective agents' and 'Effective context engineering for AI agents'. Write a one-page English summary with your own Java examples.", h:4}
+{t:"Read and summarise", d:"Read Anthropic's 'Building effective agents' and 'Effective context engineering for AI agents'. Write a one-page English summary with your own Java examples.", h:4, u:[{t:"Anthropic: Building effective agents",u:"https://www.anthropic.com/engineering/building-effective-agents"},{t:"Anthropic: Effective context engineering for AI agents",u:"https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"}]}
 ],
 quiz:[
 {q:"A process always runs: extract → validate → draft → review. Best design?", o:["Autonomous agent","Prompt chaining workflow","Fine-tuning","Single giant prompt"], a:1, w:"Predictable steps = workflow."},
@@ -925,7 +928,7 @@ resources:[
 {k:"doc", t:"Spring AI: MCP overview", u:"https://docs.spring.io/spring-ai/reference/api/mcp/mcp-overview.html"},
 {k:"doc", t:"MCP Java SDK (GitHub)", u:"https://github.com/modelcontextprotocol/java-sdk"},
 {k:"course", t:"Claude Academy: MCP courses", u:"https://academy.claude.com"},
-{k:"video", t:"Search: MCP Java Spring AI talk", u:"https://www.youtube.com/results?search_query=mcp+server+spring+ai+java"}
+{k:"video", y:"2026-01", t:"Dan Vega (jChampions 2026): Building and Securing MCP Servers in Java", u:"https://www.danvega.dev/speaking/jchampions-2026-building-securing-mcp-servers-java"}
 ],
 coach:[
 "An 'MCP server for X' is a perfect small consulting offer: fixed scope, fast delivery, visible result.",
@@ -971,7 +974,7 @@ takeaways:[
 exercises:[
  {t:"Read and run a TypeScript MCP server", d:"Clone an official TypeScript MCP server, run it, add one tool, and connect it to Claude Desktop.", h:4},
 {t:"LangChain4j port", d:"Re-implement your extraction service with LangChain4j AI Services in a small Quarkus or plain Java app. Write a comparison ADR.", h:6},
-{t:"Python reading", d:"Clone a Python RAG example from Anthropic's cookbook, run it, and port one technique (e.g. contextual retrieval) to your Java project.", h:5},
+{t:"Python reading", d:"Clone a Python RAG example from Anthropic's cookbook, run it, and port one technique (e.g. contextual retrieval) to your Java project.", h:5, u:[{t:"Anthropic Claude Cookbooks (GitHub)",u:"https://github.com/anthropics/claude-cookbooks"},{t:"Anthropic: Contextual Retrieval",u:"https://www.anthropic.com/news/contextual-retrieval"}]},
 {t:"Python sprint", d:"Rebuild your lease extractor in Python: Anthropic SDK + Pydantic validation + a FastAPI endpoint + pytest. Aim for idiomatic code (type hints, virtualenv/uv). Put it in the portfolio as a \"polyglot\" proof.", h:10},
 {t:"Fine-tuning discussion", d:"Write a one-page English note: when would you fine-tune vs prompt vs RAG for a client? Include data, cost, evaluation and maintenance. Use it in interviews.", h:2},
 {t:"Local model", d:"Run a local model with Ollama, plug it into Spring AI, and compare quality on 10 extraction cases. Note when a local model would be acceptable.", h:4}
@@ -1091,7 +1094,7 @@ resources:[
 {k:"doc", t:"promptfoo (open-source eval tool)", u:"https://www.promptfoo.dev"},
 {k:"doc", t:"Langfuse (open-source LLM observability and evals)", u:"https://langfuse.com"},
 {k:"doc", t:"Spring AI: Evaluation testing", u:"https://docs.spring.io/spring-ai/reference/api/testing.html"},
-{k:"video", t:"Search: LLM evaluation best practices talk", u:"https://www.youtube.com/results?search_query=llm+evals+best+practices+talk"}
+{k:"video", y:"2025-09", t:"Hamel Husain and Shreya Shankar: Why AI evals are the hottest new skill (Lenny's Podcast, live demo on real traces)", u:"https://www.lennysnewsletter.com/p/why-ai-evals-are-the-hottest-new-skill"}
 ],
 coach:[
 "This is the module that makes you 'senior AI'. Very few freelancers can show a CI-gated eval harness. Put it front and centre in your portfolio.",
@@ -1155,7 +1158,7 @@ resources:[
 {k:"doc", t:"OWASP Top 10 for LLM Applications / GenAI Security Project", u:"https://genai.owasp.org"},
 {k:"doc", t:"Anthropic: Mitigating jailbreaks and prompt injections", u:"https://docs.claude.com/en/docs/test-and-evaluate/strengthen-guardrails/mitigate-jailbreaks"},
 {k:"doc", t:"CNIL: AI recommendations (French data protection authority)", u:"https://www.cnil.fr/fr/intelligence-artificielle"},
-{k:"video", t:"Search: prompt injection explained talk", u:"https://www.youtube.com/results?search_query=prompt+injection+explained+talk"}
+{k:"video", y:"2025-08", t:"Simon Willison: The lethal trifecta, prompt injection and MCP (talk, slides and notes)", u:"https://simonwillison.net/2025/Aug/9/bay-area-ai/"}
 ],
 coach:[
 "Lead with security in client meetings; it immediately positions you as senior.",
@@ -1410,7 +1413,7 @@ resources:[
 {k:"doc", t:"Claude Code: plugins", u:"https://code.claude.com/docs/en/plugins"},
 {k:"doc", t:"Claude Code: GitHub Actions", u:"https://code.claude.com/docs/en/github-actions"},
 {k:"doc", t:"DORA research (software delivery metrics)", u:"https://dora.dev"},
-{k:"video", t:"Search: rolling out AI coding assistants engineering team talk", u:"https://www.youtube.com/results?search_query=rolling+out+ai+coding+agents+engineering+team"}
+{k:"video", y:"2026-05", t:"Code w/ Claude 2026 London: From one person to 80, scaling an engineering org with Claude Code (Base44)", u:"https://claude.com/code-with-claude/london"}
 ],
 coach:[
 "This is the offer that matches your 'lead dev' title: 'I make your Java team faster with AI, safely, and I prove it with metrics'.",
@@ -1465,7 +1468,7 @@ quiz:[
 ],
 resources:[
 {k:"doc", t:"Claude customer stories (real enterprise use cases)", u:"https://claude.com/customers"},
-{k:"video", t:"Search: AI use case prioritisation framework", u:"https://www.youtube.com/results?search_query=ai+use+case+prioritization+framework"}
+{k:"video", t:"YouTube search (no single reference talk): AI use case prioritisation", u:"https://www.youtube.com/results?search_query=ai+use+case+prioritization+framework"}
 ],
 coach:[
 "Productised offers are the bridge from freelance day rates to your future company: they are repeatable and sellable by others.",
@@ -1643,7 +1646,7 @@ quiz:[
 {q:"Good answer to 'How do you reduce hallucinations?' includes:", o:["'Use a better model' only","Grounding with RAG/citations, permission to say unknown, validation, and measuring with evals","Lower the max tokens","Avoid documents"], a:1, w:"Show a layered, measurable approach."}
 ],
 resources:[
-{k:"video", t:"Search: ML/AI system design interview examples", u:"https://www.youtube.com/results?search_query=llm+system+design+interview"},
+{k:"video", t:"YouTube search (no single reference talk): LLM system design interview examples", u:"https://www.youtube.com/results?search_query=llm+system+design+interview"},
 {k:"doc", t:"Anthropic: Building effective agents (re-read before interviews)", u:"https://www.anthropic.com/engineering/building-effective-agents"}
 ],
 coach:[
@@ -1985,6 +1988,8 @@ function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s)r
 function blank(){return{ex:{},quiz:{},mod:{},speak:{},proj:{},cert:{},proofs:[],iv:{},rev:{},ai:{},cards:{},notes:{},start:"",activity:[],badges:{}};}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 const $=s=>document.querySelector(s);
+function ymTxt(y){const[a,b]=String(y).split("-");return (b?["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+b-1]+" ":"")+a;}
+function ymOld(y){const[a,b]=String(y).split("-").map(Number);const n=new Date();return (n.getFullYear()-a)*12+(n.getMonth()+1-(b||6))>18;}
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const today=()=>new Date().toISOString().slice(0,10);
 function touch(){const d=today();if(!S.activity.includes(d))S.activity.push(d);}
@@ -2075,12 +2080,12 @@ function moduleView(id){const m=M.find(x=>x.id===id);if(!m){location.hash="#/";r
  <div class="card"><h3>💡 Key takeaways</h3><ul>${m.takeaways.map(o=>`<li>${esc(o)}</li>`).join("")}</ul></div></div>
  <div class="card mt theory"><h3>📚 Theory</h3>${m.theory}</div>
  <div class="card mt"><h3>🛠️ Exercises <span class="pill">${m.exercises.reduce((a,e)=>a+e.h,0)} h</span></h3>
- ${m.exercises.map((e,i)=>{const k=m.id+":"+i,d=!!S.ex[k];return `<label class="ex ${d?"done":""}"><input type="checkbox" data-ex="${k}" ${d?"checked":""}><div><div class="et">${esc(e.t)}</div><div class="small muted">${esc(e.d)}</div></div><span class="xp">${e.h} h · +${Math.round(e.h*10)} XP</span></label>`;}).join("")}</div>
+ ${m.exercises.map((e,i)=>{const k=m.id+":"+i,d=!!S.ex[k];return `<label class="ex ${d?"done":""}"><input type="checkbox" data-ex="${k}" ${d?"checked":""}><div><div class="et">${esc(e.t)}</div><div class="small muted">${esc(e.d)}</div>${(e.u||[]).map(l=>`<a class="exl" href="${l.u}" target="_blank" rel="noopener">🔗 ${esc(l.t)}${l.y?` <span class="muted">· ${ymTxt(l.y)}</span>`:""}</a>`).join("")}</div><span class="xp">${e.h} h · +${Math.round(e.h*10)} XP</span></label>`;}).join("")}</div>
  <div class="card mt"><h3>🧪 Quiz ${q?`<span class="pill ${q.best>=80?"g":"y"}">best ${q.best}%</span>`:""} <span class="pill p">pass ≥ 80% · +XP</span></h3><div id="quiz">
  ${m.quiz.map((it,i)=>`<div class="q" data-q="${i}"><b>${i+1}. ${esc(it.q)}</b>${it.o.map((o,j)=>`<label class="opt"><input type="radio" name="q${i}" value="${j}"> ${esc(o)}</label>`).join("")}<div class="why">💬 ${esc(it.w)}</div></div>`).join("")}</div>
  <div class="mt"><button class="btn" id="qsub">Check my answers</button> <button class="btn ghost" id="qres">Reset</button> <span id="qscore" class="mt" style="font-weight:700;margin-left:10px"></span></div></div>
  <div id="aiBox"></div>
- <div class="grid g2 mt"><div class="card res"><h3>🎬 Resources</h3>${m.resources.map(r=>`<a href="${r.u}" target="_blank" rel="noopener"><span class="ico ${r.k}">${r.k==="video"?"▶":r.k==="course"?"🎓":"📘"}</span><span>${esc(r.t)}</span></a>`).join("")}</div>
+ <div class="grid g2 mt"><div class="card res"><h3>🎬 Resources</h3>${m.resources.map(r=>`<a href="${r.u}" target="_blank" rel="noopener"><span class="ico ${r.k}">${r.k==="video"?"▶":r.k==="course"?"🎓":"📘"}</span><span>${esc(r.t)}${r.y?` <span class="pill ${ymOld(r.y)?"y":"g"}" title="${ymOld(r.y)?"More than 18 months old: check that it is still current":"Recent"}">${ymOld(r.y)?"⏳ ":""}${ymTxt(r.y)}</span>`:""}</span></a>`).join("")}</div>
  <div class="card"><h3>🧭 Coach's corner</h3>${m.coach.map(c=>`<div class="tip">💬<div>${esc(c)}</div></div>`).join("")}</div></div>
  <div class="card mt"><h3>🇬🇧 English corner</h3><p class="small muted">Click a card to flip it.</p><div class="cards">${m.english.vocab.map(v=>`<div class="flip" onclick="this.classList.toggle('on')"><div class="in"><div class="f">${esc(v[0])}</div><div class="b">${esc(v[1])}</div></div></div>`).join("")}</div>
  <h4>🎙️ Speaking prompt</h4><p>${esc(m.english.speak)}</p><label class="ex ${S.speak[m.id]?"done":""}"><input type="checkbox" id="spk" ${S.speak[m.id]?"checked":""}><div class="et">I recorded myself and listened back</div><span class="xp">+25 XP</span></label></div>
