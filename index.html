@@ -87,7 +87,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:8px;borde
 const M = [];
 const PHASES = [
  {n:1, name:"Foundations", sub:"LLMs, prompting, Claude API, Claude Code", weeks:"Weeks 1-8", color:"#6366f1", icon:"🧠"},
- {n:2, name:"Build on the JVM", sub:"Spring AI, RAG, agents, MCP, ecosystem", weeks:"Weeks 9-20", color:"#0ea5e9", icon:"🛠️"},
+ {n:2, name:"Build on the JVM", sub:"Python, Spring AI, RAG, agents, MCP, ecosystem", weeks:"Weeks 9-20", color:"#0ea5e9", icon:"🛠️"},
  {n:3, name:"Production-grade AI", sub:"Evals, security, LLMOps, cloud & compliance", weeks:"Weeks 21-30", color:"#10b981", icon:"🛡️"},
  {n:4, name:"Business AI & teams", sub:"Process automation, AI-augmented teams, consulting", weeks:"Weeks 31-38", color:"#f59e0b", icon:"🏢"},
  {n:5, name:"Market & career", sub:"CV 2027, portfolio, interviews, freelance strategy", weeks:"Weeks 39-48", color:"#ec4899", icon:"🚀"}
@@ -165,6 +165,16 @@ const CERTS = {
   {id:"c4", phase:3, name:"AWS Skill Builder: AIP-C01 Exam Prep Plan + free micro-credentials (AWS Agentic AI Demonstrated)", why:"Official prep path for the main exam; the practice question set is the first free step.", url:"https://skillbuilder.aws/category/exam-prep/generative-ai-developer-professional-AIP-C01"},
   {id:"c5", phase:3, name:"Oracle OCI AI Foundations Associate (free exam, optional)", why:"Free exam in 2026, quick; low signal, only if you want an extra line. Google GenAI Leader (USD 99) is business-level: skip.", url:"https://blogs.oracle.com/oracleuniversity/oci-certification-learning-paths-and-exams-2026-updates-now-available"}
  ],
+ python:{
+  name:"PCAP-31-04: Certified Associate Python Programmer (Python Institute)",
+  facts:"Current version PCAP-31-04: 42 questions, 65 minutes, pass mark 72%, valid 5 years, delivered online through the OpenEDG testing service. Price on the OpenEDG Store. PCPP1 (USD 225, requires PCAP) only if a client asks for it.",
+  steps:[
+   {id:"p1", t:"Module 23: katas, toolchain and the async extraction service (weeks 9-14)."},
+   {id:"p2", t:"Read the official PCAP-31-04 syllabus and list the gaps (OOP details, exceptions, modules and packages, strings)."},
+   {id:"p3", t:"Two full practice exams at 80% or more."},
+   {id:"p4", t:"Book the exam about 8 weeks ahead, then pass it and add the badge to LinkedIn and the proof ledger."}
+  ]
+ },
  aws:{
   name:"AWS Certified Generative AI Developer – Professional (AIP-C01)",
   facts:"75 questions (65 scored + 10 unscored), multiple choice and multiple response, pass mark 750/1000, 180 minutes (+30 min on request for non-native English speakers, ask before booking). USD 300 / EUR 256, Pearson VUE online or test centre. No prerequisite; AI Practitioner, Solutions Architect or ML Engineer Associate help. Target: 2+ years building production apps, 1 year hands-on GenAI.",
@@ -267,7 +277,7 @@ const ENGLISH_ROUTINE = [
 const MARKET = {
  updated:"November 2026",
  demand:[
-  ["Python", "71-77%", "Near-universal in international AI engineer postings. Java-first AI roles exist (banks, insurers, Swiss finance) but Python removes a filter.", "m09"],
+  ["Python", "45% (France) / 71-77% (international)", "Free-Work sample, 611 French AI postings, Sep-Nov 2026: Python 45%, Java 14%, LangChain4j 1%. Java-first AI roles exist (banks, insurers, Swiss finance) but Python removes a filter.", "m23, m09"],
   ["LLM APIs / integration", "~66%", "Calling and integrating foundation models in real applications.", "m03, m05"],
   ["Agents / agentic systems", "up to 71%", "Tool calling, orchestration, multi-agent, human approval.", "m07, m08"],
   ["Evaluation (evals)", "~61%", "Repeatedly cited as the scarcest skill and the main differentiator.", "m10"],
@@ -277,6 +287,7 @@ const MARKET = {
   ["Security, guardrails, governance", "frequent in finance", "NeMo Guardrails, content safety, audit, approval workflows.", "m11, m13"]
  ],
  trends:[
+  "Context engineering is replacing prompt engineering in US postings: 9 mentions in 2024, 703 in 2025; agentic AI 151 to 16,541; LangGraph 194 to 4,294 (Stanford AI Index 2026, Lightcast data).",
   "Forward Deployed Engineer is the breakout AI job title of 2026 (recruiter data shows postings multiplied several times; treat exact multiples with caution): engineers who sit with customers, scope AI use cases and ship them to production. OpenAI, Anthropic, Databricks, Palantir and Mistral (Paris, sovereign institutions) all hire for it. It rewards exactly your mix: senior engineering + client-facing consulting.",
   "US software-dev postings are up about 15% since early 2025 while total postings fell; 71% of the increase comes from senior roles and 37% from jobs with AI in the title (Indeed Hiring Lab, July 2026). AI engineer is #1 on LinkedIn Jobs on the Rise 2026 (US).",
   "Coding agents are now mainstream: in the JetBrains 2026 survey, Claude Code use at work went from about 18% to 39% of developers in six months. The differentiator moves from writing code to specifying, reviewing, testing and securing it.",
@@ -296,6 +307,8 @@ const MARKET = {
   "Freelance option from the French Alps: invoice Swiss clients through your own company, remote with occasional on-site days (check VAT and social security with your accountant)."
  ],
  france:[
+  "Free-Work sample of 611 AI postings (25 Sep - 25 Nov 2026): agents cited in 70%, Python 45%, RAG 39%, English 30%, Kubernetes 24%, Azure 23%, GCP 21%, AWS 18%, MCP 18%, Java 14%. Fewer than 1% are fully remote; median advertised day rate about EUR 510, with no premium for Java over Python.",
+  "Indeed Hiring Lab (July 2026): the software-development share of postings is rising in most large economies, but not yet in France and Germany. French demand for AI skills lags the US by roughly a year or two.",
   "Overall hiring is at a low: only 6% of French companies plan to hire a cadre in Q4 2026, a record low (Apec, 17 Nov 2026). IT services and consulting are down. Expect longer sales cycles for missions.",
   "Freelance AI demand is the bright spot (Malt Tech Trends 2026): AI is the #2 requested skill, 22% of mission requests need AI, agent skills +60% in a year, SME demand more than doubled.",
   "Mission mix on Malt: 45% LLM integration and orchestration, 35% RAG, 15% agents, 7% MLOps. That is exactly modules 3 to 8 plus your Java background.",
@@ -838,7 +851,7 @@ theory:`
 <li>Treat tool outputs (web pages, emails, documents) as untrusted data: they can contain injected instructions (module 11).</li>
 </ul>
 <h4>5. Context engineering for agents</h4>
-<p>Long-running agents degrade as context fills. Techniques: summarise history, store notes outside the context (a scratchpad file or memory tool), use subagents for isolated sub-tasks, load knowledge on demand (skills). You already see these mechanisms at work in your daily use of Claude.</p><h4>Platform features for context engineering (2026)</h4><p>Know what the API gives you before building it yourself: <b>compaction</b> (summarise old turns automatically), <b>context editing</b> (drop stale tool results), the <b>memory tool</b> (files the agent reads and writes across sessions), the <b>tool search tool</b> (load tool definitions on demand instead of sending 100 tools), <b>programmatic tool calling</b> (the model writes code that calls tools, keeping intermediate data out of the context), prompt caching, the Files API, <b>Managed Agents</b> (server-hosted agents with a sandbox) and Agent Skills in the API. Pick the managed option when it exists; write your own only when you need control.</p>`,
+<p>Long-running agents degrade as context fills. Techniques: summarise history, store notes outside the context (a scratchpad file or memory tool), use subagents for isolated sub-tasks, load knowledge on demand (skills). You already see these mechanisms at work in your daily use of Claude.</p><h4>Platform features for context engineering (2026)</h4><p>Know what the API gives you before building it yourself: <b>compaction</b> (summarise old turns automatically), <b>context editing</b> (drop stale tool results), the <b>memory tool</b> (files the agent reads and writes across sessions), the <b>tool search tool</b> (load tool definitions on demand instead of sending 100 tools), <b>programmatic tool calling</b> (the model writes code that calls tools, keeping intermediate data out of the context), prompt caching, the Files API, <b>Managed Agents</b> (server-hosted agents with a sandbox) and Agent Skills in the API. Pick the managed option when it exists; write your own only when you need control.</p><h4>Context engineering</h4><p>In US postings, \"context engineering\" went from 9 to 703 mentions between 2024 and 2025 (Stanford AI Index 2026, Lightcast data). It means deciding what enters the model\'s context at each step: system instructions, tool definitions, retrieved documents, memory, previous results, and what to compress or drop. Treat the context window as a budget: measure tokens per step, keep tool outputs short and structured, summarise long histories, and load knowledge just in time instead of up front.</p>`,
 takeaways:[
 "Default to workflows; reach for autonomous agents only when steps can't be predicted.",
 "Tools are prompts: design them for the model.",
@@ -851,7 +864,9 @@ exercises:[
 {t:"Router", d:"Route questions: factual lookup (small model + RAG), calculation (tool), legal interpretation (large model + disclaimer). Measure cost saved vs always using the large model.", h:6},
 {t:"Evaluator-optimiser", d:"Generate a tenant letter (new landlord introduction), have a second call critique it against a checklist, iterate max 3 times.", h:6},
 {t:"Bounded agent with approval", d:"Build an agent that prepares a rent-indexation notice: reads lease, fetches index value (mock API), computes new rent, drafts letter, then STOPS for human approval before 'sending'. Log every step.", h:12},
-{t:"Read and summarise", d:"Read Anthropic's 'Building effective agents' and 'Effective context engineering for AI agents'. Write a one-page English summary with your own Java examples.", h:4, u:[{t:"Anthropic: Building effective agents",u:"https://www.anthropic.com/engineering/building-effective-agents"},{t:"Anthropic: Effective context engineering for AI agents",u:"https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"}]}
+{t:"Read and summarise", d:"Read Anthropic's 'Building effective agents' and 'Effective context engineering for AI agents'. Write a one-page English summary with your own Java examples.", h:4, u:[{t:"Anthropic: Building effective agents",u:"https://www.anthropic.com/engineering/building-effective-agents"},{t:"Anthropic: Effective context engineering for AI agents",u:"https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"}]},
+ {t:"Context budget", d:"Instrument your agent to log tokens per step (instructions, tools, retrieved docs, history). Cut the largest item by half with summarisation or just-in-time retrieval, and show the effect on cost and on your eval score.", h:3, u:[{t:"Anthropic: Effective context engineering for AI agents",u:"https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"}]},
+ {t:"Spring AI vs LangGraph", d:"Compare your Spring AI agent with the LangGraph agent from module 23 on the same task: state handling, retries, human approval, observability, testability. Write a one-page ADR you can reuse with clients.", h:2}
 ],
 quiz:[
 {q:"A process always runs: extract → validate → draft → review. Best design?", o:["Autonomous agent","Prompt chaining workflow","Fine-tuning","Single giant prompt"], a:1, w:"Predictable steps = workflow."},
@@ -939,12 +954,63 @@ english:{vocab:[["protocol","protocole"],["transport","couche de transport"],["t
 });
 
 M.push({
+id:"m23", phase:2, weeks:"9-20 (alongside, ~3-4 h/week)", hours:46,
+title:"Python for AI engineers: from Java lead to polyglot, with proof",
+why:"Python is the default language of AI engineering: it appears in 45% of French AI postings against 14% for Java (Free-Work sample, Sep-Nov 2026) and in most international AI engineer postings. Your Java depth stays a differentiator, but without visible Python you get filtered out. This module makes you productive in modern Python and gives you proof: public repos, an eval suite and the PCAP certification.",
+objectives:["Write idiomatic modern Python (3.12+): typing, dataclasses, Pydantic, generators, context managers, decorators","Use the 2026 toolchain: uv, ruff, pyright, pytest, pre-commit, GitHub Actions","Build an async AI service with FastAPI, httpx and the Anthropic Python SDK, with structured outputs","Build a stateful agent with LangGraph: tools, retries, human-in-the-loop, checkpoints","Test and evaluate AI code in Python (pytest + an eval suite + tracing)","Prove it: two public Python repos with results tables and the PCAP-31-04 certification"],
+theory:`<h4>1. A Java lead's map of Python</h4><p>Most of what you know transfers: classes, interfaces (Python uses <b>Protocols</b> and abstract base classes), exceptions, dependency injection (done by hand or with FastAPI's <code>Depends</code>), layered architecture. What changes: dynamic typing checked by a type checker instead of a compiler, duck typing, first-class functions, and an ecosystem where scripts, notebooks and services coexist. Write Python like a senior Python developer, not like Java in Python: no getters and setters, small modules, composition over deep hierarchies, comprehensions where they read well.</p>
+<h4>2. The 2026 toolchain</h4><p><b>uv</b> replaces pip, virtualenv and pip-tools (fast installs, lock file, Python versions). <b>ruff</b> lints and formats. <b>pyright</b> (or mypy) in strict mode gives you most of the safety of a compiler. <b>pytest</b> with fixtures and parametrisation is the testing standard. Put all of them in pre-commit and CI from day one: it is the first thing a reviewer looks at.</p>
+<h4>3. Types and validation</h4><p>Type hints everywhere (<code>list[str]</code>, <code>str | None</code>, <code>TypedDict</code>, generics). <b>dataclasses</b> for internal data, <b>Pydantic v2</b> at the boundaries (HTTP, LLM outputs, config): it validates, coerces and serialises, and it is how you get reliable structured output from an LLM.</p>
+<h4>4. Async without surprises</h4><p>LLM calls are slow I/O, so services are usually async, and this is the Python that AI postings actually test. The minimal toolkit: <code>asyncio.TaskGroup</code> for parallel calls, <code>asyncio.Semaphore</code> for provider rate limits, <code>asyncio.wait_for</code> for timeouts, <b>tenacity</b> for retries with backoff, <b>httpx</b> for HTTP and the providers' async SDKs. Never block the event loop with CPU work or a synchronous client.</p>
+<h4>5. FastAPI services</h4><p>FastAPI gives typed endpoints from Pydantic models, dependency injection, OpenAPI docs and streaming responses. It is the Spring Boot of AI back-ends in Python: learn routers, dependencies, lifespan events, background tasks and testing with its test client.</p>
+<h4>6. The Python AI stack</h4><p>The <b>Anthropic Python SDK</b> (messages, tool use, streaming, batches, prompt caching). <b>LangGraph</b> for stateful agents: a graph of nodes over a typed state, with checkpoints, retries and interrupts for human approval; it is the framework most cited in US AI postings after LangChain. Know what <b>Pydantic AI</b>, LlamaIndex and Google ADK are for, and when plain SDK code is enough (often).</p>
+<h4>7. Tests and evals in Python</h4><p>Deterministic code gets unit tests; LLM behaviour gets an eval suite: a versioned dataset, graders (exact checks first, LLM-as-judge only where needed), a score per run and a threshold in CI. Add tracing (Langfuse or OpenTelemetry) so every failure can be inspected.</p>
+<h4>8. What to skip (for now)</h4><p>To stay efficient, leave aside what AI-application postings rarely ask for: deep Django or Flask, the data-science stack beyond basic pandas, PyTorch or TensorFlow training loops (that is ML engineering, a different job), notebooks as a way of working, GUI programming, and old LangChain chain syntax. Learn them only when a concrete mission needs them.</p>
+<h4>9. Proving it</h4><p>Recruiters filter on visible Python. Three proofs, in this order: (1) public repos with tests, CI and a results table; (2) paid or real-world Python work (for example AI code-evaluation missions); (3) the <b>PCAP-31-04</b> certification from the Python Institute (65 minutes, 42 questions, pass mark 72%, valid 5 years). Skip PCPP1 (USD 225): its syllabus includes GUI and socket programming you will not use. Hiring managers rank public projects above certifications; PCAP is the fast, recognised confirmation of the basics, not the main proof.</p>`,
+takeaways:["Your Java design skills transfer; the idioms and the tooling do not, so practise them on purpose","uv, ruff, pyright strict and pytest in CI from the first commit","Pydantic at every boundary, especially LLM outputs","Async for LLM calls, with timeouts and retries","LangGraph for stateful agents, plain SDK code when it is enough","Proof beats claims: repos with results, real work, then PCAP"],
+exercises:[
+ {t:"Python katas for a Java developer", d:"Solve 30 short katas with pytest: comprehensions, generators, context managers, decorators, dataclasses, Protocols, pattern matching, itertools. For each, note the Java equivalent and what is more idiomatic in Python.", h:6},
+ {t:"Project skeleton with the 2026 toolchain", d:"Create a uv project with ruff, pyright in strict mode, pytest, pre-commit and a GitHub Actions workflow. Reuse it as the template for every Python repo in the track.", h:3, u:[{t:"uv documentation",u:"https://docs.astral.sh/uv/"},{t:"Ruff documentation",u:"https://docs.astral.sh/ruff/"}]},
+ {t:"Async extraction service", d:"Rebuild the lease extractor as a FastAPI service: async Anthropic SDK client, Pydantic models for the structured output, retries and timeouts, streaming endpoint, pytest with mocked LLM calls. Compare with your Java version in a short ADR.", h:8, u:[{t:"FastAPI documentation",u:"https://fastapi.tiangolo.com/"},{t:"Anthropic Python SDK (GitHub)",u:"https://github.com/anthropics/anthropic-sdk-python"},{t:"Pydantic documentation",u:"https://docs.pydantic.dev/latest/"}]},
+ {t:"Stateful agent with LangGraph", d:"Build the rent-indexation agent in Python with LangGraph: typed state, tools (read lease, fetch index, compute rent, draft letter), retry on tool failure, an interrupt for human approval before sending, and a checkpointer so a run can resume.", h:8, u:[{t:"LangGraph (GitHub, docs linked from the README)",u:"https://github.com/langchain-ai/langgraph"}]},
+ {t:"Eval suite and tracing", d:"Add a versioned eval dataset (30 cases), exact-match graders plus one LLM-as-judge grader, a score per run in CI with a failing threshold, and Langfuse or OpenTelemetry traces. Publish the results table in the README.", h:4},
+ {t:"Container and deploy", d:"Package the service with a slim Docker image (uv in a multi-stage build), add a health check, and deploy it (Kubernetes from module 12 or a managed container service).", h:3},
+ {t:"PCAP-31-04 preparation and exam", d:"Work through the official PCAP syllabus, then take two full practice exams and reach at least 80% before booking. Book and pass PCAP-31-04, then add the badge to LinkedIn and the proof ledger.", h:8, u:[{t:"Python Institute: PCAP certification",u:"https://pythoninstitute.org/certification/pcap-certification-associate/"}]},
+ {t:"Publish the proof", d:"Make both Python repos public with a clear README (problem, architecture, results table, how to run), pin them on GitHub and write a short LinkedIn post: what a Java lead learned shipping AI in Python.", h:2},
+ {t:"One open-source contribution", d:"Fix a documented issue (label 'good first issue' or a docs gap) in a Python AI library you use: LangGraph, Pydantic AI, Langfuse or the Anthropic SDK. A merged pull request is strong, public proof.", h:4}
+],
+quiz:[
+ {q:"Where should Pydantic models sit in a Python AI service?",o:["Only in tests","At the boundaries: HTTP input and output, LLM structured outputs, configuration","Inside every private function","Nowhere, dicts are enough"],a:1,w:"Validate where untrusted or external data enters: requests, LLM outputs and config. Internal code can use dataclasses or plain types."},
+ {q:"Your FastAPI endpoint calls the LLM with a synchronous HTTP client inside an async def. What happens under load?",o:["Nothing, Python handles it","The event loop is blocked, so every other request waits","It becomes faster","FastAPI converts it to async automatically"],a:1,w:"A blocking call inside async code freezes the event loop. Use an async client or run the sync call in a thread pool."},
+ {q:"What does uv replace in a classic Python setup?",o:["pytest","pip, virtualenv and pip-tools (installs, environments, lock file)","FastAPI","The type checker"],a:1,w:"uv manages Python versions, virtual environments, dependency resolution and the lock file, much faster than pip."},
+ {q:"Why use LangGraph rather than a simple loop for the rent-indexation agent?",o:["It is required by Anthropic","It gives typed state, checkpoints to resume, retries and interrupts for human approval","It makes the model smarter","It removes the need for tests"],a:1,w:"The value is control: explicit state, resumable runs and a built-in pause for human approval. For a single call, plain SDK code is enough."},
+ {q:"Which proof of Python skills carries the most weight with a hiring manager?",o:["A list of courses followed","Public repos with tests, CI and measured results, then real work, then a certification","A certification alone","Years of Java experience"],a:1,w:"Hiring managers want to see working code and results; a certification such as PCAP confirms the basics but does not replace them."}
+],
+resources:[
+ {k:"doc",t:"The Python Tutorial (official)",u:"https://docs.python.org/3/tutorial/"},
+ {k:"doc",t:"uv: Python package and project manager",u:"https://docs.astral.sh/uv/"},
+ {k:"doc",t:"FastAPI documentation",u:"https://fastapi.tiangolo.com/"},
+ {k:"doc",t:"Pydantic documentation",u:"https://docs.pydantic.dev/latest/"},
+ {k:"doc",t:"Anthropic Python SDK (GitHub)",u:"https://github.com/anthropics/anthropic-sdk-python"},
+ {k:"doc",t:"LangGraph (GitHub)",u:"https://github.com/langchain-ai/langgraph"},
+ {k:"doc",t:"Pydantic AI (agent framework)",u:"https://ai.pydantic.dev/"},
+ {k:"course",t:"Python Institute: PCAP-31-04 certification",u:"https://pythoninstitute.org/certification/pcap-certification-associate/"},
+ {k:"course",t:"Hugging Face Agents Course (Python, free certificate)",u:"https://huggingface.co/learn/agents-course/unit0/introduction"},
+ {k:"doc",t:"Real Python: tutorials on asyncio, typing, testing (pick topics, not courses)",u:"https://realpython.com/"},
+ {k:"doc",t:"PyCoder's Weekly newsletter (Python news, 10 minutes a week)",u:"https://pycoders.com/"},
+ {k:"doc",t:"Book: Fluent Python, 2nd edition (Luciano Ramalho, O'Reilly, 2022): the idioms a Java developer is missing",u:"https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/"}
+],
+coach:["Do not learn Python from scratch: learn the differences. One kata a day for a month beats a 40-hour course.","Use Claude Code to review your Python as a senior Pythonista would: ask it to flag Java-isms, then fix them yourself.","Book the PCAP date early (for example 8 weeks ahead): a fixed date keeps the 3-4 h/week honest.","In interviews, say 'Java and Python' and show both repos: the polyglot lead who ships AI on the JVM and in Python is rare."],
+english:{vocab:[["type hint","annotation de type"],["virtual environment","environnement virtuel"],["event loop","boucle d'événements"],["lock file","fichier de verrouillage des dépendances"],["idiomatic","idiomatique, naturel pour le langage"],["checkpoint","point de reprise"]],speak:"Explain in 2 minutes, in English, why you rebuilt your Java extraction service in Python, what was easier, what was harder, and which version you would put in production for a client."}
+});
+
+M.push({
 id:"m09", phase:2, weeks:"20", hours:30,
 title:"LangChain4j, working Python and the wider ecosystem",
 why:"Clients use different stacks. Being able to read and compare them makes you the trusted advisor.",
 objectives:[
 "Compare Spring AI and LangChain4j and choose per context",
-"Write working Python for AI (Anthropic SDK, FastAPI, notebooks): 70%+ of international AI postings require it",
+"Choose between Java and Python per client context (module 23 builds the Python side)",
 "Know when fine-tuning is (rarely) the right answer",
 "Know the landscape: model providers, local models, vector databases, eval tools",
 "Run a local model for confidential or offline use cases"
@@ -975,7 +1041,7 @@ exercises:[
  {t:"Read and run a TypeScript MCP server", d:"Clone an official TypeScript MCP server, run it, add one tool, and connect it to Claude Desktop.", h:4},
 {t:"LangChain4j port", d:"Re-implement your extraction service with LangChain4j AI Services in a small Quarkus or plain Java app. Write a comparison ADR.", h:6},
 {t:"Python reading", d:"Clone a Python RAG example from Anthropic's cookbook, run it, and port one technique (e.g. contextual retrieval) to your Java project.", h:5, u:[{t:"Anthropic Claude Cookbooks (GitHub)",u:"https://github.com/anthropics/claude-cookbooks"},{t:"Anthropic: Contextual Retrieval",u:"https://www.anthropic.com/news/contextual-retrieval"}]},
-{t:"Python sprint", d:"Rebuild your lease extractor in Python: Anthropic SDK + Pydantic validation + a FastAPI endpoint + pytest. Aim for idiomatic code (type hints, virtualenv/uv). Put it in the portfolio as a \"polyglot\" proof.", h:10},
+{t:"Polyglot comparison", d:"Compare your Java extractor with the Python version built in module 23: latency, lines of code, test coverage, ease of change, deployment. Write an ADR saying which you would pick for a Java bank and for an AI startup, and why.", h:3},
 {t:"Fine-tuning discussion", d:"Write a one-page English note: when would you fine-tune vs prompt vs RAG for a client? Include data, cost, evaluation and maintenance. Use it in interviews.", h:2},
 {t:"Local model", d:"Run a local model with Ollama, plug it into Spring AI, and compare quality on 10 extraction cases. Note when a local model would be acceptable.", h:4}
 ],
@@ -1080,7 +1146,8 @@ exercises:[
 {t:"JUnit eval harness", d:"Write a JUnit 5 harness that runs the dataset, applies code-based graders and outputs a report (pass rate, cost, latency). Tag it so it is excluded from normal unit tests.", h:10},
 {t:"LLM judge", d:"Add a faithfulness judge with a rubric. Label 30 answers yourself and compute agreement with the judge. Iterate on the rubric until agreement is high.", h:8},
 {t:"CI gate", d:"Run the fast subset on each PR in GitHub Actions and fail below 90%. Prove it catches a deliberately broken prompt.", h:6},
-{t:"Model upgrade simulation", d:"Switch the default model and run the full eval. Write a one-page 'go / no-go' memo for a fictional client.", h:5}
+{t:"Model upgrade simulation", d:"Switch the default model and run the full eval. Write a one-page 'go / no-go' memo for a fictional client.", h:5},
+ {t:"Paid evaluation work as proof", d:"Take a part-time AI code-evaluation mission (for example Mercor or Turing, Java or Python). Log in the proof ledger what you evaluated, the rubric used and what it taught you about graders and failure modes.", h:4}
 ],
 quiz:[
 {q:"Why can't you rely on 'it looks better' after a prompt change?", o:["Prompts can't be measured","Outputs vary and improvements on a few cases can hide regressions elsewhere","Models dislike changes","It's always true"], a:1, w:"Only a fixed dataset reveals global effect."},
@@ -1207,7 +1274,8 @@ exercises:[
 {t:"Cost dashboard", d:"Compute cost per request from token metrics and build a dashboard with daily spend per user and per feature.", h:6},
 {t:"Resilience", d:"Add Resilience4j retry, timeout and circuit breaker around model calls, plus a fallback to a smaller model. Test with a fake failing provider.", h:8},
 {t:"Optimisation sprint", d:"Reduce cost per question by 50% without losing more than 2 points of eval score (routing, caching, context trimming). Document each step's effect.", h:12},
-{t:"Release process", d:"Write a one-page runbook for upgrading the model version: eval, shadow traffic, rollout, rollback.", h:4}
+{t:"Release process", d:"Write a one-page runbook for upgrading the model version: eval, shadow traffic, rollout, rollback.", h:4},
+ {t:"Agent on Kubernetes", d:"Deploy the containerised agent on a local Kubernetes cluster (kind or k3d): deployment, service, config and secret, liveness and readiness probes, resource limits, and OpenTelemetry traces exported to Langfuse or Jaeger. Kubernetes appears in about a quarter of French AI postings.", h:5}
 ],
 quiz:[
 {q:"Which latency metric matters most for user experience?", o:["Average only","p95 / tail latency","Minimum","Token count"], a:1, w:"Tail latency is what users feel on bad days."},
@@ -1269,7 +1337,9 @@ exercises:[
 {t:"Provider FAQ", d:"Write a one-page 'data and security FAQ' for Anthropic API and Bedrock, each claim linked to official docs.", h:5},
 {t:"AI Act classification", d:"Classify 5 use cases (lease assistant, CV screening, customer support bot, credit pre-scoring, internal code assistant). Justify each.", h:4},
 {t:"Compliance file", d:"Produce the full compliance-ready file for the lease assistant (risk class, data flow, DPIA screening, oversight, user notice).", h:8},
-{t:"Certification scouting", d:"Compare AWS Certified Generative AI Developer – Professional and Microsoft AI-103 (Azure AI App and Agent Developer). Pick one target for month 10 based on your target clients.", h:2}
+{t:"Certification scouting", d:"Compare AWS Certified Generative AI Developer – Professional and Microsoft AI-103 (Azure AI App and Agent Developer). Pick one target for month 10 based on your target clients.", h:2},
+ {t:"Same assistant on Azure AI Foundry", d:"Run the lease assistant on Azure AI Foundry (model deployment, an agent with one tool, content safety). Note the differences with Bedrock: identity, networking, pricing, region availability. Azure appears in 23% of French AI postings, often in large accounts.", h:4, u:[{t:"Microsoft Applied Skills: agents in Microsoft Foundry",u:"https://learn.microsoft.com/en-us/credentials/applied-skills/get-started-developing-agents-in-microsoft-foundry/"}]},
+ {t:"Vertex AI quick tour", d:"Call a model through Vertex AI, run one RAG query with Vertex AI Search or your own pgvector index, and write a one-page comparison table AWS / Azure / GCP for a client choosing a platform.", h:3}
 ],
 quiz:[
 {q:"A CV-screening AI used for hiring is, under the AI Act:", o:["Minimal risk","High-risk","Prohibited","Not covered"], a:1, w:"Employment and worker management are listed high-risk areas."},
@@ -1459,7 +1529,8 @@ exercises:[
 {t:"Discovery workshop kit", d:"Prepare a 3-hour discovery workshop: agenda, questions, canvas, output template.", h:6},
 {t:"Proposal", d:"Write a one-page English proposal for a 4-week pilot (the document intake pipeline for a property manager), with price based on your target day rate.", h:5},
 {t:"Executive pitch", d:"Record a 3-minute English pitch to a CEO. Watch it, cut the jargon, re-record.", h:3},
-{t:"Offer catalogue", d:"Define 3 productised offers (e.g. 'AI audit 3 days', 'MCP integration 2 weeks', 'Team AI coding enablement 1 month') with deliverables and indicative prices.", h:5}
+{t:"Offer catalogue", d:"Define 3 productised offers (e.g. 'AI audit 3 days', 'MCP integration 2 weeks', 'Team AI coding enablement 1 month') with deliverables and indicative prices.", h:5},
+ {t:"Forward deployed engineer simulation", d:"Play a 2-week FDE engagement on a real SME process (for example invoice intake): a one-hour discovery call script in English, a scoped proposal, a working pilot deployed in the client environment (Docker or their cloud), a demo, and a handover note with metrics. Forward deployed engineer postings grew more than 1,000% in the US in 2026 (Lightcast via Fortune).", h:8, u:[{t:"Fortune: forward deployed engineers (Sept 2026)",u:"https://fortune.com/2026/09/03/forward-deployed-engineers-fast-growing-six-figure-silicon-valley-job-integrate-ai-with-customers-tech-careers-palantir/",y:"2026-09"}]}
 ],
 quiz:[
 {q:"A client asks for 'a ChatGPT for the company'. Your first move?", o:["Start coding","Clarify users, tasks, data, volume and success metric","Quote a price","Recommend the biggest model"], a:1, w:"Translate the request into a use case."},
@@ -1638,7 +1709,8 @@ exercises:[
 {t:"Q&A bank", d:"Write and rehearse answers to the 10 classic questions above and 10 more you collect from job posts.", h:8},
 {t:"STAR stories", d:"Write your 8 stories in English, 150 words each, with numbers. Rehearse until fluent.", h:6},
 {t:"Mock interviews", d:"Do 4 mock interviews: 2 with Claude playing a demanding interviewer (voice mode if available), 2 with real people (network, English-speaking freelancers).", h:8},
-{t:"Live coding practice", d:"Practise building a small Spring AI endpoint in 30 minutes while explaining your thinking in English.", h:6}
+{t:"Live coding practice", d:"Practise building a small Spring AI endpoint in 30 minutes while explaining your thinking in English.", h:6},
+ {t:"FDE interview loop", d:"Prepare the forward deployed engineer loop in English: a customer case (scope an AI use case live with a sceptical stakeholder), a live build in Python (45 min, tool-calling agent with tests) and a debugging round on a broken RAG pipeline. Rehearse each with the AI mock interviewer.", h:4}
 ],
 quiz:[
 {q:"First step in an AI system design interview?", o:["Draw the architecture","Clarify requirements and constraints","Name the biggest model","Talk about your CV"], a:1, w:"Clarify before designing."},
@@ -2118,6 +2190,7 @@ function projects(){let h=`<div class="hero"><h1>📦 Capstone projects</h1><p>P
 function certs(){const C=CERTS,cs=S.cert;const ck=(id,txt,xp,extra)=>{const c=!!cs[id];return `<label class="ex ${c?"done":""}"><input type="checkbox" data-c="${id}" ${c?"checked":""}><div><div class="et">${txt}</div>${extra||""}</div><span class="xp">+${xp} XP</span></label>`;};
  let h=`<div class="hero"><h1>🎓 Certifications plan</h1><p>Knowledge you can prove. Free certificates along the way, AWS Generative AI Developer Professional as the main paid exam, Claude Certified Architect as soon as access is open to you.</p></div>
  <div class="card mt"><h3>🆓 Free certificates, phase by phase</h3>${C.free.map(c=>ck(c.id,`Phase ${c.phase} · ${esc(c.name)}`,120,`<div class="small muted">${esc(c.why)} <a href="${c.url}" target="_blank" rel="noopener">Open →</a></div>`)).join("")}</div>
+ <div class="card mt"><h3>🐍 ${esc(C.python.name)} <span class="pill g">Python proof · month 3-4</span></h3><p class="small muted">${esc(C.python.facts)}</p>${C.python.steps.map(s=>ck(s.id,esc(s.t),30)).join("")}${ck("pcap","🏆 PCAP passed",250)}<p class="small"><a href="https://pythoninstitute.org/certification/pcap-certification-associate/" target="_blank" rel="noopener">Official PCAP page →</a></p></div>
  <div class="card mt"><h3>☁️ ${esc(C.aws.name)} <span class="pill g">Main target · month 10</span></h3><p class="small muted">${esc(C.aws.facts)}</p>
  <table><tr><th>Domain</th><th>Weight</th><th>Covered in</th></tr>${C.aws.domains.map(d=>`<tr><td>${esc(d[0])}</td><td><b>${d[1]}</b></td><td><span class="pill">${d[2]}</span></td></tr>`).join("")}</table>
  <h4>Preparation plan</h4>${C.aws.plan.map(s=>ck(s.id,`<b>${esc(s.w)}</b> · ${esc(s.t)}`,30)).join("")}
