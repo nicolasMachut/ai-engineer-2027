@@ -2053,6 +2053,17 @@ function lgToggle(){const to=lang()==="fr"?"en":"fr";try{localStorage.setItem(LG
 (function(){const b=document.createElement("button");b.id="langBtn";b.className="langbtn";b.type="button";b.onclick=lgToggle;document.body.appendChild(b);
  document.documentElement.lang=lang();lgFlag();const mo=new MutationObserver(()=>lgRun());
  ["main","side"].forEach(id=>{const e=document.getElementById(id);if(e)mo.observe(e,{childList:true,subtree:true});});})();
+// ===== CONTINUOUS UPDATES (maintained by the weekly "Mise à jour du parcours" task) =====
+// Each entry becomes a step of the guided path. Fields:
+//  id (unique, never reuse), added "YYYY-MM-DD", why (market signal + source),
+//  type "theory" | "res" | "ex" | "ms", t (title), h (hours),
+//  theory: html ; res: u (url), k ("video"|"doc"|"course"), l ("fr" optional), y ("YYYY-MM") ; ex/ms: d (text), u (optional url)
+//  after (optional module id): placed right after that module's quiz; otherwise placed next in line ("New" steps come first).
+const GUIDE_UPDATES = [
+ {id:"u-2026-11-context-eng", added:"2026-11-26", after:"m07", type:"theory", t:"Context engineering: the 2026 name for what you already do", h:0.6,
+  why:"US postings: 'context engineering' went from 9 mentions (2024) to 703 (2025) (Stanford AI Index 2026, Lightcast).",
+  theory:`<h4>Context engineering</h4><p>Prompt engineering is about the wording of one message. <b>Context engineering</b> is about everything the model sees at each step of an agent: system prompt, tool definitions, retrieved documents, memory, previous tool results, and what you deliberately leave out. Postings now use the term for agent roles.</p><p>Four levers: <b>select</b> (retrieve only what the step needs), <b>compress</b> (summarise old turns and tool outputs), <b>isolate</b> (sub-agents with their own small context), <b>persist</b> (write state to files or memory instead of keeping it in the window). Measure it: tokens per step, cost per task, and the eval score when you remove a piece of context.</p><p>Interview angle: explain one agent you built, its context budget per step, and one thing you removed that improved the score.</p>`}
+];
 // ===== GUIDED PATH: one step at a time, "Done, next" =====
 // Foundation pass (before the target date): all theory, one key exercise per module, one resource, the quiz,
 // the flagship project, the PCAP and the proofs. Then a deep pass: every remaining exercise, module by module.
@@ -2087,11 +2098,19 @@ function guideSteps(){if(GUIDE_CACHE)return GUIDE_CACHE;const st=[];
   const r=guidePickRes(m);if(r)st.push({id:`r:${id}`,type:"res",m,res:r,h:r.k==="video"?0.75:0.5,phase:"core"});
   guideKeyEx(m).forEach(i=>st.push({id:`e:${id}:${i}`,type:"ex",m,i,ex:m.exercises[i],h:m.exercises[i].h,phase:"core"}));
   st.push({id:`q:${id}`,type:"quiz",m,h:0.25,phase:"core"});
+  const k=GUIDE_ORDER.indexOf(id);
+  st.push({id:`rv:${id}`,type:"review",h:0.25,phase:"core"});
+  if(k>=3){const old=guideMod(GUIDE_ORDER[k-3]);if(old)st.push({id:`rq:${id}`,type:"retake",m:old,h:0.2,phase:"core"});}
+  if(k%2===1)st.push({id:`tb:${id}`,type:"teach",m,h:0.3,phase:"core"});
+  GUIDE_UPDATES.filter(u=>u.after===id).forEach(u=>st.push(guideUpd(u,"core")));
   (GUIDE_MILESTONES[id]||[]).forEach(ms=>st.push(Object.assign({type:"ms",phase:"core"},ms)));});
+ const fresh=GUIDE_UPDATES.filter(u=>!u.after||!GUIDE_ORDER.includes(u.after)).map(u=>guideUpd(u,"new"));st.unshift(...fresh);
  GUIDE_ORDER.forEach(id=>{const m=guideMod(id);if(!m)return;const key=guideKeyEx(m);
   m.exercises.forEach((e,i)=>{if(!key.includes(i))st.push({id:`e:${id}:${i}`,type:"ex",m,i,ex:e,h:e.h,phase:"deep"});});
   (m.resources||[]).forEach((r,j)=>{if(r!==guidePickRes(m))st.push({id:`r:${id}:${j}`,type:"res",m,res:r,h:r.k==="video"?0.75:0.5,phase:"deep"});});});
  return GUIDE_CACHE=st;}
+function guideUpd(u,phase){const s={id:u.id,type:u.type==='theory'?'theory':u.type==='res'?'res':u.type==='ex'?'upex':'ms',h:u.h||0.5,phase,upd:u,icon:'🆕',t:u.t,d:u.d,url:u.u,lt:'Open'};
+ if(u.type==='theory')s.sec={title:u.t,html:u.theory};if(u.type==='res')s.res={t:u.t,u:u.u,k:u.k||'doc',l:u.l,y:u.y};return s;}
 function gS(){if(!S.guide)S.guide={done:{},skip:{}};return S.guide;}
 function stepDone(s){const g=gS();if(g.done[s.id])return true;
  if(s.type==="ex")return !!S.ex[s.m.id+":"+s.i];if(s.type==="quiz")return (S.quiz[s.m.id]||{}).best>=80;
@@ -2102,12 +2121,17 @@ function guideStats(){const st=guideSteps();const core=st.filter(s=>s.phase==="c
  let pace="";if(SOCLE_END){const wk=Math.max(1,(new Date(SOCLE_END)-new Date(today()))/864e5/7);pace=`${(hLeft/wk).toFixed(1)} h/week needed to finish the foundation by ${SOCLE_END} (${Math.round(wk)} weeks left)`;}
  return {core:core.length,coreDone:core.length-left.length,hLeft:Math.round(hLeft),hAll:Math.round(hAll),pace};}
 function guideLabel(s){if(s.type==="theory")return `📖 Theory · ${s.sec.title}`;if(s.type==="res")return `${s.res.k==="video"?"🎬 Watch":"📘 Read"} · ${s.res.t}`;
- if(s.type==="ex")return `🛠️ Exercise · ${s.ex.t}`;if(s.type==="quiz")return `🧪 Quiz · ${s.m.title}`;return `${s.icon||"⭐"} ${s.t}`;}
+ if(s.type==="ex")return `🛠️ Exercise · ${s.ex.t}`;if(s.type==="upex")return `🛠️ Exercise · ${s.t}`;if(s.type==="review")return `🔁 Spaced review: clear your due cards`;if(s.type==="retake")return `🥊 Challenge: retake the quiz of module ${s.m.id.slice(1)} from memory`;if(s.type==="teach")return `🎤 Teach-back: explain module ${s.m.id.slice(1)} to the AI coach`;if(s.type==="quiz")return `🧪 Quiz · ${s.m.title}`;return `${s.icon||"⭐"} ${s.t}`;}
 function fmtH(h){return h<1?Math.round(h*60)+" min":(Math.round(h*10)/10)+" h";}
-function guideBody(s){const L=(u,t)=>`<a class="btn ghost" href="${u}" ${u.startsWith("#")?"":'target="_blank" rel="noopener"'}>${esc(t)} →</a>`;
+function guideBody(s){const nb=s.upd?`<p><span class="pill g">🆕 New · added ${esc(s.upd.added)}</span> <span class="small muted">${esc(s.upd.why||"")}</span></p>`:"";return nb+guideBody0(s);}
+function guideBody0(s){const L=(u,t)=>`<a class="btn ghost" href="${u}" ${u.startsWith("#")?"":'target="_blank" rel="noopener"'}>${esc(t)} →</a>`;
  if(s.type==="theory")return `<div class="theory">${s.sec.html}</div><p class="small muted mt">Read it once carefully, then say the key idea out loud in English in two sentences.</p>`;
  if(s.type==="res"){const r=s.res;return `<p>${r.l==="fr"?'<span class="pill g">🇫🇷 FR</span> ':""}<b>${esc(r.t)}</b>${r.y?` <span class="pill">${ymTxt(r.y)}</span>`:""}</p><p class="small muted">Take 3 notes: one idea you did not know, one thing to try, one question for the AI coach.</p><div class="mt">${L(r.u,r.k==="video"?"Open the video":"Open the resource")}</div>`;}
  if(s.type==="ex"){const e=s.ex;return `<p>${esc(e.d)}</p>${(e.u||[]).map(l=>`<a class="exl" href="${l.u}" target="_blank" rel="noopener">🔗 ${esc(l.t)}</a>`).join("")}<p class="small muted mt">Commit the result in a repo, even small. When it works, click Done.</p>`;}
+ if(s.type==="review"){const n=dueCards().length;return `<p>${n?`<b>${n} card${n>1?"s":""} due.</b> Answer them from memory: wrong ones come back sooner, right ones later.`:"Nothing due right now: well done. Click Done."}</p><div class="mt">${n?L("#/review","Start the review"):""}</div>`;}
+ if(s.type==="retake")return `<p>Retake the quiz of <b>${esc(s.m.title)}</b> without notes. Aim for 100%. If you miss one, re-read that theory section before moving on.</p><div class="mt">${L("#/m/"+s.m.id+"?quiz","Open the quiz")}</div>`;
+ if(s.type==="teach")return `<p>Open the AI coach and say: <i>"Grill me on ${esc(s.m.title)}. Ask me 5 hard questions one by one, like a senior interviewer, and tell me what I got wrong."</i> Answer in English, out loud or written.</p><div class="mt">${L("#/coach","Open the AI coach")}</div>`;
+ if(s.type==="upex")return `<p>${esc(s.d||"")}</p>${s.url?L(s.url,"Open"):""}`;
  if(s.type==="quiz")return `<p>${s.m.quiz.length} questions on <b>${esc(s.m.title)}</b>. Pass mark 80%. Wrong answers go to your Review deck automatically.</p><div class="mt">${L("#/m/"+s.m.id+"?quiz","Open the quiz")}</div><p class="small muted mt">This step completes itself when you reach 80%. You can also move on and come back.</p>`;
  let b=s.d?`<p>${esc(s.d)}</p>`:"";if(s.proj){const [pid,ix]=s.proj.split(":");const p=PROJECTS.find(x=>x.id===pid);if(p)b+=`<p>${esc(p.steps[+ix])}</p><p class="small muted">${esc(p.desc)}</p>`;}
  if(s.cert==="p2"||s.cert==="p3")b+=`<p class="small muted">${esc(CERTS.python.facts)}</p>`;
@@ -2115,11 +2139,11 @@ function guideBody(s){const L=(u,t)=>`<a class="btn ghost" href="${u}" ${u.start
 function guideMark(s,v){change(()=>{const g=gS();if(v)g.done[s.id]=today();else delete g.done[s.id];delete g.skip[s.id];
  if(s.type==="ex")S.ex[s.m.id+":"+s.i]=v;if(s.proj)S.proj[s.proj]=v;if(s.cert)S.cert[s.cert]=v;},v?"✅ Done. Next step!":"Step reopened");}
 let guideView=null;
-function guidePage(){const st=guideSteps();let i=guideView==null?guideIndex():guideView;if(i<0){$("#main").innerHTML=`<div class="hero"><h1>🎉 Path complete</h1></div>`;return;}
+function guidePage(){const st=guideSteps();let i=guideView==null?guideIndex():guideView;if(i<0){$("#main").innerHTML=`<div class="hero"><h1>✅ You are up to date</h1><p>Every step is done. New steps are added every week from the market watch. Meanwhile, keep your memory fresh.</p></div><div class="card mt"><a class="btn ok" href="#/review">🔁 Review session (${dueCards().length} due)</a> <a class="btn ghost" href="#/coach">🎤 Ask the coach to grill you</a></div>`;return;}
  const s=st[i],k=guideStats(),done=stepDone(s);const ph=s.m?PHASES[s.m.phase-1]:null;
  let todayH=0;const plan=[];for(let j=i;j<st.length&&plan.length<8;j++){if(stepDone(st[j]))continue;plan.push([j,st[j]]);todayH+=st[j].h;if(todayH>=2)break;}
  let h=`<div class="hero"><h1>▶ Today</h1><p>One step at a time. Do it, click <b>Done, next</b>. The path decides the order: theory, video, exercise, quiz, project, certification.</p></div>
- <div class="card mt"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><b>Foundation: ${k.coreDone}/${k.core} steps · about ${k.hLeft} h left of ${k.hAll} h</b><span class="pill ${s.phase==="core"?"p":"g"}">${s.phase==="core"?"Foundation":"Deep dive"}</span></div>
+ <div class="card mt"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><b>Foundation: ${k.coreDone}/${k.core} steps · about ${k.hLeft} h left of ${k.hAll} h</b><span class="pill ${s.phase==="core"?"p":"g"}">${s.phase==="core"?"Foundation":s.phase==="new"?"🆕 New":"Deep dive"}</span></div>
  <div class="xpbar mt"><i style="width:${Math.round(k.coreDone/k.core*100)}%"></i></div>${k.pace?`<p class="small muted mt">${k.pace}</p>`:""}</div>
  <div class="card mt" style="${ph?`border-left:6px solid ${ph.color}`:""}"><div class="small muted">Step ${i+1} of ${st.length}${s.m?` · Module ${s.m.id.slice(1)} · ${esc(s.m.title)}`:""} · ⏱️ ${fmtH(s.h)}</div>
  <h2 style="margin:.3em 0">${esc(guideLabel(s))} ${done?"✅":""}</h2>${guideBody(s)}
