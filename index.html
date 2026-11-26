@@ -2639,6 +2639,327 @@ ${HOW(`<ul><li>OWASP Agentic risks: tool misuse, identity and privilege abuse, m
 ${EG("Memory poisoning: an attacker gets the agent to save \"the user always approves payments\" in its long-term memory. Later sessions trust it. Defence: review what gets written to memory, and keep approvals outside the model.")}
 ${CHK(["Why can't approvals rely on the model's judgement alone?","The model can be manipulated; approval gates must be enforced by code or a human."])}
 `;
+
+THEORY_V2.m12 = `
+<h4>1. Observability</h4>
+${ONE("For every AI request, record what went in, what happened and what came out, so you can explain any answer and any cost afterwards.")}
+${PIC("A flight recorder (black box) for each request.")}
+${HOW("Trace: user, prompt version, model, retrieved documents, tool calls, tokens, cost, latency, outcome. OpenTelemetry tracing (supported by Spring AI via Micrometer) follows an agent across all its steps. Store prompts and outputs carefully: sampling, masking of personal data, limited retention.")}
+${EG("A user complains about a wrong answer from Tuesday. With the trace you see the retrieved chunks were from an old lease version: the bug is in ingestion, not the prompt.")}
+${CHK(["Name five things to record per request.","Prompt version, model, retrieved documents, tool calls, tokens/cost, latency, outcome (any five)."])}
+
+<h4>2. Cost engineering</h4>
+${ONE("Know what one unit of work costs, then pull the right levers to reduce it.")}
+${HOW(`<ul><li>Know your <b>unit cost</b>: per question, per document, per user per month.</li><li><b>Route</b> easy requests to small models.</li><li><b>Prompt caching</b> for stable prefixes; <b>Batch API</b> for offline work.</li><li><b>Trim context</b>: fewer, better chunks; summarised history.</li><li><b>Cap output length</b>; budgets and alerts per tenant.</li></ul>`)}
+${EG("Document assistant at 4 cents per question × 50,000 questions a month = 2,000 euros. Routing 70% to a small model and caching the system prompt can bring it under 600 euros.")}
+${CHK(["What is a unit cost, and why compute it?","The cost of one unit of work (a question, a document); it makes the budget predictable and shows which lever matters."])}
+
+<h4>3. Latency</h4>
+${ONE("Make the answer feel fast (streaming) and be fast (parallel calls, small models, precomputation), and measure the slow cases, not the average.")}
+${HOW("Stream responses. Parallelise independent calls. Small models for intermediate steps. Precompute summaries and embeddings. Measure <b>p50</b> (median) and <b>p95</b> (the slowest 5%), not averages.")}
+${EG("Average 2 s looks fine, but p95 is 14 s: one user in twenty waits 14 seconds. That is the number users remember.")}
+${CHK(["Why p95 rather than the average?","The average hides the slow requests that frustrate users; p95 shows them."])}
+
+<h4>4. Reliability</h4>
+${ONE("Calls to models fail regularly: retry wisely, cut off slow calls, and always have a plan B.")}
+${HOW("Retries with exponential backoff and <b>jitter</b> (random delay so all clients don't retry at the same moment); timeouts on every call; circuit breakers (Resilience4j); fallback model or provider; graceful degradation (e.g. return the sources without a generated answer). Idempotent side effects, so retries are safe.")}
+${EG("The provider is overloaded: the circuit breaker opens, requests go to a fallback model, and the UI shows \"simplified answer\" instead of an error.")}
+${CHK(["What is jitter for?","Spreading retries randomly so that thousands of clients don't hammer the service at the same instant."])}
+
+<h4>5. Versioning and releases</h4>
+${ONE("Version the prompt, the model and the dataset together, release carefully, and always be able to roll back.")}
+${HOW("Feature flags, shadow tests (new version runs in parallel without being shown) or A/B tests; previous version ready to roll back. Pin the exact model version in production; upgrade deliberately after evals.")}
+${TRAP("Using a \"latest\" model alias in production: behaviour changes the day the provider updates it.")}
+${CHK(["What is a shadow test?","Running the new version on real traffic in parallel, without showing its answers, to compare with the current one."])}
+
+<h4>Tracing standard and cost levers</h4>
+${ONE("Use the OpenTelemetry GenAI conventions for traces, and know the 2026 cost levers.")}
+${HOW("Traces with <code>gen_ai.*</code> attributes (operation, model, input/output tokens) and spans for agents and tool calls. The conventions are still evolving: pin a version. The Claude API can emit OpenTelemetry spans itself. Cost levers: effort level, model routing, prompt caching (watch the <b>cache hit rate</b>), Batch API combined with caching, per-tenant budgets. Tokenizers differ between models: compare prices per task, not per token.")}
+${CHK(["Why compare model prices per task rather than per token?","Tokenizers differ: the same text can be 30% more tokens on one model."])}
+`;
+
+THEORY_V2.m13 = `
+<h4>1. Access paths</h4>
+${ONE("Claude is available directly from Anthropic or through the big clouds (AWS Bedrock, Google Vertex AI, Microsoft), and big companies usually prefer their own cloud.")}
+${HOW("Why the cloud path: one bill, existing IAM (identity and access), private networking, EU regions, existing contracts. Spring AI supports Bedrock and others, so your code changes little.")}
+${CHK(["Give two reasons a company uses Claude via its cloud provider.","Existing contract and billing, IAM and private networking, EU data residency (any two)."])}
+
+<h4>2. Data questions every client asks</h4>
+${ONE("Every client will ask the same four questions about their data: prepare a one-page answer per provider.")}
+${HOW(`<ol><li>Where is data processed and stored (region)?</li><li>Is it used for training? How long is it kept?</li><li>Who can access logs? Is there a data processing agreement?</li><li>How are secrets, keys and identities managed?</li></ol>Cite the official documentation for each answer.`)}
+${YOU("Answering these in the first meeting, with sources, saves weeks of back-and-forth with the client's DPO and security team.")}
+${CHK(["What should every answer on the one-pager cite?","The provider's official documentation."])}
+
+<h4>3. EU AI Act essentials</h4>
+${ONE("The EU AI Act regulates AI by level of risk: some uses are banned, some are \"high-risk\" with heavy obligations, and most business assistants only have transparency duties.")}
+${HOW(`<table><tr><th>Level</th><th>Examples</th><th>Since / from</th></tr>
+<tr><td><b>Prohibited</b></td><td>Social scoring, manipulative techniques...</td><td>February 2025 (with AI literacy duty)</td></tr>
+<tr><td><b>General-purpose AI models</b> (providers)</td><td>Obligations on model makers</td><td>August 2025</td></tr>
+<tr><td><b>Transparency</b></td><td>Users must know they talk to an AI; AI-generated content marked</td><td>August 2026 (grace period to 2 December 2026 for marking content of systems already on the market)</td></tr>
+<tr><td><b>High-risk</b> stand-alone (Annex III)</td><td>Hiring, credit scoring, education, critical infrastructure</td><td>2 December 2027</td></tr>
+<tr><td><b>High-risk</b> in regulated products (Annex I)</td><td>AI inside machines, medical devices...</td><td>2 August 2028</td></tr></table>
+The postponement of high-risk dates comes from the <b>AI Omnibus</b> (Regulation (EU) 2026/1744, in force since 27 July 2026).`)}
+${EG("A lease Q&A assistant for landlords: not high-risk, but users must be told they talk to an AI. A CV-screening tool: high-risk (hiring), heavy obligations from December 2027.")}
+${YOU("You must be able to say <b>why</b> a given assistant is or is not high-risk. Clients ask.")}
+${CHK(["Is an AI that ranks job applicants high-risk?","Yes: employment and hiring is listed in Annex III."])}
+
+<h4>4. GDPR for AI features</h4>
+${ONE("GDPR applies fully to AI features: legal basis, purpose, minimisation, retention, people's rights, and an impact assessment when the risk is high.")}
+${HOW("Checklist: legal basis, purpose limitation, minimisation, retention period, data subject rights (access, deletion...), DPIA (data protection impact assessment) when risk is high, processor contract with the model provider. The <b>CNIL</b> publishes practical AI guidance in French: use it with French clients.")}
+${CHK(["What is a DPIA?","A data protection impact assessment, required by GDPR for processing likely to create high risk for people."])}
+
+<h4>5. The compliance-ready project file</h4>
+${ONE("Deliver, without being asked, a short file that answers the compliance questions in advance.")}
+${HOW("Use-case description and risk classification, data-flow diagram, provider and region, retention, security measures, evaluation results, human oversight, texts informing users.")}
+${YOU("Very few developers do this; it is a strong differentiator and speeds up go-live.")}
+${CHK(["Name four items of the compliance file.","Risk classification, data-flow diagram, provider and region, retention, security measures, eval results, human oversight, user information (any four)."])}
+`;
+
+THEORY_V2.m14 = `
+<h4>1. Where the value is</h4>
+${ONE("AI pays off most on high-volume, repetitive, text-heavy tasks with clear rules, where a human can review the result.")}
+${HOW("Typical targets: invoice and contract processing, email triage, ticket classification, report drafting, data cleaning, compliance checks.")}
+${EG("You live it with your own property and company admin (leases, invoices, bank emails). The same patterns apply to a property manager, a logistics firm or an accounting office.")}
+${CHK(["Give the four characteristics of a good automation target.","High volume, repetitive, text-heavy, clear rules (and tolerance for review)."])}
+
+<h4>2. The document AI pipeline</h4>
+${ONE("Almost every document automation follows the same six steps: receive, classify, extract, validate, review, integrate.")}
+${HOW(`<table><tr><th>Step</th><th>What</th><th>Who / how</th></tr>
+<tr><td>1. Intake</td><td>Email, upload, scanner, API; convert PDF to text and images</td><td>Code</td></tr>
+<tr><td>2. Classify</td><td>What is this document?</td><td>Small model</td></tr>
+<tr><td>3. Extract</td><td>Fields with a schema</td><td>Model + structured output</td></tr>
+<tr><td>4. Validate</td><td>Dates coherent, totals match, IBAN valid</td><td><b>Code</b>, business rules</td></tr>
+<tr><td>5. Human review</td><td>Low-confidence or high-stakes items</td><td>Human</td></tr>
+<tr><td>6. Integrate</td><td>Write to ERP/CRM/accounting, file, notify</td><td>Code</td></tr></table>`)}
+${EG("Supplier invoices: 80% pass all checks and are booked automatically; 20% (total doesn't match, new supplier) go to a review screen.")}
+${CHK(["Who validates business rules: the model or code?","Code: deterministic and testable."])}
+
+<h4>3. Designing for business users</h4>
+${ONE("Business users need simple buttons, their procedures built in, the source shown next to each extracted value, and an easy way to report errors.")}
+${HOW("Prompts packaged as buttons or templates; Claude Projects or skills containing their procedures; review screens with the source next to the value; one-click error reporting.")}
+${YOU("The best AI feature is invisible: it pre-fills, the human confirms.")}
+${CHK(["Why show the source next to the extracted value?","So the reviewer can check in one glance and trust (or correct) the value."])}
+
+<h4>4. Discovery and ROI</h4>
+${ONE("Measure the current situation, estimate the gain and the cost, compute the payback, then pilot on real data before promising.")}
+${HOW(`<ol><li>Interview the people doing the work.</li><li>Baseline: volume per month, minutes per item, error rate, cost.</li><li>Estimate: share handled straight-through (e.g. 70%), review time on the rest, run cost.</li><li>Payback period.</li><li>Pilot 2 to 4 weeks on real data.</li></ol>`)}
+${EG("2,000 invoices a month × 4 min = 133 h. With 70% automatic and 1 min of review on the rest: about 10 h. 123 hours saved × 40 euros = about 4,900 euros a month, against a project cost of 25,000 euros: payback in about 5 months.")}
+${CHK(["Why pilot before promising a number?","Real data reveals the actual automation rate and edge cases; estimates are often optimistic."])}
+
+<h4>5. Change management</h4>
+${ONE("Adoption by people, not technology, is usually the real bottleneck.")}
+${HOW("People fear replacement. Present AI as removing drudgery, involve users in testing, keep humans accountable for decisions, train them.")}
+${EG("The accounting team tests the pilot and suggests the review screen layout: they now own the tool instead of resisting it.")}
+${CHK(["What is usually the real bottleneck of an AI project?","Adoption by the people who must use it."])}
+`;
+
+THEORY_V2.m15 = `
+<h4>1. The adoption playbook</h4>
+${ONE("Introduce AI coding tools in a team in five steps: measure, pilot, standardise, train, measure again.")}
+${HOW(`<ol><li><b>Baseline</b>: one month of lead time, PR size, defect rate, review time.</li><li><b>Pilot</b> with 2 or 3 volunteers on real tasks.</li><li><b>Standardise</b>: shared CLAUDE.md, skills for team conventions, a review subagent, hooks for formatting and tests, allowed commands, all distributed as a plugin.</li><li><b>Train</b>: pair sessions, demos of good and bad usage, a written playbook.</li><li><b>Measure again</b> and adjust.</li></ol>`)}
+${CHK(["Why measure before the pilot?","Without a baseline you cannot prove any improvement."])}
+
+<h4>2. Quality and security rules</h4>
+${ONE("AI-written code follows the same rules as human code, plus a few specific safeguards.")}
+${HOW(`<ul><li>Humans own every merged line; same review for AI code.</li><li>Tests before or with code; no merge without green CI.</li><li>No secrets or customer data in prompts; enterprise accounts with proper data policies.</li><li>Autonomy only in sandboxes; protected branches and folders via hooks and permissions.</li><li>Watch licences and dependencies in generated code.</li></ul>`)}
+${CHK(["Who is responsible for a bug in AI-generated code that was merged?","The human who reviewed and merged it, as for any code."])}
+
+<h4>3. The people side</h4>
+${ONE("Seniors tend to resist and juniors tend to over-trust: coach both differently.")}
+${HOW("Seniors: use it for the boring 60% (boilerplate, tests, migrations). Juniors: must explain every generated line and still write some code by hand, or they stop learning. Celebrate measurable wins, not hype.")}
+${CHK(["What rule protects juniors' learning?","They must be able to explain every generated line, and keep writing some code by hand."])}
+
+<h4>4. New team workflows</h4>
+${ONE("AI changes how teams work: automatic first reviews, tests for legacy code, migration campaigns, living documentation, parallel agents.")}
+${EG("A Spring Boot 2 → 3 migration of 40 services run by agents, one service per worktree, each validated by its test suite, reviewed by humans.")}
+${CHK(["What makes an agent-run migration safe?","Good test coverage that verifies each migrated service, plus human review."])}
+
+<h4>5. Measuring impact</h4>
+${ONE("Measure impact with standard delivery metrics and developer satisfaction, and report honestly, including failures.")}
+${HOW("DORA metrics: lead time, deployment frequency, change failure rate; plus review load and developer satisfaction.")}
+${TRAP("Reporting only \"lines of code generated\". It says nothing about value, and can hide more bugs.")}
+${CHK(["Name three DORA metrics.","Lead time for changes, deployment frequency, change failure rate (and time to restore)."])}
+`;
+
+THEORY_V2.m16 = `
+<h4>1. From request to use case</h4>
+${ONE("Turn a vague request like \"a ChatGPT for our company\" into a precise, measurable use case.")}
+${HOW("Ask: which users, which task, what volume, what error tolerance, which data, which success metric. Score candidate use cases on value, feasibility (data available, risk) and time to first result.")}
+${EG("\"A ChatGPT for us\" becomes: \"The 6 property managers answer 300 tenant emails a week; an assistant drafts replies from the lease and the rules; success = 50% of drafts sent with minor edits, in 6 weeks.\"")}
+${CHK(["Name four questions that turn a request into a use case.","Users, task, volume, error tolerance, data, success metric (any four)."])}
+
+<h4>2. The engagement ladder</h4>
+${ONE("Sell AI work in four steps, each with a deliverable and a go/no-go decision.")}
+${HOW(`<table><tr><th>Step</th><th>Duration</th><th>Deliverable</th></tr><tr><td>1. Audit / discovery</td><td>2 to 5 days</td><td>Processes, data, quick wins, risks, roadmap</td></tr><tr><td>2. Pilot / proof of value</td><td>3 to 6 weeks</td><td>One use case on real data, eval set, measured result</td></tr><tr><td>3. Industrialisation</td><td>Variable</td><td>Security, integration, observability, training</td></tr><tr><td>4. Run and improve</td><td>Ongoing</td><td>Monitoring, evals, new use cases</td></tr></table>`)}
+${YOU("This structure lets you sell fixed-price packages (audit, pilot) on top of day-rate work.")}
+${CHK(["Why a go/no-go after each step?","The client limits risk, and you get a clear decision point to sell the next step."])}
+
+<h4>3. The one-page proposal</h4>
+${ONE("A proposal fits on one page: context, measurable objective, scope, approach, risks, team and planning, price, next step.")}
+${EG("Objective: \"reduce invoice processing time by 60% within 3 months, measured on April volumes\". Scope out: \"no ERP migration\".")}
+${CHK(["Why state what is out of scope?","To avoid misunderstandings and scope creep later."])}
+
+<h4>4. Talking to executives</h4>
+${ONE("With executives, talk outcomes, cost, risk, timeline and measurement, never jargon, and admit limits early.")}
+${EG("Not \"we'll use RAG with hybrid search\" but \"your team will answer tenant emails twice as fast, we'll know in 6 weeks, and here is what it costs and the risks\".")}
+${YOU("Admitting limits early builds trust and protects you when something doesn't work.")}
+${CHK(["Name the five topics executives care about.","Outcomes, cost, risk, timeline, how it is measured."])}
+`;
+
+THEORY_V2.m17 = `
+<h4>1. Positioning</h4>
+${ONE("Your positioning is one sentence saying who you are, what you do, for whom, and with what result.")}
+${HOW("Formula: <b>[Role] who [does what] for [whom] so that [outcome]</b>.")}
+${EG("\"Senior Java lead developer specialised in production AI: I integrate LLMs, RAG and agents into Spring systems for enterprises, with evals, security and measurable ROI.\"")}
+${YOU("Keep the tone factual and modest; let the numbers impress.")}
+${TRAP("Positioning as \"AI enthusiast\" or \"prompt engineer\": vague, and in competition with everyone.")}
+${CHK(["Give the four slots of the positioning formula.","Role, what you do, for whom, outcome."])}
+
+<h4>2. The 2027 CV</h4>
+${ONE("A CV of two pages maximum where every experience line shows an action, its scope and a measured result.")}
+${HOW(`<ul><li>Headline matching the positioning, then a 4-line summary.</li><li>Skills grouped: Java/Spring core, AI engineering (Spring AI, LangChain4j, RAG, agents, MCP, evals), cloud and ops, leadership.</li><li>Experience as achievements: <b>action + scope + measurable result</b>.</li><li>Projects with GitHub links and one-line results.</li><li>One certification at most, current and relevant.</li><li>English version for remote and Swiss clients.</li></ul>`)}
+${EG("Weak: \"Worked on a RAG chatbot.\" Strong: \"Built an eval-gated RAG assistant over 200 contracts: 94% correct answers with citations, 0.4 cents per question.\"")}
+${CHK(["What three parts make an achievement line?","Action, scope, measurable result."])}
+
+<h4>3. Applicant tracking systems and recruiters</h4>
+${ONE("Software filters CVs on keywords and recruiters read for 10 seconds: use the exact terms buyers search, in a clean layout.")}
+${HOW("Keywords: \"Spring AI\", \"LLM\", \"RAG\", \"AI agents\", \"MCP\", \"Claude\", \"LangChain4j\", \"Java 21\", \"Spring Boot\". No tables or images that break parsing. The 10 seconds go to: headline, summary, first two achievements.")}
+${TRAP("A beautiful two-column CV with icons: the tracking system reads it as scrambled text.")}
+${CHK(["What does a recruiter read in 10 seconds?","Headline, summary, and the first two achievements."])}
+
+<h4>4. LinkedIn as a channel</h4>
+${ONE("LinkedIn is a sales channel: a keyword headline, a clear About section, featured proof, and regular useful posts.")}
+${HOW("Headline with keywords; About in first person with your positioning; Featured: best repo and best article; regular posts (lessons, measured results, short snippets); thoughtful comments on posts by people at target companies. Turn on \"open to work\" only if it fits your strategy.")}
+${CHK(["What goes in the Featured section?","Your best proof: top repository and best article."])}
+`;
+
+THEORY_V2.m18 = `
+<h4>1. The portfolio</h4>
+${ONE("A few excellent projects beat many average ones: each one must be understandable, runnable and measured in two minutes.")}
+${HOW("README with: problem, demo GIF or screenshots, architecture diagram, one-command run, measured results (eval scores, cost, latency), design decisions and limits. Fake but realistic data only.")}
+${TRAP("A repo with no README results table: the reviewer can't tell if it works.")}
+${CHK(["Name four sections of a strong portfolio README.","Problem, demo, architecture, how to run, measured results, decisions and limits (any four)."])}
+
+<h4>2. Suggested portfolio set</h4>
+${ONE("Three projects cover what Java AI missions ask for: a RAG assistant, an MCP server and a team kit for Claude Code.")}
+${HOW(`<ul><li><b>Lease Assistant</b>: Spring AI RAG with citations, evals in CI, security tests.</li><li><b>Lease MCP server</b>: secured MCP server with Spring AI annotations.</li><li><b>Spring team kit</b>: Claude Code plugin with skills, reviewer subagent and hooks.</li><li>Optional: document intake pipeline demo.</li></ul>`)}
+${CHK(["Which project proves you can roll out AI tools to a team?","The Spring team kit (Claude Code plugin with skills, subagent and hooks)."])}
+
+<h4>3. Writing</h4>
+${ONE("Write what you learned, with numbers: it proves expertise better than any claim.")}
+${HOW("Structure: problem, what you tried, data, result, code. Publish on a blog or dev.to, share on LinkedIn, adapt in French for French audiences.")}
+${EG("Title: \"From 71% to 94%: what improved my RAG on legal documents\".")}
+${CHK(["Why put numbers in the title?","They show a concrete, verifiable result and attract the right readers."])}
+
+<h4>4. Open source contribution</h4>
+${ONE("Start small in Spring AI or LangChain4j: being a listed contributor is a strong signal for Java AI missions.")}
+${HOW("Documentation fixes, examples, bug reproductions, then small fixes.")}
+${CHK(["What is a good first contribution?","A documentation fix, an example, or a clear bug reproduction."])}
+
+<h4>5. Speaking</h4>
+${ONE("Concrete talks at local meetups build reputation fast; big conferences come later.")}
+${HOW("Java User Groups and AI meetups (Lyon, Geneva, Annecy, Bordeaux, or online) welcome concrete talks. Stretch goal: Devoxx France or Spring I/O with a strong proposal.")}
+${CHK(["What makes a meetup talk accepted?","A concrete subject with real results, not a generic overview."])}
+`;
+
+THEORY_V2.m19 = `
+<h4>1. AI system design framework</h4>
+${ONE("In an AI system design interview, walk through seven steps in order: clarify, baseline, architecture, quality, safety, operations, roadmap.")}
+${HOW(`<ol><li><b>Clarify</b>: users, task, volume, latency, error tolerance, data, constraints.</li><li><b>Baseline</b>: the simplest solution (one prompt, long context) and why it may not be enough.</li><li><b>Architecture</b>: ingestion, retrieval, model choice, tools, orchestration, storage.</li><li><b>Quality</b>: eval set, metrics, CI gate, feedback loop.</li><li><b>Safety and compliance</b>: permissions, injection, data, AI Act class.</li><li><b>Operations</b>: observability, cost per request, latency, fallbacks.</li><li><b>Roadmap</b>: pilot, rollout, next iterations.</li></ol>`)}
+${EG("\"Design an assistant for 500 property managers.\" You start with questions (volume, languages, which documents, acceptable error), propose \"long context + caching\" as baseline, then RAG because the corpus is 50,000 leases, and so on.")}
+${TRAP("Jumping straight to architecture without clarifying: interviewers mark it down.")}
+${CHK(["Why start with a baseline?","It shows you choose the simplest thing that works and justify any added complexity."])}
+
+<h4>2. Classic technical questions</h4>
+${ONE("The same seven questions come back in almost every AI engineer interview: prepare a structured answer for each.")}
+${HOW(`<ul><li>How do you reduce hallucinations? (module 1, 6)</li><li>How do you evaluate a RAG system? An agent? (module 10)</li><li>When would you not use an agent? (module 7)</li><li>How do you protect against prompt injection? (module 11)</li><li>How do you control cost at 1 million requests a month? (module 12)</li><li>Spring AI: how do advisors work? How do you test AI code? (module 5)</li><li>How do you roll out Claude Code to a team safely? (modules 4, 15)</li></ul>`)}
+${YOU("Answer each in three points, with one real example from your projects.")}
+${CHK(["Answer in one sentence: when would you not use an agent?","When the steps are known in advance: a workflow is cheaper, more predictable and easier to test."])}
+
+<h4>3. Behavioural stories (STAR)</h4>
+${ONE("Prepare eight true stories in the STAR format: Situation, Task, Action, Result.")}
+${HOW("The eight: a production incident, a disagreement with a client, a project you rescued, leading a team, a failure and what you learned, a time you said no, a time you improved a process with AI, a time you learned fast.")}
+${EG("S: a release broke invoicing for 2,000 clients. T: restore within the day. A: rollback, root cause, test added. R: fixed in 3 hours, no repeat in 2 years.")}
+${CHK(["What does STAR stand for?","Situation, Task, Action, Result."])}
+
+<h4>4. English under pressure</h4>
+${ONE("Rehearse aloud, use simple structured sentences, and allow yourself to ask for clarification or time.")}
+${HOW("\"There are three points. First... Second... Third...\". It is fine to say \"Could you rephrase that?\" or \"Let me think for a few seconds.\"")}
+${CHK(["A useful phrase to structure an answer?","\"There are three points. First... Second... Third...\""])}
+`;
+
+THEORY_V2.m20 = `
+<h4>1. Pricing</h4>
+${ONE("Price the AI specialisation as a premium over a standard Java profile, know your floor, and compare net rates.")}
+${HOW("2026 market signals in France: confirmed Java/Angular freelancers around 400 to 500 euros a day, seniors higher, rare specialisations higher still. Target 550 to 650 euros direct for the AI specialisation. Intermediaries take a margin: compare what you actually receive. For fixed-price offers, negotiate on value and scope, not hours.")}
+${CHK(["Why compare net rates?","Intermediaries and platforms take a margin; the displayed rate is not what you receive."])}
+
+<h4>2. Building a pipeline</h4>
+${ONE("Keep several channels active and start looking 2 to 3 months before a mission ends.")}
+${HOW(`<ul><li>Platforms: Malt, Free-Work, LinkedIn jobs.</li><li>IT consulting firms and portage companies for large accounts (keep 2 or 3 good relationships).</li><li>Direct: startups, scale-ups, SMEs through your network and content.</li><li>Inbound: articles, talks, repos.</li></ul>Track it in a simple CRM (a spreadsheet is enough): contact, status, next action.`)}
+${CHK(["When should you start looking for the next mission?","2 to 3 months before the current one ends."])}
+
+<h4>3. Full remote and international</h4>
+${ONE("Full remote missions are rarer in France and won with strong English, good async communication and visible output.")}
+${HOW("More common with startups and international clients. Invoicing foreign clients through your company is usually simple within the EU and with Switzerland (check VAT with your accountant).")}
+${CHK(["What wins a remote mission?","Strong English, async communication skills, visible output (repos, articles)."])}
+
+<h4>4. Switzerland from the French Alps</h4>
+${ONE("Two ways to work for Swiss clients: become a salaried cross-border worker, or stay freelance with your company, within the limit on on-site days.")}
+${HOW(`<table><tr><th></th><th>A. Salaried cross-border (G permit)</th><th>B. Freelance through your company</th></tr>
+<tr><td>Permit</td><td>G permit, easy to get with a Swiss work contract (employer, portage or staffing firm)</td><td>No permit up to <b>90 working days on site per calendar year</b> (online notification at least 8 days before); beyond that, a permit with quotas, rarely granted</td></tr>
+<tr><td>Tax</td><td>Taxed at source in Geneva; remote work up to 40% keeps the salary taxable in Switzerland (2026 rules)</td><td>Your company invoices; usual French taxation</td></tr>
+<tr><td>Trade-off</td><td>Higher salaries, but you leave your freelance structure</td><td>Keeps your structure; only days physically worked in Switzerland count</td></tr></table>`)}
+${EG("Two on-site days a week ≈ 90 days a year: right at the limit. One day a week ≈ 45 days: comfortable. Negotiate mostly remote.")}
+${TRAP("Accepting a mission with 3 on-site days a week through your French company: about 135 days, over the limit. Confirm the rules with the Geneva cantonal office (OCPM) or your accountant before signing.")}
+${CHK(["How many on-site working days per year can a French company's freelancer do in Switzerland without a permit?","Up to 90 days per calendar year, with the notification procedure."])}
+
+<h4>5. Certification</h4>
+${ONE("Pick one certification aligned with your target clients; projects still count more.")}
+${HOW(`<table><tr><th>Certification</th><th>Key facts</th></tr>
+<tr><td><b>AWS Certified Generative AI Developer – Professional (AIP-C01)</b></td><td>Domains: FM integration, data and compliance 31%, implementation and integration 26%, safety, security and governance 20%, operational efficiency 12%, testing and troubleshooting 11%. 75 questions (65 scored), 180 min, pass 750/1000, USD 300. Closest match to this track.</td></tr>
+<tr><td><b>Microsoft AI-103</b>, Azure AI Apps and Agents Developer (successor of AI-102, retired June 2026)</td><td>Foundry, generative and agentic solutions 30-35%, planning and management 25-30%, plus vision, text and information extraction. Python-based, pass 700, available in French, free practice assessment on Microsoft Learn.</td></tr>
+<tr><td><b>Anthropic Claude Certified Architect – Foundations</b></td><td>120 min, closed book, pass 720/1000, USD 125, Pearson VUE, Credly badge valid 12 months (free renewal). Reserved to employees of Claude Partner Network organisations, with a company-domain email. Claude Academy courses are free for all, with completion badges.</td></tr></table>See the Market intel page for the full comparison.`)}
+${CHK(["Which certification is closest to this track?","AWS Certified Generative AI Developer – Professional (AIP-C01)."])}
+
+<h4>6. The next 12 months after the track</h4>
+${ONE("Review your situation every quarter and keep showing that you are current.")}
+${HOW("Quarterly review: missions, rate, skills, content, pipeline. Each quarter, re-run your evals on the latest models and post the results.")}
+${CHK(["What keeps you visibly current after the track?","Quarterly evals of new models, published as posts."])}
+`;
+
+THEORY_V2.m21 = `
+<h4>1. The Forward Deployed mindset</h4>
+${ONE("A Forward Deployed Engineer sits with the customer, finds the use case worth automating, ships it to production and measures the result.")}
+${HOW("It is the fastest-growing AI role in 2026. As a freelance consultant you already do half of it (shipping); the missing half is discovery, framing and measured outcomes.")}
+${CHK(["What are the two halves of the Forward Deployed role?","Discovery and framing of the right use case, and shipping it to production with measured results."])}
+
+<h4>2. Use-case framing canvas</h4>
+${ONE("Before building, fill five boxes: the job, the value, the feasibility, the risk and the success metric.")}
+${HOW(`<ul><li><b>Job to be done</b>: who, what task, how often, how long today.</li><li><b>Value</b>: hours saved, errors avoided, revenue unlocked (in euros).</li><li><b>Feasibility</b>: data available? which part is deterministic code, which part needs the model? acceptable error rate?</li><li><b>Risk</b>: what happens when it is wrong? Who validates?</li><li><b>Success metric</b>: decided before building, measured after.</li></ul>`)}
+${CHK(["When must the success metric be decided?","Before building, so the result can't be judged after the fact by convenience."])}
+
+<h4>3. Writing that gets decisions</h4>
+${ONE("Every AI project gets a one-page design doc, bottom line first, with numbers rather than adjectives.")}
+${HOW("Context, goal and non-goals, options considered, decision, risks, metrics, rollout.")}
+${CHK(["Why \"bottom line first\"?","Decision-makers read the first lines; the conclusion must be there."])}
+
+<h4>4. ROI and run cost</h4>
+${ONE("Compare what the system costs to run with the value of the time it saves, as a range, with the break-even point.")}
+${HOW("Cost = cost per request × volume + infrastructure + human review time. Value = time saved × hourly cost. Show a low-high range and when it breaks even.")}
+${EG("Low case: saves 60 h a month; high case: 120 h. At 40 euros/h, 2,400 to 4,800 euros a month against 600 euros of run cost.")}
+${CHK(["Why give a range rather than one number?","Estimates are uncertain; a range is honest and still supports a decision."])}
+
+<h4>5. Governance: EU AI Act and GDPR basics</h4>
+${ONE("You are not the lawyer; you are the engineer who designs the system so that the lawyer can say yes.")}
+${HOW("Know the AI Act risk tiers (prohibited, high-risk, limited with transparency duties, minimal), general-purpose AI obligations, AI literacy duties for deployers, and GDPR basics: legal basis, minimisation, processor agreements, data location (details in module 13).")}
+${CHK(["Name the four AI Act risk tiers.","Prohibited, high-risk, limited (transparency duties), minimal."])}
+
+<h4>6. Influence and demos</h4>
+${ONE("Demo the user's real case, show how failures are handled, and finish with the metric and the next step.")}
+${HOW("Real case, not a toy. Show the failure handling. End with the metric and the next step. Teaching (a workshop, an internal talk) positions you as the expert faster than any certificate.")}
+${CHK(["Why show failure handling in a demo?","It builds trust: the audience sees the system is safe when the model is wrong."])}
+`;
 // Apply theory v2: keep the old dense text as the revision sheet.
 M.forEach(m=>{if(THEORY_V2[m.id]){m.sheet=m.theory;m.theory=THEORY_V2[m.id];}});
 // ===== AI TUTOR (Anthropic API, key stored only in this browser) =====
