@@ -2962,6 +2962,35 @@ ${CHK(["Why show failure handling in a demo?","It builds trust: the audience see
 `;
 // Apply theory v2: keep the old dense text as the revision sheet.
 M.forEach(m=>{if(THEORY_V2[m.id]){m.sheet=m.theory;m.theory=THEORY_V2[m.id];}});
+// ===== RECRUITER QUESTIONS BANK =====
+// Questions hiring managers actually ask AI engineers (2026 interview guides: Exponent, DataCamp,
+// LetsDataScience, PracHub, practitioner reports). Used by the quiz generator as seeds for
+// "recruiter" questions, turned into multiple choice with one best senior answer.
+const INTERVIEW_BANK = {
+ m01:["Explain how an LLM generates text, to a non-technical client.","Why do LLMs hallucinate, and what do you do about it in production?","What is a context window and why does it matter for cost and quality?","What changed with reasoning models, and when is extra thinking worth the cost?"],
+ m02:["How do you structure a production prompt so it is reliable and testable?","How do you know a prompt change is an improvement and not just different?","When do you use few-shot examples, and what can go wrong with them?"],
+ m03:["The API is stateless: how do you implement conversation memory?","How do you get reliably valid JSON out of an LLM?","How would you cut the bill of an LLM feature by 5x without losing quality?","How do you make LLM calls reliable (rate limits, timeouts, retries)?"],
+ m04:["How do you use AI coding agents on a real codebase without lowering quality?","What do you put in CLAUDE.md / AGENTS.md, and what do you leave out?","When do you enforce a rule with a hook rather than a prompt?"],
+ m05:["Why Spring AI rather than calling the HTTP API directly?","How do you unit-test code that calls an LLM?","What is an advisor in Spring AI and what would you use one for?"],
+ m06:["Explain how RAG works.","A RAG answer is wrong even though the correct document exists: how do you debug it?","How do you evaluate retrieval and generation separately?","How do you enforce document permissions in a RAG system?","When would you NOT use RAG?"],
+ m22:["How do you design an ingestion pipeline that stays correct when source documents change or are deleted?","Why does PDF parsing quality matter so much for RAG, and how do you measure it?","How do you do hybrid search in PostgreSQL?"],
+ m07:["Workflow or agent: how do you decide?","Design a customer-service AI agent.","How do you keep an agent safe when it can take actions?","What is context engineering and how do you apply it in a long-running agent?"],
+ m08:["What problem does MCP solve compared to custom integrations?","How do you secure an MCP server exposed to a company-wide assistant?","What is tool poisoning?"],
+ m09:["Spring AI or LangChain4j: how do you choose for a client?","Fine-tuning versus RAG versus prompting: when do you pick which?","How do you choose between a frontier API model and a self-hosted open-weight model?"],
+ m10:["How would you build an eval set and decide whether a change is safe to ship?","How do you validate that an LLM-as-judge is trustworthy?","How do you evaluate an agent, not just its final answer?","What is the difference between pass@k and pass^k, and which matters in production?"],
+ m11:["How do you defend against prompt injection, direct and indirect?","What is excessive agency and how do you limit it?","Why is model output untrusted input, and what does that change in your code?"],
+ m12:["What do you log and trace for every LLM request?","How do you reduce latency of an LLM feature?","How do you roll out a new model version safely?"],
+ m13:["Is this use case high-risk under the EU AI Act, and why?","What data questions will a client's DPO ask before an LLM goes live?","Why would an enterprise use Claude through Bedrock or Vertex rather than directly?"],
+ m14:["Design a document-processing pipeline for invoices.","How do you estimate the ROI of automating a back-office process?","Where should business rules live: in the prompt or in code?"],
+ m15:["How would you roll out AI coding tools to a team of 10 developers safely?","How do you measure whether AI tools actually improved delivery?","How do you keep juniors learning when AI writes most of the code?"],
+ m16:["A client asks for 'a ChatGPT for our company': what do you do first?","How do you structure an AI engagement from audit to production?"],
+ m17:["Tell me about yourself in two minutes, as an AI engineer.","What measurable result are you proudest of?"],
+ m18:["Walk me through one of your AI projects: what did you measure and what failed?"],
+ m19:["Design an insurance-claims agent with RAG under a token budget.","Tell me about a production incident you handled.","Tell me about a time you said no to a stakeholder."],
+ m20:["Why should we pick you over a pure Python AI engineer?","How do you work effectively fully remote?"],
+ m21:["How do you find the use case worth automating at a new client?","How do you present an AI result to executives?"],
+ m23:["What is the difference between a dataclass and a Pydantic model, and when do you use each?","How do you run 200 LLM calls concurrently in Python without hitting rate limits?","How would you structure a FastAPI service that streams LLM answers?"]
+};
 // ===== AI TUTOR (Anthropic API, key stored only in this browser) =====
 const AIK="aiTrack.key", AIM="aiTrack.models";
 const AI_DEF={fast:"claude-haiku-5-5",smart:"claude-sonnet-5-5"};
@@ -2982,27 +3011,37 @@ function mdLite(t){let h=esc(t);h=h.replace(/```[a-zA-Z]*\n([\s\S]*?)```/g,(m,c)
  h=h.replace(/(^|\n)((?:[-*] .+(?:\n|$))+)/g,(m,a,b)=>a+"<ul>"+b.trim().split("\n").map(l=>"<li>"+l.replace(/^[-*] /,"")+"</li>").join("")+"</ul>");
  return h.replace(/\n{2,}/g,"<br><br>").replace(/\n/g,"<br>");}
 function strip(h){return String(h).replace(/<[^>]+>/g," ").replace(/&[a-z]+;/g," ").replace(/\s+/g," ").trim();}
-function mctx(m){return `MODULE ${m.id}: ${m.title}\nWhy: ${m.why}\nObjectives: ${m.objectives.join("; ")}\nKey takeaways: ${m.takeaways.join("; ")}\nTheory: ${strip(m.sheet||m.theory).slice(0,9000)}\nExercises: ${m.exercises.map(e=>e.t).join("; ")}\nResources to watch/read: ${(m.resources||[]).map(r=>r.t).join("; ")}${(S.notes[m.id]||"").trim()?`\nLEARNER NOTES (his own key points from the videos and readings): ${S.notes[m.id].trim().slice(0,3000)}`:""}`;}
+function mctx(m){return `MODULE ${m.id}: ${m.title}\nWhy: ${m.why}\nObjectives: ${m.objectives.join("; ")}\nKey takeaways: ${m.takeaways.join("; ")}\nTheory: ${strip(m.theory).slice(0,14000)}\nExercises: ${m.exercises.map(e=>e.t).join("; ")}\nResources to watch/read: ${(m.resources||[]).map(r=>r.t).join("; ")}${(S.notes[m.id]||"").trim()?`\nLEARNER NOTES (his own key points from the videos and readings): ${S.notes[m.id].trim().slice(0,3000)}`:""}`;}
 const LEARNER="The learner is Nicolas, a senior freelance Java/Spring/Angular lead developer (12 years) training to become a senior AI engineer on the JVM in 2027. He is French; the track is in English. Be precise, current (late 2026) and practical; prefer production concerns (evals, security, cost, deterministic code) over theory for its own sake.";
 async function busy(btn,fn){const t=btn.textContent;btn.disabled=true;btn.textContent="⏳ Thinking…";try{await fn();}catch(e){toast("⚠️ "+e.message);}finally{btn.disabled=false;btn.textContent=t;}}
 function noKey(){return `<p class="small">Add your Anthropic API key in <a href="#/settings">Settings</a> to unlock the AI tutor. The key stays in this browser only.</p>`;}
 
 // ---- module tutor card ----
-let aiTab="quiz",aiQ=null,aiOpen=null;
+let aiTab="open",aiQ=null,aiOpen=null;
 function aiModule(m){const box=document.getElementById("aiBox");if(!box)return;aiS();
- const tabs=[["quiz","🎲 Adaptive quiz"],["open","✍️ Explain it back"],["chat","💬 Tutor"],["cards","🃏 Cards from notes"]];
+ const tabs=[["open","✍️ Explain it back"],["chat","💬 Tutor"],["cards","🃏 Cards from notes"]];
  let h=`<div class="card mt"><h3>🤖 AI tutor <span class="pill p">level ${S.ai.diff[m.id]||2}/5</span></h3>`;
  if(!aiKey()){box.innerHTML=h+noKey()+"</div>";return;}
  h+=`<div class="tabs">${tabs.map(t=>`<button class="tab ${aiTab===t[0]?"on":""}" data-t="${t[0]}">${t[1]}</button>`).join("")}</div><div id="aiPane" class="mt"></div></div>`;
  box.innerHTML=h;box.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{aiTab=b.dataset.t;aiModule(m);});
- ({quiz:aiQuizPane,open:aiOpenPane,chat:aiChatPane,cards:aiCardsPane})[aiTab](m,document.getElementById("aiPane"));}
+ ({open:aiOpenPane,chat:aiChatPane,cards:aiCardsPane})[aiTab](m,document.getElementById("aiPane"));}
 
+function aiQuizBox(m){const el=document.getElementById("aiQuizBox");if(!el)return;aiS();
+ if(!aiKey()){el.innerHTML=`<p class="small muted">🎲 Unlimited AI rounds: add your Anthropic API key in Settings to get new questions every time.</p>`;return;}
+ el.innerHTML=`<h4>🎲 Unlimited rounds (AI) <span class="pill p">level ${S.ai.diff[m.id]||2}/5</span></h4><div id="aiQuizInner"></div>`;aiQuizPane(m,document.getElementById("aiQuizInner"));}
 function aiQuizPane(m,el){const d=S.ai.diff[m.id]||2,weak=(S.ai.weak[m.id]||[]).slice(-8);
- if(!aiQ||aiQ.mid!==m.id){el.innerHTML=`<p class="small muted">Fresh questions every time, generated from this module. Difficulty adapts to your results (now ${d}/5) and targets your weak spots${weak.length?": "+esc(weak.join(", ")):""}. Missed questions go to your Review deck.</p><button class="btn" id="aqGo">Generate 5 questions</button>`;
+ if(!aiQ||aiQ.mid!==m.id){el.innerHTML=`<p class="small muted">Fresh questions every time, generated from this module. Difficulty adapts to your results (now ${d}/5) and targets your weak spots${weak.length?": "+esc(weak.join(", ")):""}. Missed questions go to your Review deck.</p><button class="btn" id="aqGo">▶ New round: 5 questions</button>`;
   $("#aqGo").onclick=e=>busy(e.target,async()=>{const missed=Object.keys(S.rev).filter(k=>k.startsWith(m.id+":")&&S.rev[k].b<=2).map(k=>{const c=cardOf(k);return c?c.q.q:"";}).filter(Boolean).slice(0,5);
-   const j=await askJSON(`You write multiple-choice questions to train a learner. ${LEARNER}\n${mctx(m)}`,`Write 5 new multiple-choice questions on this module at difficulty ${d}/5 (1 = definitions, 3 = applied scenarios, 5 = tricky production trade-offs and edge cases). ${weak.length?"Prioritise these weak concepts: "+weak.join(", ")+". ":""}${missed.length?"He recently missed: "+missed.join(" | ")+" (test the same concepts differently). ":""}If LEARNER NOTES are present, make 1 or 2 of the 5 questions test the ideas in those notes (what he learned from the videos); never invent the content of a video beyond its title and his notes. Avoid trivia; prefer realistic scenarios. Exactly 4 options, one correct, plausible distractors, vary the position of the correct answer. JSON: {"questions":[{"q":"...","o":["...","...","...","..."],"a":0,"w":"why the answer is right and the others wrong, 1-2 sentences","concept":"short concept name"}]}`,{model:aiModels().fast,max:2500});
-   aiQ={mid:m.id,qs:(j.questions||[]).filter(x=>x.o&&x.o.length===4),done:false};aiQuizPane(m,el);});return;}
- el.innerHTML=aiQ.qs.map((it,i)=>`<div class="q" data-aq="${i}"><b>${i+1}. ${esc(it.q)}</b>${it.o.map((o,j)=>`<label class="opt"><input type="radio" name="aq${i}" value="${j}"> ${esc(o)}</label>`).join("")}<div class="why">💬 ${esc(it.w)} <span class="pill">${esc(it.concept||"")}</span></div></div>`).join("")+`<div class="mt"><button class="btn" id="aqChk">Check</button> <button class="btn ghost" id="aqNew">New set</button> <b id="aqSc" style="margin-left:10px"></b></div>`;
+   const seen=(S.ai.seen&&S.ai.seen[m.id]||[]).slice(-40);const rq=(typeof INTERVIEW_BANK!=="undefined"&&INTERVIEW_BANK[m.id])||[];const hasNotes=!!(S.notes[m.id]||"").trim();
+   const j=await askJSON(`You write multiple-choice questions that train an AI engineer for real interviews and real work. ${LEARNER}\n${mctx(m)}${rq.length?"\nRECRUITER QUESTIONS asked in 2026 AI engineer interviews for this topic: "+rq.join(" | "):""}`,`Write 5 new multiple-choice questions on this module at difficulty ${d}/5 (1 = core definitions and mechanisms, 3 = deeper understanding and applied cases, 5 = subtle trade-offs and edge cases a senior must know).
+Mandatory mix, in this order:
+1-2. type "theory": test UNDERSTANDING of two different ideas explained in the THEORY above (a mechanism, a definition, a why, a difference between two concepts, a common trap). Not wording recall.
+3. type "${hasNotes?"video":"theory"}": ${hasNotes?"test an idea from LEARNER NOTES (what he learned from the videos and readings); never invent video content beyond his notes.":"another theory idea from a different section."}
+4. type "recruiter": take one of the RECRUITER QUESTIONS (vary it across rounds) and ask "Which answer would convince a hiring manager most?": the right option is the concise senior answer, the 3 distractors are typical junior, incomplete or buzzword answers.
+5. type "scenario": a short realistic production situation where he must pick the right decision.
+Hard rules: NO arithmetic or calculation questions (numbers only if the trap is conceptual, never "compute X"). NO trivia (version numbers, dates, prices, names) unless it is a core fact of the course. NO question answerable by common sense alone. Options of similar length and style, exactly 4, one clearly best, plausible distractors, vary the position of the correct answer. ${weak.length?"Target these weak concepts when relevant: "+weak.join(", ")+". ":""}${missed.length?"He recently missed: "+missed.join(" | ")+" (test the same concepts differently). ":""}${seen.length?"Do NOT repeat or paraphrase these previous questions: "+seen.join(" | ")+". ":""}The explanation "w" says why the answer is right, why the best distractor is wrong, and names the theory section to re-read. JSON: {"questions":[{"type":"theory|video|recruiter|scenario","q":"...","o":["...","...","...","..."],"a":0,"w":"...","concept":"short concept name"}]}`,{model:aiModels().fast,max:2500});
+   aiQ={mid:m.id,qs:(j.questions||[]).filter(x=>x.o&&x.o.length===4),done:false};S.ai.seen=S.ai.seen||{};S.ai.seen[m.id]=(S.ai.seen[m.id]||[]).concat(aiQ.qs.map(x=>x.q.slice(0,120))).slice(-40);save();aiQuizPane(m,el);});return;}
+ el.innerHTML=aiQ.qs.map((it,i)=>`<div class="q" data-aq="${i}"><span class="pill ${it.type==="recruiter"?"p":it.type==="video"?"g":it.type==="scenario"?"y":""}">${({theory:"📖 Theory",video:"🎬 Video",recruiter:"🎤 Recruiter",scenario:"🛠️ Scenario"})[it.type]||"📖 Theory"}</span><br><b>${i+1}. ${esc(it.q)}</b>${it.o.map((o,j)=>`<label class="opt"><input type="radio" name="aq${i}" value="${j}"> ${esc(o)}</label>`).join("")}<div class="why">💬 ${esc(it.w)} <span class="pill">${esc(it.concept||"")}</span></div></div>`).join("")+`<div class="mt"><button class="btn" id="aqChk">Check</button> <button class="btn ghost" id="aqNew">▶ Next round</button> <b id="aqSc" style="margin-left:10px"></b></div>`;
  $("#aqNew").onclick=()=>{aiQ=null;aiQuizPane(m,el);};
  $("#aqChk").onclick=()=>{if(aiQ.done)return;let ok=0,ans=0;aiQ.qs.forEach((it,i)=>{const sel=el.querySelector(`input[name=aq${i}]:checked`);const box=el.querySelector(`[data-aq="${i}"]`);box.classList.add("shown");
    box.querySelectorAll(".opt").forEach((o,j)=>{if(j===it.a)o.classList.add("right");else if(sel&&+sel.value===j)o.classList.add("wrong");});
@@ -3010,7 +3049,7 @@ function aiQuizPane(m,el){const d=S.ai.diff[m.id]||2,weak=(S.ai.weak[m.id]||[]).
   if(ans<aiQ.qs.length){toast("Answer all questions first");return;}aiQ.done=true;const sc=Math.round(ok/aiQ.qs.length*100);let d=S.ai.diff[m.id]||2;
   if(sc>=80&&d<5)d++;else if(sc<50&&d>1)d--;S.ai.diff[m.id]=d;S.ai.weak[m.id]=(S.ai.weak[m.id]||[]).slice(-12);
   S.ai.qs=S.ai.qs||{};const r=S.ai.qs[m.id]||{rounds:0,best:0};r.rounds++;r.last=sc;r.best=Math.max(r.best,sc);r.at=today();S.ai.qs[m.id]=r;
-  $("#aqSc").innerHTML=`${ok}/${aiQ.qs.length} · ${sc}% ${sc>=80?"✅ mastered (≥ 80%). Keep going with a new set if you want.":"· not yet 80%: click New set and try again."} · next level ${d}/5 · round ${r.rounds}`;aiXP(ok*5,"🎲");};}
+  $("#aqSc").innerHTML=`${ok}/${aiQ.qs.length} · ${sc}% ${sc>=80?"✅ mastered (≥ 80%). Keep going with another round if you want.":"· not yet 80%: click Next round and try again."} · next level ${d}/5 · round ${r.rounds}`;aiXP(ok*5,"🎲");};}
 
 function aiOpenPane(m,el){const hist=(S.ai.open[m.id]||[]).slice(-5);
  el.innerHTML=`<p class="small muted">The best way to learn: explain it in your own words. You get an open question, write your answer (English or French), and get graded against a senior rubric with what is missing and a follow-up.${hist.length?" Last scores: "+hist.map(x=>x+"/10").join(" · "):""}</p>
@@ -3399,9 +3438,10 @@ function moduleView(id){const m=M.find(x=>x.id===id);if(!m){location.hash="#/";r
  ${m.sheet?`<details class="card mt sheet"><summary><b>📋 Revision sheet</b> <span class="small muted">short version of the theory above, for quick review</span></summary><div class="theory">${m.sheet}</div></details>`:""}
  <div class="card mt"><h3>🛠️ Exercises <span class="pill">${m.exercises.reduce((a,e)=>a+e.h,0)} h</span></h3>
  ${m.exercises.map((e,i)=>{const k=m.id+":"+i,d=!!S.ex[k];return `<label class="ex ${d?"done":""}"><input type="checkbox" data-ex="${k}" ${d?"checked":""}><div><div class="et">${guideKeyEx(m).includes(i)?'<span class="pill p">Foundation</span> ':'<span class="pill">Deep dive</span> '}${esc(e.t)}</div><div class="small muted">${esc(e.d)}</div>${(e.u||[]).map(l=>`<a class="exl" href="${l.u}" target="_blank" rel="noopener">🔗 ${esc(l.t)}${l.y?` <span class="muted">· ${ymTxt(l.y)}</span>`:""}</a>`).join("")}</div><span class="xp">${e.h} h · +${Math.round(e.h*10)} XP</span></label>`;}).join("")}</div>
- <div class="card mt"><h3>🧪 Quiz ${q?`<span class="pill ${q.best>=80?"g":"y"}">best ${q.best}%</span>`:""} <span class="pill p">pass ≥ 80% · +XP</span></h3><div id="quiz">
+ <div class="card mt"><h3>🧪 Quiz ${q?`<span class="pill ${q.best>=80?"g":"y"}">best ${q.best}%</span>`:""} <span class="pill p">pass ≥ 80% · +XP</span></h3><p class="small muted">Round 1: the core questions of the module. Then as many new rounds as you want, generated by AI (theory, videos, recruiter questions, scenarios). Goal: 80% or more.</p><div id="quiz">
  ${m.quiz.map((it,i)=>`<div class="q" data-q="${i}"><b>${i+1}. ${esc(it.q)}</b>${it.o.map((o,j)=>`<label class="opt"><input type="radio" name="q${i}" value="${j}"> ${esc(o)}</label>`).join("")}<div class="why">💬 ${esc(it.w)}</div></div>`).join("")}</div>
- <div class="mt"><button class="btn" id="qsub">Check my answers</button> <button class="btn ghost" id="qres">Reset</button> <span id="qscore" class="mt" style="font-weight:700;margin-left:10px"></span></div></div>
+ <div class="mt"><button class="btn" id="qsub">Check my answers</button> <button class="btn ghost" id="qres">Reset</button> <span id="qscore" class="mt" style="font-weight:700;margin-left:10px"></span></div>
+ <div id="aiQuizBox" class="mt2"></div></div>
  <div id="aiBox"></div>
  <div class="grid g2 mt"><div class="card res"><h3>🎬 Resources</h3>${m.resources.map(r=>`<a href="${r.u}" target="_blank" rel="noopener"><span class="ico ${r.k}">${r.k==="video"?"▶":r.k==="course"?"🎓":"📘"}</span><span>${r.l==="fr"?'<span class="pill g" title="Ressource en français">🇫🇷 FR</span> ':""}${esc(r.t)}${r.y?` <span class="pill ${ymOld(r.y)?"y":"g"}" title="${ymOld(r.y)?"More than 18 months old: check that it is still current":"Recent"}">${ymOld(r.y)?"⏳ ":""}${ymTxt(r.y)}</span>`:""}</span></a>`).join("")}</div>
  <div class="card"><h3>🧭 Coach's corner</h3>${m.coach.map(c=>`<div class="tip">💬<div>${esc(c)}</div></div>`).join("")}</div></div>
@@ -3422,7 +3462,7 @@ function moduleView(id){const m=M.find(x=>x.id===id);if(!m){location.hash="#/";r
    if(sel){ans++;if(+sel.value===it.a)ok++;}});
   const sc=Math.round(ok/m.quiz.length*100);$("#qscore").textContent=`${ok}/${m.quiz.length} · ${sc}% ${sc>=80?"🎉 passed":"· retry after reviewing"}`;
   if(ans===m.quiz.length){m.quiz.forEach((it,i)=>{const sel=document.querySelector(`input[name=q${i}]:checked`);const k=m.id+":"+i;if(+sel.value!==it.a)S.rev[k]={b:1,d:today()};else if(!S.rev[k])S.rev[k]={b:2,d:addDays(3)};});change(()=>{const old=S.quiz[m.id]||{best:0,tries:0};S.quiz[m.id]={best:Math.max(old.best,sc),tries:old.tries+1,last:sc};},sc===100?"🎯 Perfect score!":sc>=80?"🧪 Quiz passed":"");if(sc===100)burst();}};
- $("#qres").onclick=()=>moduleView(id);aiModule(m);}
+ $("#qres").onclick=()=>moduleView(id);aiModule(m);if(typeof aiQuizBox==="function")aiQuizBox(m);}
 
 function projects(){let h=`<div class="hero"><h1>📦 Capstone projects</h1><p>Projects you will actually use: your property portfolio, your money, your mountain days. Real usage is your strongest proof. Each step = +40 XP, each finished project = +150 XP.</p></div>
  <div class="card mt"><h3>🧠 What makes it senior (and not "generated by Claude Code in a weekend")</h3><ul><li><b>Measured:</b> an eval set and numbers in the README (accuracy, recall, cost, latency).</li><li><b>Deterministic where it matters:</b> money, dates and rules in tested code; the model explains, it does not compute.</li><li><b>Secure by design:</b> threat model, injection tests, approvals enforced in code.</li><li><b>Decided:</b> ADRs explaining trade-offs (model, stack, local vs cloud).</li><li><b>Used:</b> real usage stats over months. Claude Code writes code fast; you own the design, the evals and the judgement.</li></ul></div>`;
@@ -3544,7 +3584,7 @@ function sheets(){let h=`<div class="hero"><h1>📋 Revision sheets</h1><p>The s
  PHASES.forEach(p=>{h+=`<h3 class="mt2">${p.icon} Phase ${p.n} · ${esc(p.name)}</h3>`;M.filter(m=>m.phase===p.n).forEach(m=>{h+=`<details class="card mt sheet"><summary><b>${m.id.slice(1)}. ${esc(m.title)}</b> <a class="small" href="#/m/${m.id}">open the module</a></summary><div class="theory">${m.sheet||m.theory}</div></details>`;});});
  $("#main").innerHTML=h;}
 function route(){const r=location.hash||"#/";const sd=document.getElementById("side");if(sd)sd.classList.remove("open");renderSide();
- if(r==="#/today"){guideView=null;guidePage();}else if(r.startsWith("#/m/")){moduleView(r.slice(4).split("?")[0]);if(r.includes("?quiz")){const q=document.getElementById("quiz");if(q)q.scrollIntoView();}if(r.includes("?ai")){if(typeof aiTab!=="undefined"){aiTab="quiz";const mm=M.find(x=>x.id===r.slice(4).split("?")[0]);if(mm)aiModule(mm);}const b=document.getElementById("aiBox");if(b)b.scrollIntoView();}}else if(r==="#/roadmap")roadmap();else if(r==="#/projects")projects();else if(r==="#/career")career();else if(r==="#/market")market();else if(r==="#/certs")certs();else if(r==="#/review")review(true);else if(r==="#/sheets")sheets();else if(r==="#/interview")interview();else if(r==="#/coach")coach();else if(r==="#/proof")proof();
+ if(r==="#/today"){guideView=null;guidePage();}else if(r.startsWith("#/m/")){moduleView(r.slice(4).split("?")[0]);if(r.includes("?quiz")){const q=document.getElementById("quiz");if(q)q.scrollIntoView();}if(r.includes("?ai")){const b=document.getElementById("aiQuizBox");if(b)b.scrollIntoView();}}else if(r==="#/roadmap")roadmap();else if(r==="#/projects")projects();else if(r==="#/career")career();else if(r==="#/market")market();else if(r==="#/certs")certs();else if(r==="#/review")review(true);else if(r==="#/sheets")sheets();else if(r==="#/interview")interview();else if(r==="#/coach")coach();else if(r==="#/proof")proof();
  else if(r==="#/english")english();else if(r==="#/badges")badges();else if(r==="#/settings")settings();else dashboard();}
 window.addEventListener("hashchange",route);route();
 </script></body></html>
