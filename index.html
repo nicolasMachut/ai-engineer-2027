@@ -2998,8 +2998,9 @@ function aiKey(){try{return localStorage.getItem(AIK)||"";}catch(e){return "";}}
 function aiModels(){try{return Object.assign({},AI_DEF,JSON.parse(localStorage.getItem(AIM)||"{}"));}catch(e){return AI_DEF;}}
 function aiS(){if(!S.ai)S.ai={};const a=S.ai;["diff","weak","chat","open","xpLog"].forEach(k=>{if(!a[k])a[k]={};});if(!S.cards)S.cards={};return a;}
 function aiXP(n,why){aiS();change(()=>{S.ai.xp=(S.ai.xp||0)+n;},why?why+" +"+n+" XP":"");}
+function aiLangRule(){const fr=(typeof lang==="function"&&lang()==="fr");return fr?"\n\nLANGUAGE: the learner reads the site in FRENCH. Write every learner-facing text in natural French (questions, answer options, explanations, rubrics, feedback, model answers, follow-ups, chat replies), keeping standard technical terms in English (RAG, embedding, prompt, token...). JSON keys stay in English. Exception: corrections of his English (fields or tips about English phrasing) quote the English text.":"\n\nLANGUAGE: write every learner-facing text in English.";}
 async function callClaude(system,messages,o){o=o||{};const key=aiKey();if(!key)throw new Error("No API key: add it in Settings.");
- const m=aiModels();const body={model:o.model||m.smart,max_tokens:o.max||1500,system:[{type:"text",text:system,cache_control:{type:"ephemeral"}}],messages};
+ const m=aiModels();const body={model:o.model||m.smart,max_tokens:o.max||1500,system:[{type:"text",text:system+((typeof TR_SYS!=="undefined"&&system.startsWith(TR_SYS))||(typeof LG_SYS!=="undefined"&&system.startsWith(LG_SYS))||system.startsWith("Reply with exactly")?"":aiLangRule()),cache_control:{type:"ephemeral"}}],messages};
  const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify(body)});
  const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error((j.error&&j.error.message)||("HTTP "+r.status));
  return (j.content||[]).filter(c=>c.type==="text").map(c=>c.text).join("\n");}
@@ -3051,7 +3052,7 @@ Hard rules: NO arithmetic or calculation questions (numbers only if the trap is 
   S.ai.qs=S.ai.qs||{};const r=S.ai.qs[m.id]||{rounds:0,best:0};r.rounds++;r.last=sc;r.best=Math.max(r.best,sc);r.at=today();S.ai.qs[m.id]=r;
   $("#aqSc").innerHTML=`${ok}/${aiQ.qs.length} · ${sc}% ${sc>=80?"✅ mastered (≥ 80%). Keep going with another round if you want.":"· not yet 80%: click Next round and try again."} · next level ${d}/5 · round ${r.rounds}`;aiXP(ok*5,"🎲");};}
 
-function oralLang(){return (S.ai&&S.ai.oralLang)||"en-US";}
+function oralLang(){return (S.ai&&S.ai.oralLang)||((typeof lang==="function"&&lang()==="fr")?"fr-FR":"en-US");}
 let oralRec=null;
 function oralWire(){const say=$("#aoSay"),mic=$("#aoMic"),lang=$("#aoLang"),st=$("#aoSt"),ta=$("#aoA");if(!say)return;
  lang.onchange=()=>{S.ai.oralLang=lang.value;save();};
@@ -3111,7 +3112,7 @@ function aiInterview(el){if(!el)return;if(!aiKey()){el.innerHTML=`<div class="ca
  $("#ivSend").onclick=e=>{const t=$("#ivIn").value.trim();if(t)ivTurn(t,e.target);};
  $("#ivQuit").onclick=()=>{ivSim=null;aiInterview(el);};
  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;const mic=$("#ivMic");
- if(!SR)mic.style.display="none";else mic.onclick=()=>{if(rec){rec.stop();return;}rec=new SR();rec.lang="en-US";rec.continuous=true;rec.interimResults=false;mic.textContent="⏹️ Stop";
+ if(!SR)mic.style.display="none";else mic.onclick=()=>{if(rec){rec.stop();return;}rec=new SR();rec.lang=(typeof lang==="function"&&lang()==="fr")?"fr-FR":"en-US";rec.continuous=true;rec.interimResults=false;mic.textContent="⏹️ Stop";
   rec.onresult=ev=>{for(let i=ev.resultIndex;i<ev.results.length;i++)if(ev.results[i].isFinal)$("#ivIn").value+=(($("#ivIn").value?" ":"")+ev.results[i][0].transcript);};rec.onend=()=>{rec=null;mic.textContent="🎙️ Speak";};rec.start();};
  $("#ivEnd").onclick=e=>busy(e.target,async()=>{const tr=ivSim.msgs.slice(1).map(x=>(x.role==="user"?"CANDIDATE: ":"INTERVIEWER: ")+x.content).join("\n");
   const j=await askJSON(`You are a hiring panel for a senior AI engineer role at a European scale-up. ${LEARNER}`,`Problem: ${ivSim.p.t}\nWhat a strong answer covers: ${ivSim.p.look.join("; ")}\nTranscript:\n${tr}\nScore the candidate. JSON: {"decision":"Strong hire|Hire|Lean no hire|No hire","score":0-10,"strengths":["..."],"gaps":["the 3 biggest gaps, each with how to fix it"],"english":["up to 5 English corrections: original -> better"],"next_step":"one concrete thing to practise next"}`,{max:1800});
@@ -3120,7 +3121,7 @@ function aiInterview(el){if(!el)return;if(!aiKey()){el.innerHTML=`<div class="ca
 function ivTurn(text,btn){busy(btn,async()=>{ivSim.msgs.push({role:"user",content:text});const p=ivSim.p;
  const sys=`You are a senior interviewer at a European AI scale-up, running a ${p.beh?"behavioural interview (ask these one at a time, adapt follow-ups: "+INTERVIEW.behavioural.join(" | ")+")":"45-minute AI system design interview on: "+p.t}. ${LEARNER}\nPrivate checklist of what a strong answer covers (never reveal it): ${p.look.join("; ")}.\nRules: speak English only; one question or remark at a time, under 90 words; let the candidate drive; ask for numbers, trade-offs and failure modes; challenge vague statements; do not teach or give answers during the interview. On "Start the interview now." greet briefly and state the problem${p.beh?"":" with 2 or 3 constraints (scale, users, budget)"}.`;
  const r=await callClaude(sys,ivSim.msgs.map(x=>({role:x.role,content:x.content})),{max:500});ivSim.msgs.push({role:"assistant",content:r});
- if(S.ai.tts&&window.speechSynthesis){const u=new SpeechSynthesisUtterance(r.replace(/[*`#]/g,""));u.lang="en-US";speechSynthesis.cancel();speechSynthesis.speak(u);}
+ if(S.ai.tts&&window.speechSynthesis){const u=new SpeechSynthesisUtterance(r.replace(/[*`#]/g,""));u.lang=(typeof lang==="function"&&lang()==="fr")?"fr-FR":"en-US";speechSynthesis.cancel();speechSynthesis.speak(u);}
  aiInterview(document.getElementById("ivAI"));});}
 
 // ---- AI coach page: weekly plan + work review ----
