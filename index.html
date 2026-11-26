@@ -95,6 +95,9 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:8px;borde
 .theory table{border-collapse:collapse;width:100%;margin:6px 0;font-size:14px}.theory th,.theory td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}.theory th{background:#f1f5f9}
 .theory h4{font-size:18px;margin-top:28px;padding-top:12px;border-top:1px solid var(--line)}
 details.sheet summary{cursor:pointer}details.sheet summary a{margin-left:8px}
+
+.resrow{display:flex;align-items:center;gap:8px}.resrow input{width:18px;height:18px;accent-color:var(--ok);flex:none;cursor:pointer}.resrow a{flex:1}.resrow.done a{opacity:.6}
+button[disabled]{opacity:.7;cursor:not-allowed}
 </style></head><body><div class="app"><aside id="side"></aside><main id="main"></main></div><div id="toast" class="toast"></div><script>// ===== GLOBAL DATA =====
 const M = [];
 const PHASES = [
@@ -3328,7 +3331,7 @@ function guideUpd(u,phase){const s={id:u.id,type:u.type==='theory'?'theory':u.ty
 function guideMastered(id){return (S.quiz[id]||{}).best>=80||(((S.ai||{}).qs||{})[id]||{}).best>=80;}
 function gS(){if(!S.guide)S.guide={done:{},skip:{}};return S.guide;}
 function stepDone(s){const g=gS();if(g.done[s.id])return true;
- if(s.type==="ex")return !!S.ex[s.m.id+":"+s.i];if(s.type==="quiz")return guideMastered(s.m.id);
+ if(s.type==="ex")return !!S.ex[s.m.id+":"+s.i];if(s.type==="quiz")return guideMastered(s.m.id);if(s.type==="res"&&s.m){const ri=(s.m.resources||[]).indexOf(s.res);if(ri>=0&&(S.res||{})[s.m.id+":"+ri])return true;}
  if(s.proj)return !!S.proj[s.proj];if(s.cert)return !!S.cert[s.cert];return false;}
 function guideIndex(){const st=guideSteps(),g=gS();const i=st.findIndex(s=>!stepDone(s)&&!g.skip[s.id]);return i<0?st.findIndex(s=>!stepDone(s)):i;}
 function guideStats(){const st=guideSteps();const core=st.filter(s=>s.phase==="core");const left=core.filter(s=>!stepDone(s));
@@ -3355,7 +3358,7 @@ function guideBody0(s){const L=(u,t)=>`<a class="btn ghost" href="${u}" ${u.star
  let b=s.d?`<p>${esc(s.d)}</p>`:"";if(s.proj){const [pid,ix]=s.proj.split(":");const p=PROJECTS.find(x=>x.id===pid);if(p)b+=`<p>${esc(p.steps[+ix])}</p><p class="small muted">${esc(p.desc)}</p>`;}
  if(s.cert==="p2"||s.cert==="p3")b+=`<p class="small muted">${esc(CERTS.python.facts)}</p>`;
  return b+`<div class="mt">${s.link?L(s.link,s.lt||"Open"):""} ${s.url?L(s.url,s.lt||"Open"):""}</div>`;}
-function guideMark(s,v){change(()=>{const g=gS();if(v)g.done[s.id]=today();else delete g.done[s.id];delete g.skip[s.id];
+function guideMark(s,v){if(v&&s.type==="quiz"&&!guideMastered(s.m.id)){toast("🔒 Pass the quiz at 80% or more first");return;}change(()=>{const g=gS();if(s.type==="ex"&&s.m){if(v)S.ex[s.m.id+":"+s.i]=true;else delete S.ex[s.m.id+":"+s.i];}if(s.type==="res"&&s.m){const ri=(s.m.resources||[]).indexOf(s.res);if(ri>=0){S.res=S.res||{};if(v)S.res[s.m.id+":"+ri]=today();else delete S.res[s.m.id+":"+ri];}}if(v)g.done[s.id]=today();else delete g.done[s.id];delete g.skip[s.id];
  if(s.type==="ex")S.ex[s.m.id+":"+s.i]=v;if(s.proj)S.proj[s.proj]=v;if(s.cert)S.cert[s.cert]=v;},v?"✅ Done. Next step!":"Step reopened");}
 let guideView=null;
 function guidePage(){const st=guideSteps();let i=guideView==null?guideIndex():guideView;if(i<0){$("#main").innerHTML=`<div class="hero"><h1>✅ You are up to date</h1><p>Every step is done. New steps are added every week from the market watch. Meanwhile, keep your memory fresh.</p></div><div class="card mt"><a class="btn ok" href="#/review">🔁 Review session (${dueCards().length} due)</a> <a class="btn ghost" href="#/coach">🎤 Ask the coach to grill you</a></div>`;return;}
@@ -3367,7 +3370,7 @@ function guidePage(){const st=guideSteps();let i=guideView==null?guideIndex():gu
  <div class="card mt" style="${ph?`border-left:6px solid ${ph.color}`:""}"><div class="small muted">Step ${i+1} of ${st.length}${s.m?` · Module ${s.m.id.slice(1)} · ${esc(s.m.title)}`:""} · ⏱️ ${fmtH(s.h)}</div>
  <h2 style="margin:.3em 0">${esc(guideLabel(s))} ${done?"✅":""}</h2>${guideBody(s)}
  <div class="mt2" style="display:flex;gap:10px;flex-wrap:wrap">${i>0?`<button class="btn ghost" id="gprev">← Previous</button>`:""}
- ${done?`<button class="btn ghost" id="gundo">↩︎ Not done</button><button class="btn ok" id="gnext">Next →</button>`:`<button class="btn ok" id="gdone">✅ Done, next</button><button class="btn ghost" id="gskip">Later</button>`}</div></div>
+ ${done?`<button class="btn ghost" id="gundo">↩︎ Not done</button><button class="btn ok" id="gnext">Next →</button>`:(s.type==="quiz"&&!guideMastered(s.m.id)?`<button class="btn ghost" disabled>🔒 Reach 80% in the quiz to continue</button>`:`<button class="btn ok" id="gdone">✅ Done, next</button>`)+`<button class="btn ghost" id="gskip">Later</button>`}</div></div>
  <div class="card mt"><h3>📅 Today's session (about 2 h)</h3>${plan.map(([j,p])=>`<div class="modrow" data-g="${j}" style="cursor:pointer"><div class="num">${j+1}</div><div><div class="t">${esc(guideLabel(p))}</div><div class="small muted">${p.m?esc(p.m.title)+" · ":""}${fmtH(p.h)}</div></div></div>`).join("")}</div>`;
  $("#main").innerHTML=h;window.scrollTo(0,0);
  const go=j=>{guideView=j;guidePage();};
@@ -3384,7 +3387,7 @@ function guideTeaser(){const st=guideSteps(),i=guideIndex();if(i<0)return "";con
 const KEY="aiTrack.public.v1";
 let S=load();
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s)return Object.assign(blank(),s);}catch(e){}return blank();}
-function blank(){return{guide:{done:{},skip:{}},ex:{},quiz:{},mod:{},speak:{},proj:{},cert:{},proofs:[],iv:{},rev:{},ai:{},cards:{},notes:{},start:"",activity:[],badges:{}};}
+function blank(){return{res:{},guide:{done:{},skip:{}},ex:{},quiz:{},mod:{},speak:{},proj:{},cert:{},proofs:[],iv:{},rev:{},ai:{},cards:{},notes:{},start:"",activity:[],badges:{}};}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 const $=s=>document.querySelector(s);
 function ymTxt(y){const[a,b]=String(y).split("-");return (b?["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+b-1]+" ":"")+a;}
@@ -3476,6 +3479,9 @@ function roadmap(){let h=`<div class="hero"><h1>🗺️ Roadmap</h1><p>Five phas
   ${ms.map(m=>`<div class="modrow" style="--c:${p.color}" onclick="location.hash='#/m/${m.id}'"><div class="num">${m.id.slice(1)}</div><div><div class="t">${esc(m.title)} ${S.mod[m.id]?"✅":""}</div><div class="small muted">Weeks ${m.weeks} · ${m.hours} h · ${esc(m.why)}</div></div><div class="mini"><i style="width:${modPct(m)}%"></i></div></div>`).join("")}</div>`;});
  $("#main").innerHTML=h;}
 
+function modMissing(m){const miss=[];const kx=(typeof guideKeyEx==="function"?guideKeyEx(m):[0]).filter(i=>!S.ex[m.id+":"+i]);
+ if(kx.length)miss.push(kx.length>1?kx.length+" Foundation exercises":"the Foundation exercise");
+ if(!(typeof guideMastered==="function"?guideMastered(m.id):(S.quiz[m.id]||{}).best>=80))miss.push("quiz at 80% or more");return miss;}
 function moduleView(id){const m=M.find(x=>x.id===id);if(!m){location.hash="#/";return;}const p=PHASES[m.phase-1];const q=S.quiz[m.id];
  const idx=M.indexOf(m),prev=M[idx-1],nxt=M[idx+1];
  let h=`<div class="mhead" style="--c:${p.color}"><span class="pill" style="background:rgba(255,255,255,.2);color:#fff">${p.icon} Phase ${p.n} · Weeks ${m.weeks} · ${m.hours} h</span><h1>${m.id.slice(1)}. ${esc(m.title)}</h1><div class="why">${esc(m.why)}</div>
@@ -3490,20 +3496,21 @@ function moduleView(id){const m=M.find(x=>x.id===id);if(!m){location.hash="#/";r
  ${m.quiz.map((it,i)=>`<div class="q" data-q="${i}"><b>${i+1}. ${esc(it.q)}</b>${it.o.map((o,j)=>`<label class="opt"><input type="radio" name="q${i}" value="${j}"> ${esc(o)}</label>`).join("")}<div class="why">💬 ${esc(it.w)}</div></div>`).join("")}</div>
  <div class="mt"><button class="btn" id="qsub">Check my answers</button> <button class="btn ghost" id="qres">Reset</button> <span id="qscore" class="mt" style="font-weight:700;margin-left:10px"></span></div></details></div>
  <div id="aiBox"></div>
- <div class="grid g2 mt"><div class="card res"><h3>🎬 Resources</h3>${m.resources.map(r=>`<a href="${r.u}" target="_blank" rel="noopener"><span class="ico ${r.k}">${r.k==="video"?"▶":r.k==="course"?"🎓":"📘"}</span><span>${r.l==="fr"?'<span class="pill g" title="Ressource en français">🇫🇷 FR</span> ':""}${esc(r.t)}${r.y?` <span class="pill ${ymOld(r.y)?"y":"g"}" title="${ymOld(r.y)?"More than 18 months old: check that it is still current":"Recent"}">${ymOld(r.y)?"⏳ ":""}${ymTxt(r.y)}</span>`:""}</span></a>`).join("")}</div>
+ <div class="grid g2 mt"><div class="card res"><h3>🎬 Resources</h3>${m.resources.map((r,ri)=>`<div class="resrow ${(S.res||{})[m.id+":"+ri]?"done":""}"><input type="checkbox" data-res="${m.id}:${ri}" title="Watched / read" ${(S.res||{})[m.id+":"+ri]?"checked":""}><a href="${r.u}" target="_blank" rel="noopener"><span class="ico ${r.k}">${r.k==="video"?"▶":r.k==="course"?"🎓":"📘"}</span><span>${r.l==="fr"?'<span class="pill g" title="Ressource en français">🇫🇷 FR</span> ':""}${esc(r.t)}${r.y?` <span class="pill ${ymOld(r.y)?"y":"g"}" title="${ymOld(r.y)?"More than 18 months old: check that it is still current":"Recent"}">${ymOld(r.y)?"⏳ ":""}${ymTxt(r.y)}</span>`:""}</span></a></div>`).join("")}<p class="small muted">Tick what you have watched or read.</p></div>
  <div class="card"><h3>🧭 Coach's corner</h3>${m.coach.map(c=>`<div class="tip">💬<div>${esc(c)}</div></div>`).join("")}</div></div>
  <div class="card mt"><h3>🇬🇧 English corner</h3><p class="small muted">Click a card to flip it.</p><div class="cards">${m.english.vocab.map(v=>`<div class="flip" onclick="this.classList.toggle('on')"><div class="in"><div class="f">${esc(v[0])}</div><div class="b">${esc(v[1])}</div></div></div>`).join("")}</div>
  <h4>🎙️ Speaking prompt</h4><p>${esc(m.english.speak)}</p><label class="ex ${S.speak[m.id]?"done":""}"><input type="checkbox" id="spk" ${S.speak[m.id]?"checked":""}><div class="et">I recorded myself and listened back</div><span class="xp">+25 XP</span></label><div id="spkBox" class="mt"></div></div>
  <div class="card mt"><h3>📝 My notes</h3><textarea id="notes" placeholder="Failure journal, ideas, links, numbers for your CV...">${esc(S.notes[m.id]||"")}</textarea></div>
  <div class="mt2" style="display:flex;gap:10px;flex-wrap:wrap">${prev?`<a class="btn ghost" href="#/m/${prev.id}">← ${esc(prev.title)}</a>`:""}
- <button class="btn ${S.mod[m.id]?"ghost":"ok"}" id="done">${S.mod[m.id]?"↩︎ Mark as not completed":"🏁 Mark module completed (+100 XP)"}</button>
+ ${(()=>{const miss=modMissing(m);return S.mod[m.id]||!miss.length?`<button class="btn ${S.mod[m.id]?"ghost":"ok"}" id="done">${S.mod[m.id]?"↩︎ Mark as not completed":"🏁 Mark module completed (+100 XP)"}</button>`:`<button class="btn ghost" id="done" disabled title="${esc(miss.join(" · "))}">🔒 To complete the module: ${esc(miss.join(" · "))}</button>`;})()}
  ${nxt?`<a class="btn ghost" href="#/m/${nxt.id}">${esc(nxt.title)} →</a>`:""}</div>`;
  $("#main").innerHTML=h;window.scrollTo(0,0);
  document.querySelectorAll("[data-ex]").forEach(c=>c.onchange=()=>{const k=c.dataset.ex,e=m.exercises[+k.split(":")[1]];
   change(()=>{S.ex[k]=c.checked;},c.checked?"✅ +"+Math.round(e.h*10)+" XP":"Exercise unchecked");moduleView(id);});
  $("#spk").onchange=e=>{change(()=>{S.speak[m.id]=e.target.checked;},e.target.checked?"🎙️ +25 XP":"");moduleView(id);};
  $("#notes").oninput=e=>{S.notes[m.id]=e.target.value;save();};
- $("#done").onclick=()=>{const v=!S.mod[m.id];change(()=>{S.mod[m.id]=v;},v?"🏁 Module completed! +100 XP":"Module reopened");if(v)burst();moduleView(id);};
+ document.querySelectorAll("[data-res]").forEach(c=>c.onchange=()=>{change(()=>{S.res=S.res||{};if(c.checked)S.res[c.dataset.res]=today();else delete S.res[c.dataset.res];},c.checked?"🎬 Marked as watched":"Unmarked");moduleView(id);});
+ $("#done").onclick=()=>{const v=!S.mod[m.id];if(v&&modMissing(m).length){toast("🔒 "+modMissing(m).join(" · "));return;}change(()=>{S.mod[m.id]=v;},v?"🏁 Module completed! +100 XP":"Module reopened");if(v)burst();moduleView(id);};
  $("#qsub").onclick=()=>{let ok=0,ans=0;m.quiz.forEach((it,i)=>{const sel=document.querySelector(`input[name=q${i}]:checked`);const box=document.querySelector(`[data-q="${i}"]`);box.classList.add("shown");
    box.querySelectorAll(".opt").forEach((o,j)=>{o.classList.remove("right","wrong");if(j===it.a)o.classList.add("right");else if(sel&&+sel.value===j)o.classList.add("wrong");});
    if(sel){ans++;if(+sel.value===it.a)ok++;}});
