@@ -3233,6 +3233,40 @@ function lgToggle(){const to=lang()==="fr"?"en":"fr";try{localStorage.setItem(LG
 (function(){const b=document.createElement("button");b.id="langBtn";b.className="langbtn";b.type="button";b.onclick=lgToggle;document.body.appendChild(b);
  document.documentElement.lang=lang();lgFlag();const mo=new MutationObserver(()=>lgRun());
  ["main","side"].forEach(id=>{const e=document.getElementById(id);if(e)mo.observe(e,{childList:true,subtree:true});});})();
+
+// ---- speaking coach: record, transcribe, get feedback (English corner) ----
+let spk={mid:null,url:null,text:"",secs:0,res:""};
+function speakBox(m){const el=document.getElementById("spkBox");if(!el)return;aiS();
+ if(spk.mid!==m.id)spk={mid:m.id,url:null,text:"",secs:0,res:""};
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition,canRec=!!(navigator.mediaDevices&&window.MediaRecorder);
+ const hist=((S.ai.speak||{})[m.id]||[]).slice(-5);
+ el.innerHTML=`<div class="card" style="background:#f8fafc"><b>🎙️ Record and get corrected</b> <span class="small muted">Target: about 2 minutes, in English, as if you were talking to a real client.${hist.length?" Last scores: "+hist.map(x=>x+"/10").join(" · "):""}</span>
+ <div class="mt" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn" id="skRec">⏺ Start recording</button> <b id="skT">0:00</b> <span id="skSt" class="small muted"></span></div>
+ ${spk.url?`<audio class="mt" controls src="${spk.url}" style="width:100%"></audio>`:""}
+ <textarea id="skTx" class="mt" placeholder="Live transcript of what you say (you can also type or fix it)...">${esc(spk.text)}</textarea>
+ <div class="mt"><button class="btn ghost" id="skGo">✅ Get feedback</button></div><div id="skRes" class="mt">${spk.res}</div>
+ <p class="small muted">${SR?"":"Live transcript needs Chrome or Edge. "}${canRec?"The audio stays in your browser (not uploaded); only the transcript is sent for feedback.":"Audio recording is not supported in this browser."}</p></div>`;
+ const btn=$("#skRec"),tx=$("#skTx"),st=$("#skSt"),tm=$("#skT");let rec=null,mr=null,chunks=[],t0=0,timer=null,fin="";
+ tx.oninput=()=>{spk.text=tx.value;};
+ btn.onclick=async()=>{
+  if(mr||rec){if(timer){clearInterval(timer);timer=null;}if(mr){try{mr.stop();}catch(e){stopAll();}}else stopAll();return;}
+  fin="";tx.value="";spk.text="";chunks=[];
+  try{if(canRec){const stream=await navigator.mediaDevices.getUserMedia({audio:true});mr=new MediaRecorder(stream);mr.ondataavailable=e=>chunks.push(e.data);
+    mr.onstop=()=>{stream.getTracks().forEach(t=>t.stop());if(spk.url)URL.revokeObjectURL(spk.url);spk.url=URL.createObjectURL(new Blob(chunks,{type:mr.mimeType||"audio/webm"}));mr=null;stopAll();};mr.start();}}catch(e){st.textContent="Microphone refused: allow it in the browser.";mr=null;}
+  if(SR){rec=new SR();rec.lang="en-US";rec.continuous=true;rec.interimResults=true;
+   rec.onresult=ev=>{let inter="";for(let i=ev.resultIndex;i<ev.results.length;i++){const t=ev.results[i][0].transcript;if(ev.results[i].isFinal)fin+=t+" ";else inter+=t;}tx.value=fin+inter;spk.text=tx.value;};
+   rec.onend=()=>{if(mr||timer){try{rec.start();}catch(e){}}else rec=null;};try{rec.start();}catch(e){}}
+  if(!mr&&!rec)return;t0=Date.now();btn.textContent="⏹ Stop";st.textContent="🔴 Recording... speak in English";
+  timer=setInterval(()=>{const s=Math.round((Date.now()-t0)/1000);spk.secs=s;tm.textContent=Math.floor(s/60)+":"+String(s%60).padStart(2,"0");tm.style.color=s>150?"var(--bad)":s>=90?"var(--ok)":"";},500);
+  };
+ function stopAll(){if(timer){clearInterval(timer);timer=null;}if(rec){const r=rec;rec=null;try{r.stop();}catch(e){}}speakBox(m);}
+ $("#skGo").onclick=e=>busy(e.target,async()=>{const t=(tx.value||"").trim();if(t.split(/\s+/).length<25){toast("Record (or type) a real answer first");return;}spk.text=t;
+  const words=t.split(/\s+/).length,secs=spk.secs||0;
+  const j=await askJSON(`You are an English speaking coach and a senior AI engineering interviewer. ${LEARNER}\n${mctx(m)}`,`Speaking task (to do in English, about 2 minutes): ${m.english.speak}\nTranscript of his spoken answer (automatic speech recognition: ignore obvious recognition errors, punctuation and capitalisation):\n"""${t}"""\nDuration: ${secs?Math.floor(secs/60)+" min "+(secs%60)+" s":"unknown"}, ${words} words${secs?", "+Math.round(words/(secs/60))+" words per minute":""}.\nEvaluate: (1) content: correct, complete, adapted to the audience of the task; (2) structure and clarity; (3) English: grammar, vocabulary, natural phrasing, filler words; (4) timing and pace. Pronunciation cannot be assessed from a transcript: do not pretend to. JSON: {"score":0-10,"verdict":"one sentence","content":["what was good or missing on the substance"],"structure":["..."],"english":["you said X → say Y, max 6 corrections"],"fillers":"short note on filler words and repetitions","timing":"short note on duration and pace","better_version":"a natural spoken version of his answer, same ideas, about 200 to 250 words, simple English a client understands","phrases":["3 useful expressions to reuse"]}`,{max:2200});
+  const L=(k,t)=>(j[k]||[]).length?`<h4>${t}</h4><ul>${j[k].map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:"";
+  spk.res=`<div class="card"><h3>${j.score}/10 <span class="small muted">${esc(j.verdict||"")}</span></h3>${L("content","🧠 Content")}${L("structure","🧱 Structure")}${L("english","🇬🇧 English corrections")}${j.fillers?`<p><b>🗣️ Fillers:</b> ${esc(j.fillers)}</p>`:""}${j.timing?`<p><b>⏱️ Timing:</b> ${esc(j.timing)}</p>`:""}<h4>📘 A better version to read aloud</h4><p class="small">${esc(j.better_version||"")}</p>${L("phrases","💬 Expressions to reuse")}<p class="small muted">Next: read the better version out loud once, then record yourself again without looking.</p></div>`;
+  S.ai.speak=S.ai.speak||{};(S.ai.speak[m.id]=S.ai.speak[m.id]||[]).push(+j.score||0);
+  if(!S.speak[m.id]){S.speak[m.id]=true;}save();aiXP(Math.round((+j.score||0)*3),"🎙️");speakBox(m);});}
 // ===== CONTINUOUS UPDATES (maintained by the weekly "Mise à jour du parcours" task) =====
 // Each entry becomes a step of the guided path. Fields:
 //  id (unique, never reuse), added "YYYY-MM-DD", why (market signal + source),
@@ -3459,7 +3493,7 @@ function moduleView(id){const m=M.find(x=>x.id===id);if(!m){location.hash="#/";r
  <div class="grid g2 mt"><div class="card res"><h3>🎬 Resources</h3>${m.resources.map(r=>`<a href="${r.u}" target="_blank" rel="noopener"><span class="ico ${r.k}">${r.k==="video"?"▶":r.k==="course"?"🎓":"📘"}</span><span>${r.l==="fr"?'<span class="pill g" title="Ressource en français">🇫🇷 FR</span> ':""}${esc(r.t)}${r.y?` <span class="pill ${ymOld(r.y)?"y":"g"}" title="${ymOld(r.y)?"More than 18 months old: check that it is still current":"Recent"}">${ymOld(r.y)?"⏳ ":""}${ymTxt(r.y)}</span>`:""}</span></a>`).join("")}</div>
  <div class="card"><h3>🧭 Coach's corner</h3>${m.coach.map(c=>`<div class="tip">💬<div>${esc(c)}</div></div>`).join("")}</div></div>
  <div class="card mt"><h3>🇬🇧 English corner</h3><p class="small muted">Click a card to flip it.</p><div class="cards">${m.english.vocab.map(v=>`<div class="flip" onclick="this.classList.toggle('on')"><div class="in"><div class="f">${esc(v[0])}</div><div class="b">${esc(v[1])}</div></div></div>`).join("")}</div>
- <h4>🎙️ Speaking prompt</h4><p>${esc(m.english.speak)}</p><label class="ex ${S.speak[m.id]?"done":""}"><input type="checkbox" id="spk" ${S.speak[m.id]?"checked":""}><div class="et">I recorded myself and listened back</div><span class="xp">+25 XP</span></label></div>
+ <h4>🎙️ Speaking prompt</h4><p>${esc(m.english.speak)}</p><label class="ex ${S.speak[m.id]?"done":""}"><input type="checkbox" id="spk" ${S.speak[m.id]?"checked":""}><div class="et">I recorded myself and listened back</div><span class="xp">+25 XP</span></label><div id="spkBox" class="mt"></div></div>
  <div class="card mt"><h3>📝 My notes</h3><textarea id="notes" placeholder="Failure journal, ideas, links, numbers for your CV...">${esc(S.notes[m.id]||"")}</textarea></div>
  <div class="mt2" style="display:flex;gap:10px;flex-wrap:wrap">${prev?`<a class="btn ghost" href="#/m/${prev.id}">← ${esc(prev.title)}</a>`:""}
  <button class="btn ${S.mod[m.id]?"ghost":"ok"}" id="done">${S.mod[m.id]?"↩︎ Mark as not completed":"🏁 Mark module completed (+100 XP)"}</button>
@@ -3475,7 +3509,7 @@ function moduleView(id){const m=M.find(x=>x.id===id);if(!m){location.hash="#/";r
    if(sel){ans++;if(+sel.value===it.a)ok++;}});
   const sc=Math.round(ok/m.quiz.length*100);$("#qscore").textContent=`${ok}/${m.quiz.length} · ${sc}% ${sc>=80?"🎉 passed":"· retry after reviewing"}`;
   if(ans===m.quiz.length){m.quiz.forEach((it,i)=>{const sel=document.querySelector(`input[name=q${i}]:checked`);const k=m.id+":"+i;if(+sel.value!==it.a)S.rev[k]={b:1,d:today()};else if(!S.rev[k])S.rev[k]={b:2,d:addDays(3)};});change(()=>{const old=S.quiz[m.id]||{best:0,tries:0};S.quiz[m.id]={best:Math.max(old.best,sc),tries:old.tries+1,last:sc};},sc===100?"🎯 Perfect score!":sc>=80?"🧪 Quiz passed":"");if(sc===100)burst();}};
- $("#qres").onclick=()=>moduleView(id);aiModule(m);if(typeof aiQuizBox==="function")aiQuizBox(m);}
+ $("#qres").onclick=()=>moduleView(id);aiModule(m);if(typeof aiQuizBox==="function")aiQuizBox(m);if(typeof speakBox==="function")speakBox(m);}
 
 function projects(){let h=`<div class="hero"><h1>📦 Capstone projects</h1><p>Projects you will actually use: your property portfolio, your money, your mountain days. Real usage is your strongest proof. Each step = +40 XP, each finished project = +150 XP.</p></div>
  <div class="card mt"><h3>🧠 What makes it senior (and not "generated by Claude Code in a weekend")</h3><ul><li><b>Measured:</b> an eval set and numbers in the README (accuracy, recall, cost, latency).</li><li><b>Deterministic where it matters:</b> money, dates and rules in tested code; the model explains, it does not compute.</li><li><b>Secure by design:</b> threat model, injection tests, approvals enforced in code.</li><li><b>Decided:</b> ADRs explaining trade-offs (model, stack, local vs cloud).</li><li><b>Used:</b> real usage stats over months. Claude Code writes code fast; you own the design, the evals and the judgement.</li></ul></div>`;
