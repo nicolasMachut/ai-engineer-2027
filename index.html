@@ -1883,7 +1883,8 @@ function aiQuizPane(m,el){const d=S.ai.diff[m.id]||2,weak=(S.ai.weak[m.id]||[]).
    if(sel){ans++;if(+sel.value===it.a)ok++;else{const k="c:"+Date.now()+i;S.cards[k]={mid:m.id,q:it.q,o:it.o,a:it.a,w:it.w};S.rev[k]={b:1,d:today()};(S.ai.weak[m.id]=S.ai.weak[m.id]||[]).push(it.concept||it.q.slice(0,40));}}});
   if(ans<aiQ.qs.length){toast("Answer all questions first");return;}aiQ.done=true;const sc=Math.round(ok/aiQ.qs.length*100);let d=S.ai.diff[m.id]||2;
   if(sc>=80&&d<5)d++;else if(sc<50&&d>1)d--;S.ai.diff[m.id]=d;S.ai.weak[m.id]=(S.ai.weak[m.id]||[]).slice(-12);
-  $("#aqSc").textContent=`${ok}/${aiQ.qs.length} · next level ${d}/5`;aiXP(ok*5,"🎲");};}
+  S.ai.qs=S.ai.qs||{};const r=S.ai.qs[m.id]||{rounds:0,best:0};r.rounds++;r.last=sc;r.best=Math.max(r.best,sc);r.at=today();S.ai.qs[m.id]=r;
+  $("#aqSc").innerHTML=`${ok}/${aiQ.qs.length} · ${sc}% ${sc>=80?"✅ mastered (≥ 80%). Keep going with a new set if you want.":"· not yet 80%: click New set and try again."} · next level ${d}/5 · round ${r.rounds}`;aiXP(ok*5,"🎲");};}
 
 function aiOpenPane(m,el){const hist=(S.ai.open[m.id]||[]).slice(-5);
  el.innerHTML=`<p class="small muted">The best way to learn: explain it in your own words. You get an open question, write your answer (English or French), and get graded against a senior rubric with what is missing and a follow-up.${hist.length?" Last scores: "+hist.map(x=>x+"/10").join(" · "):""}</p>
@@ -2111,9 +2112,10 @@ function guideSteps(){if(GUIDE_CACHE)return GUIDE_CACHE;const st=[];
  return GUIDE_CACHE=st;}
 function guideUpd(u,phase){const s={id:u.id,type:u.type==='theory'?'theory':u.type==='res'?'res':u.type==='ex'?'upex':'ms',h:u.h||0.5,phase,upd:u,icon:'🆕',t:u.t,d:u.d,url:u.u,lt:'Open'};
  if(u.type==='theory')s.sec={title:u.t,html:u.theory};if(u.type==='res')s.res={t:u.t,u:u.u,k:u.k||'doc',l:u.l,y:u.y};return s;}
+function guideMastered(id){return (S.quiz[id]||{}).best>=80||(((S.ai||{}).qs||{})[id]||{}).best>=80;}
 function gS(){if(!S.guide)S.guide={done:{},skip:{}};return S.guide;}
 function stepDone(s){const g=gS();if(g.done[s.id])return true;
- if(s.type==="ex")return !!S.ex[s.m.id+":"+s.i];if(s.type==="quiz")return (S.quiz[s.m.id]||{}).best>=80;
+ if(s.type==="ex")return !!S.ex[s.m.id+":"+s.i];if(s.type==="quiz")return guideMastered(s.m.id);
  if(s.proj)return !!S.proj[s.proj];if(s.cert)return !!S.cert[s.cert];return false;}
 function guideIndex(){const st=guideSteps(),g=gS();const i=st.findIndex(s=>!stepDone(s)&&!g.skip[s.id]);return i<0?st.findIndex(s=>!stepDone(s)):i;}
 function guideStats(){const st=guideSteps();const core=st.filter(s=>s.phase==="core");const left=core.filter(s=>!stepDone(s));
@@ -2129,10 +2131,14 @@ function guideBody0(s){const L=(u,t)=>`<a class="btn ghost" href="${u}" ${u.star
  if(s.type==="res"){const r=s.res;return `<p>${r.l==="fr"?'<span class="pill g">🇫🇷 FR</span> ':""}<b>${esc(r.t)}</b>${r.y?` <span class="pill">${ymTxt(r.y)}</span>`:""}</p><p class="small muted">Take 3 notes: one idea you did not know, one thing to try, one question for the AI coach.</p><div class="mt">${L(r.u,r.k==="video"?"Open the video":"Open the resource")}</div>`;}
  if(s.type==="ex"){const e=s.ex;return `<p>${esc(e.d)}</p>${(e.u||[]).map(l=>`<a class="exl" href="${l.u}" target="_blank" rel="noopener">🔗 ${esc(l.t)}</a>`).join("")}<p class="small muted mt">Commit the result in a repo, even small. When it works, click Done.</p>`;}
  if(s.type==="review"){const n=dueCards().length;return `<p>${n?`<b>${n} card${n>1?"s":""} due.</b> Answer them from memory: wrong ones come back sooner, right ones later.`:"Nothing due right now: well done. Click Done."}</p><div class="mt">${n?L("#/review","Start the review"):""}</div>`;}
- if(s.type==="retake")return `<p>Retake the quiz of <b>${esc(s.m.title)}</b> without notes. Aim for 100%. If you miss one, re-read that theory section before moving on.</p><div class="mt">${L("#/m/"+s.m.id+"?quiz","Open the quiz")}</div>`;
+ if(s.type==="retake")return `<p>Test <b>${esc(s.m.title)}</b> again from memory, without notes. Best: one round of the AI quiz (new questions, harder level). Aim for 80% or more; if you miss one, re-read that theory section.</p><div class="mt">${L("#/m/"+s.m.id+"?ai","AI quiz (new questions)")} ${L("#/m/"+s.m.id+"?quiz","Module quiz")}</div>`;
  if(s.type==="teach")return `<p>Open the AI coach and say: <i>"Grill me on ${esc(s.m.title)}. Ask me 5 hard questions one by one, like a senior interviewer, and tell me what I got wrong."</i> Answer in English, out loud or written.</p><div class="mt">${L("#/coach","Open the AI coach")}</div>`;
  if(s.type==="upex")return `<p>${esc(s.d||"")}</p>${s.url?L(s.url,"Open"):""}`;
- if(s.type==="quiz")return `<p>${s.m.quiz.length} questions on <b>${esc(s.m.title)}</b>. Pass mark 80%. Wrong answers go to your Review deck automatically.</p><div class="mt">${L("#/m/"+s.m.id+"?quiz","Open the quiz")}</div><p class="small muted mt">This step completes itself when you reach 80%. You can also move on and come back.</p>`;
+ if(s.type==="quiz"){const q=S.quiz[s.m.id],a=((S.ai||{}).qs||{})[s.m.id];const ok=guideMastered(s.m.id);
+  return `<p>Goal: <b>80% or more</b> on <b>${esc(s.m.title)}</b>. ${ok?"✅ Reached. You can keep training as long as you want.":"Until you reach it, this step stays here."}</p>
+  <p class="small muted">Module quiz: ${q?"best "+q.best+"%, "+q.tries+" tries":"not taken yet"} · AI quiz: ${a?"best "+a.best+"%, last "+a.last+"%, "+a.rounds+" rounds":"no round yet"}</p>
+  <ol class="small"><li>Take the module quiz (${s.m.quiz.length} questions).</li><li>Below 80%: open the AI quiz. It generates 5 new questions every round, targets your weak spots and adapts the difficulty. Unlimited rounds until you pass 80%.</li><li>Wrong answers go to your Review deck automatically.</li></ol>
+  <div class="mt">${L("#/m/"+s.m.id+"?quiz","Module quiz")} ${L("#/m/"+s.m.id+"?ai","AI quiz (unlimited)")}</div>`;}
  let b=s.d?`<p>${esc(s.d)}</p>`:"";if(s.proj){const [pid,ix]=s.proj.split(":");const p=PROJECTS.find(x=>x.id===pid);if(p)b+=`<p>${esc(p.steps[+ix])}</p><p class="small muted">${esc(p.desc)}</p>`;}
  if(s.cert==="p2"||s.cert==="p3")b+=`<p class="small muted">${esc(CERTS.python.facts)}</p>`;
  return b+`<div class="mt">${s.link?L(s.link,s.lt||"Open"):""} ${s.url?L(s.url,s.lt||"Open"):""}</div>`;}
@@ -2408,7 +2414,7 @@ function settings(){$("#main").innerHTML=`<div class="hero"><h1>⚙️ Settings 
  $("#rst").onclick=()=>{if(confirm("Reset all progress?")){S=blank();save();renderSide();toast("Progress reset");}};}
 
 function route(){const r=location.hash||"#/";const sd=document.getElementById("side");if(sd)sd.classList.remove("open");renderSide();
- if(r==="#/today"){guideView=null;guidePage();}else if(r.startsWith("#/m/")){moduleView(r.slice(4).split("?")[0]);if(r.includes("?quiz")){const q=document.getElementById("quiz");if(q)q.scrollIntoView();}}else if(r==="#/roadmap")roadmap();else if(r==="#/projects")projects();else if(r==="#/career")career();else if(r==="#/market")market();else if(r==="#/certs")certs();else if(r==="#/review")review(true);else if(r==="#/interview")interview();else if(r==="#/coach")coach();else if(r==="#/proof")proof();
+ if(r==="#/today"){guideView=null;guidePage();}else if(r.startsWith("#/m/")){moduleView(r.slice(4).split("?")[0]);if(r.includes("?quiz")){const q=document.getElementById("quiz");if(q)q.scrollIntoView();}if(r.includes("?ai")){if(typeof aiTab!=="undefined"){aiTab="quiz";const mm=M.find(x=>x.id===r.slice(4).split("?")[0]);if(mm)aiModule(mm);}const b=document.getElementById("aiBox");if(b)b.scrollIntoView();}}else if(r==="#/roadmap")roadmap();else if(r==="#/projects")projects();else if(r==="#/career")career();else if(r==="#/market")market();else if(r==="#/certs")certs();else if(r==="#/review")review(true);else if(r==="#/interview")interview();else if(r==="#/coach")coach();else if(r==="#/proof")proof();
  else if(r==="#/english")english();else if(r==="#/badges")badges();else if(r==="#/settings")settings();else dashboard();}
 window.addEventListener("hashchange",route);route();
 </script></body></html>
