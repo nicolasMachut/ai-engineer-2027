@@ -2053,11 +2053,95 @@ function lgToggle(){const to=lang()==="fr"?"en":"fr";try{localStorage.setItem(LG
 (function(){const b=document.createElement("button");b.id="langBtn";b.className="langbtn";b.type="button";b.onclick=lgToggle;document.body.appendChild(b);
  document.documentElement.lang=lang();lgFlag();const mo=new MutationObserver(()=>lgRun());
  ["main","side"].forEach(id=>{const e=document.getElementById(id);if(e)mo.observe(e,{childList:true,subtree:true});});})();
+// ===== GUIDED PATH: one step at a time, "Done, next" =====
+// Foundation pass (before the target date): all theory, one key exercise per module, one resource, the quiz,
+// the flagship project, the PCAP and the proofs. Then a deep pass: every remaining exercise, module by module.
+const SOCLE_END = "";
+const GUIDE_ORDER = ["m01","m02","m03","m04","m05","m23","m06","m22","m07","m08","m09","m10","m11","m12","m13","m14","m15","m16","m17","m18","m19","m20","m21"];
+const GUIDE_KEY_EX = {m23:[0,1,2]}; // default: the shortest of the first three exercises
+const GUIDE_MILESTONES = {
+ m02:[{id:"g-li", icon:"💼", t:"Career kit: update your LinkedIn headline and About section", d:"Open the Career kit, adapt the headline and About blocks to your profile, and publish them on LinkedIn. Do not mention dates or the current client.", h:0.75, link:"#/career", lt:"Open the Career kit"}],
+ m04:[{id:"g-p3-0", icon:"🏔️", t:"Mountain project, step 1: repository and bulletin fetch", proj:"p3:0", h:4, link:"#/projects", lt:"Project details"}],
+ m05:[{id:"g-p3-1", icon:"🏔️", t:"Mountain project, step 2: extract the bulletin text", proj:"p3:1", h:4, link:"#/projects", lt:"Project details"}],
+ m23:[{id:"g-pcap-syl", icon:"🐍", t:"PCAP: read the official syllabus and list your gaps", cert:"p2", h:1.5, url:"https://pythoninstitute.org/certification/pcap-certification-associate/", lt:"Official PCAP page"},
+      {id:"g-pcap-book", icon:"🐍", t:"PCAP: book the exam about 8 weeks from now", d:"Buy the voucher on the OpenEDG store and pick a date about 8 weeks ahead. A fixed date is what makes the preparation happen.", h:0.25, url:"https://pythoninstitute.org/certification/pcap-certification-associate/", lt:"Book on the official page"}],
+ m06:[{id:"g-p3-2", icon:"🏔️", t:"Mountain project, step 3: weather and snow data tools", proj:"p3:2", h:4, link:"#/projects", lt:"Project details"}],
+ m07:[{id:"g-p3-3", icon:"🏔️", t:"Mountain project, step 4: your saved routes and the matching engine", proj:"p3:3", h:4, link:"#/projects", lt:"Project details"}],
+ m09:[{id:"g-pcap-mock", icon:"🐍", t:"PCAP: two full practice exams at 80% or more", cert:"p3", h:4, link:"#/certs", lt:"Certifications page"},
+      {id:"g-pcap-pass", icon:"🏆", t:"PCAP: pass the exam, then add the badge to LinkedIn and the Proof ledger", cert:"pcap", h:2, link:"#/proof", lt:"Proof ledger"}],
+ m10:[{id:"g-p3-6", icon:"🏔️", t:"Mountain project: briefing generator with citations and disclaimer", proj:"p3:6", h:5, link:"#/projects", lt:"Project details"},
+      {id:"g-p3-live", icon:"🏔️", t:"Mountain project: put it online with a demo and a README (architecture, prompts, evals)", d:"Public repository, a short demo (GIF or video), and a README with the problem, the architecture, the eval results table and how to run it. This is your first visible proof.", h:4, link:"#/projects", lt:"Project details"},
+      {id:"g-leadrive", icon:"🚗", t:"Leadrive case study: write and publish it", d:"One page: the problem, the architecture (Spring AI + Claude), how you tested prompts on real scenarios, what you measured, what you would do next. No client names, no figures you cannot back.", h:4, link:"#/career", lt:"Career kit"}],
+ m21:[{id:"g-proofs", icon:"🎯", t:"Pin the proofs: GitHub, LinkedIn, CV", d:"Pin the mountain project and the Python repo on GitHub, add the case study and the PCAP badge to LinkedIn, and link every claim of the CV to a public proof.", h:2, link:"#/career", lt:"Career kit"},
+      {id:"g-ledger", icon:"🧾", t:"Log everything in the Proof ledger", d:"One line per proof: repo, certificate, article, metric. This is what you will show in interviews.", h:0.5, link:"#/proof", lt:"Proof ledger"},
+      {id:"g-socle-done", icon:"🎉", t:"Foundation complete: you can now show you are good at AI engineering", d:"From here the path switches to the deep dive: every remaining exercise, module by module, the other projects and the main certification.", h:0}]
+};
+function guideMod(id){return M.find(m=>m.id===id);}
+function guideKeyEx(m){if(GUIDE_KEY_EX[m.id])return GUIDE_KEY_EX[m.id];const c=m.exercises.slice(0,3).map((e,i)=>[e.h,i]).sort((a,b)=>a[0]-b[0]);return [c[0][1]];}
+function guidePickRes(m){const r=m.resources||[];return r.find(x=>x.l==="fr"&&x.k==="video")||r.find(x=>x.l==="fr")||r.find(x=>x.k==="video")||r[0];}
+function guideSections(m){const parts=(m.theory||"").split(/(?=<h4>)/).filter(s=>s.trim());return parts.map(p=>{const mm=p.match(/<h4>(.*?)<\/h4>/);return {title:mm?mm[1].replace(/<[^>]+>/g,""):"Theory",html:p};});}
+let GUIDE_CACHE=null;
+function guideSteps(){if(GUIDE_CACHE)return GUIDE_CACHE;const st=[];
+ GUIDE_ORDER.forEach(id=>{const m=guideMod(id);if(!m)return;
+  guideSections(m).forEach((s,i)=>st.push({id:`t:${id}:${i}`,type:"theory",m,sec:s,h:0.6,phase:"core"}));
+  const r=guidePickRes(m);if(r)st.push({id:`r:${id}`,type:"res",m,res:r,h:r.k==="video"?0.75:0.5,phase:"core"});
+  guideKeyEx(m).forEach(i=>st.push({id:`e:${id}:${i}`,type:"ex",m,i,ex:m.exercises[i],h:m.exercises[i].h,phase:"core"}));
+  st.push({id:`q:${id}`,type:"quiz",m,h:0.25,phase:"core"});
+  (GUIDE_MILESTONES[id]||[]).forEach(ms=>st.push(Object.assign({type:"ms",phase:"core"},ms)));});
+ GUIDE_ORDER.forEach(id=>{const m=guideMod(id);if(!m)return;const key=guideKeyEx(m);
+  m.exercises.forEach((e,i)=>{if(!key.includes(i))st.push({id:`e:${id}:${i}`,type:"ex",m,i,ex:e,h:e.h,phase:"deep"});});
+  (m.resources||[]).forEach((r,j)=>{if(r!==guidePickRes(m))st.push({id:`r:${id}:${j}`,type:"res",m,res:r,h:r.k==="video"?0.75:0.5,phase:"deep"});});});
+ return GUIDE_CACHE=st;}
+function gS(){if(!S.guide)S.guide={done:{},skip:{}};return S.guide;}
+function stepDone(s){const g=gS();if(g.done[s.id])return true;
+ if(s.type==="ex")return !!S.ex[s.m.id+":"+s.i];if(s.type==="quiz")return (S.quiz[s.m.id]||{}).best>=80;
+ if(s.proj)return !!S.proj[s.proj];if(s.cert)return !!S.cert[s.cert];return false;}
+function guideIndex(){const st=guideSteps(),g=gS();const i=st.findIndex(s=>!stepDone(s)&&!g.skip[s.id]);return i<0?st.findIndex(s=>!stepDone(s)):i;}
+function guideStats(){const st=guideSteps();const core=st.filter(s=>s.phase==="core");const left=core.filter(s=>!stepDone(s));
+ const hLeft=left.reduce((a,s)=>a+s.h,0),hAll=core.reduce((a,s)=>a+s.h,0);
+ let pace="";if(SOCLE_END){const wk=Math.max(1,(new Date(SOCLE_END)-new Date(today()))/864e5/7);pace=`${(hLeft/wk).toFixed(1)} h/week needed to finish the foundation by ${SOCLE_END} (${Math.round(wk)} weeks left)`;}
+ return {core:core.length,coreDone:core.length-left.length,hLeft:Math.round(hLeft),hAll:Math.round(hAll),pace};}
+function guideLabel(s){if(s.type==="theory")return `📖 Theory · ${s.sec.title}`;if(s.type==="res")return `${s.res.k==="video"?"🎬 Watch":"📘 Read"} · ${s.res.t}`;
+ if(s.type==="ex")return `🛠️ Exercise · ${s.ex.t}`;if(s.type==="quiz")return `🧪 Quiz · ${s.m.title}`;return `${s.icon||"⭐"} ${s.t}`;}
+function fmtH(h){return h<1?Math.round(h*60)+" min":(Math.round(h*10)/10)+" h";}
+function guideBody(s){const L=(u,t)=>`<a class="btn ghost" href="${u}" ${u.startsWith("#")?"":'target="_blank" rel="noopener"'}>${esc(t)} →</a>`;
+ if(s.type==="theory")return `<div class="theory">${s.sec.html}</div><p class="small muted mt">Read it once carefully, then say the key idea out loud in English in two sentences.</p>`;
+ if(s.type==="res"){const r=s.res;return `<p>${r.l==="fr"?'<span class="pill g">🇫🇷 FR</span> ':""}<b>${esc(r.t)}</b>${r.y?` <span class="pill">${ymTxt(r.y)}</span>`:""}</p><p class="small muted">Take 3 notes: one idea you did not know, one thing to try, one question for the AI coach.</p><div class="mt">${L(r.u,r.k==="video"?"Open the video":"Open the resource")}</div>`;}
+ if(s.type==="ex"){const e=s.ex;return `<p>${esc(e.d)}</p>${(e.u||[]).map(l=>`<a class="exl" href="${l.u}" target="_blank" rel="noopener">🔗 ${esc(l.t)}</a>`).join("")}<p class="small muted mt">Commit the result in a repo, even small. When it works, click Done.</p>`;}
+ if(s.type==="quiz")return `<p>${s.m.quiz.length} questions on <b>${esc(s.m.title)}</b>. Pass mark 80%. Wrong answers go to your Review deck automatically.</p><div class="mt">${L("#/m/"+s.m.id+"?quiz","Open the quiz")}</div><p class="small muted mt">This step completes itself when you reach 80%. You can also move on and come back.</p>`;
+ let b=s.d?`<p>${esc(s.d)}</p>`:"";if(s.proj){const [pid,ix]=s.proj.split(":");const p=PROJECTS.find(x=>x.id===pid);if(p)b+=`<p>${esc(p.steps[+ix])}</p><p class="small muted">${esc(p.desc)}</p>`;}
+ if(s.cert==="p2"||s.cert==="p3")b+=`<p class="small muted">${esc(CERTS.python.facts)}</p>`;
+ return b+`<div class="mt">${s.link?L(s.link,s.lt||"Open"):""} ${s.url?L(s.url,s.lt||"Open"):""}</div>`;}
+function guideMark(s,v){change(()=>{const g=gS();if(v)g.done[s.id]=today();else delete g.done[s.id];delete g.skip[s.id];
+ if(s.type==="ex")S.ex[s.m.id+":"+s.i]=v;if(s.proj)S.proj[s.proj]=v;if(s.cert)S.cert[s.cert]=v;},v?"✅ Done. Next step!":"Step reopened");}
+let guideView=null;
+function guidePage(){const st=guideSteps();let i=guideView==null?guideIndex():guideView;if(i<0){$("#main").innerHTML=`<div class="hero"><h1>🎉 Path complete</h1></div>`;return;}
+ const s=st[i],k=guideStats(),done=stepDone(s);const ph=s.m?PHASES[s.m.phase-1]:null;
+ let todayH=0;const plan=[];for(let j=i;j<st.length&&plan.length<8;j++){if(stepDone(st[j]))continue;plan.push([j,st[j]]);todayH+=st[j].h;if(todayH>=2)break;}
+ let h=`<div class="hero"><h1>▶ Today</h1><p>One step at a time. Do it, click <b>Done, next</b>. The path decides the order: theory, video, exercise, quiz, project, certification.</p></div>
+ <div class="card mt"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><b>Foundation: ${k.coreDone}/${k.core} steps · about ${k.hLeft} h left of ${k.hAll} h</b><span class="pill ${s.phase==="core"?"p":"g"}">${s.phase==="core"?"Foundation":"Deep dive"}</span></div>
+ <div class="xpbar mt"><i style="width:${Math.round(k.coreDone/k.core*100)}%"></i></div>${k.pace?`<p class="small muted mt">${k.pace}</p>`:""}</div>
+ <div class="card mt" style="${ph?`border-left:6px solid ${ph.color}`:""}"><div class="small muted">Step ${i+1} of ${st.length}${s.m?` · Module ${s.m.id.slice(1)} · ${esc(s.m.title)}`:""} · ⏱️ ${fmtH(s.h)}</div>
+ <h2 style="margin:.3em 0">${esc(guideLabel(s))} ${done?"✅":""}</h2>${guideBody(s)}
+ <div class="mt2" style="display:flex;gap:10px;flex-wrap:wrap">${i>0?`<button class="btn ghost" id="gprev">← Previous</button>`:""}
+ ${done?`<button class="btn ghost" id="gundo">↩︎ Not done</button><button class="btn ok" id="gnext">Next →</button>`:`<button class="btn ok" id="gdone">✅ Done, next</button><button class="btn ghost" id="gskip">Later</button>`}</div></div>
+ <div class="card mt"><h3>📅 Today's session (about 2 h)</h3>${plan.map(([j,p])=>`<div class="modrow" data-g="${j}" style="cursor:pointer"><div class="num">${j+1}</div><div><div class="t">${esc(guideLabel(p))}</div><div class="small muted">${p.m?esc(p.m.title)+" · ":""}${fmtH(p.h)}</div></div></div>`).join("")}</div>`;
+ $("#main").innerHTML=h;window.scrollTo(0,0);
+ const go=j=>{guideView=j;guidePage();};
+ document.querySelectorAll("[data-g]").forEach(e=>e.onclick=()=>go(+e.dataset.g));
+ if($("#gprev"))$("#gprev").onclick=()=>go(i-1);
+ if($("#gdone"))$("#gdone").onclick=()=>{guideMark(s,true);guideView=null;guidePage();renderSide();};
+ if($("#gskip"))$("#gskip").onclick=()=>{gS().skip[s.id]=today();save();guideView=null;guidePage();};
+ if($("#gundo"))$("#gundo").onclick=()=>{guideMark(s,false);guidePage();renderSide();};
+ if($("#gnext"))$("#gnext").onclick=()=>{guideView=null;guidePage();};}
+function guideTeaser(){const st=guideSteps(),i=guideIndex();if(i<0)return "";const s=st[i],k=guideStats();
+ return `<div class="card mt" style="border-left:6px solid #6366f1"><h3>▶ Your next step</h3><p><b>${esc(guideLabel(s))}</b> <span class="small muted">· ${fmtH(s.h)}${s.m?" · "+esc(s.m.title):""}</span></p>
+ <p class="small muted">Foundation ${k.coreDone}/${k.core} steps · about ${k.hLeft} h left${k.pace?" · "+k.pace:""}</p><a class="btn ok" href="#/today">Start today's session →</a></div>`;}
 // ===== APP =====
 const KEY="aiTrack.public.v1";
 let S=load();
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s)return Object.assign(blank(),s);}catch(e){}return blank();}
-function blank(){return{ex:{},quiz:{},mod:{},speak:{},proj:{},cert:{},proofs:[],iv:{},rev:{},ai:{},cards:{},notes:{},start:"",activity:[],badges:{}};}
+function blank(){return{guide:{done:{},skip:{}},ex:{},quiz:{},mod:{},speak:{},proj:{},cert:{},proofs:[],iv:{},rev:{},ai:{},cards:{},notes:{},start:"",activity:[],badges:{}};}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 const $=s=>document.querySelector(s);
 function ymTxt(y){const[a,b]=String(y).split("-");return (b?["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+b-1]+" ":"")+a;}
@@ -2114,7 +2198,7 @@ function renderSide(){const x=xpOf(),l=level(x),r=location.hash||"#/";
  <div class="me"><div class="lv">Lv ${l.i+1} · ${esc(l.name)}</div><small>${x} XP${l.next?" · "+(l.next-x)+" to "+esc(l.nextName):" · max level"}</small>
  <div class="xpbar"><i style="width:${l.pct}%"></i></div><small>🔥 ${streak()} week streak · ${totalPct()}% done</small><br><button class="menu-btn" onclick="document.getElementById('side').classList.toggle('open')">☰ Menu</button></div><nav>`;
  const L=(href,ic,t)=>`<a href="${href}" class="${r===href?"on":""}">${ic} ${t}</a>`;
- h+=L("#/","🏠","Dashboard")+L("#/roadmap","🗺️","Roadmap")+L("#/projects","📦","Capstone projects")+L("#/coach","🤖","AI coach")+L("#/review","🔁","Review"+(dueCards().length?" ("+dueCards().length+")":""))+L("#/certs","🎓","Certifications")+L("#/proof","🧾","Proof ledger")+L("#/market","🌍","Market intel")+L("#/interview","🎤","Interview prep (optional)")+L("#/career","💼","Career kit")+L("#/english","🇬🇧","English track")+L("#/badges","🏅","Badges")+L("#/settings","⚙️","Settings & backup");
+ h+=L("#/today","▶","Today (guided path)")+L("#/","🏠","Dashboard")+L("#/roadmap","🗺️","Roadmap")+L("#/projects","📦","Capstone projects")+L("#/coach","🤖","AI coach")+L("#/review","🔁","Review"+(dueCards().length?" ("+dueCards().length+")":""))+L("#/certs","🎓","Certifications")+L("#/proof","🧾","Proof ledger")+L("#/market","🌍","Market intel")+L("#/interview","🎤","Interview prep (optional)")+L("#/career","💼","Career kit")+L("#/english","🇬🇧","English track")+L("#/badges","🏅","Badges")+L("#/settings","⚙️","Settings & backup");
  PHASES.forEach(p=>{h+=`<div class="sec">${p.icon} Phase ${p.n} · ${esc(p.name)}</div>`;
   M.filter(m=>m.phase===p.n).forEach(m=>{const pc=modPct(m);h+=`<a class="mod ${r==="#/m/"+m.id?"on":""}" href="#/m/${m.id}">${m.id.slice(1)} · ${esc(m.title)}<span class="ck">${S.mod[m.id]?"✅":pc?pc+"%":""}</span></a>`;});});
  $("#side").innerHTML=h+"</nav>";}
@@ -2123,7 +2207,7 @@ function renderSide(){const x=xpOf(),l=level(x),r=location.hash||"#/";
 function dashboard(){const x=xpOf(),l=level(x),cw=currentWeek(),tp=totalPct();
  const next=M.find(m=>!S.mod[m.id]);const doneEx=Object.values(S.ex).filter(Boolean).length,totEx=M.reduce((a,m)=>a+m.exercises.length,0);
  const hrs=M.reduce((a,m)=>a+m.exercises.reduce((b,e,i)=>b+(S.ex[m.id+":"+i]?e.h:0),0),0);
- let h=`<div class="hero"><h1>Your path to Senior AI Engineer, 2027</h1><p>12 months · ~15 h/week · ${M.length} modules · ${PROJECTS.length} capstone projects · certification plan. From strong Java lead to the AI engineer companies fight for: theory, hands-on, quizzes, English and career, all in one place.</p></div>
+ let h=`<div class="hero"><h1>Your path to Senior AI Engineer, 2027</h1><p>12 months · ~15 h/week · ${M.length} modules · ${PROJECTS.length} capstone projects · certification plan. From strong Java lead to the AI engineer companies fight for: theory, hands-on, quizzes, English and career, all in one place.</p></div>${guideTeaser()}
  <div class="grid g4 mt"><div class="card" style="display:flex;gap:14px;align-items:center"><div class="ring" style="--p:${tp}"><div>${tp}%</div></div><div class="stat"><b>${tp}%</b><span>track completed</span></div></div>
  <div class="card stat"><b>Lv ${l.i+1}</b><span>${esc(l.name)} · ${x} XP</span><div class="xpbar" style="background:#eef0f6"><i style="width:${l.pct}%"></i></div></div>
  <div class="card stat"><b>🔥 ${streak()}</b><span>week streak</span></div>
@@ -2157,7 +2241,7 @@ function moduleView(id){const m=M.find(x=>x.id===id);if(!m){location.hash="#/";r
  <div class="card"><h3>💡 Key takeaways</h3><ul>${m.takeaways.map(o=>`<li>${esc(o)}</li>`).join("")}</ul></div></div>
  <div class="card mt theory"><h3>📚 Theory</h3>${m.theory}</div>
  <div class="card mt"><h3>🛠️ Exercises <span class="pill">${m.exercises.reduce((a,e)=>a+e.h,0)} h</span></h3>
- ${m.exercises.map((e,i)=>{const k=m.id+":"+i,d=!!S.ex[k];return `<label class="ex ${d?"done":""}"><input type="checkbox" data-ex="${k}" ${d?"checked":""}><div><div class="et">${esc(e.t)}</div><div class="small muted">${esc(e.d)}</div>${(e.u||[]).map(l=>`<a class="exl" href="${l.u}" target="_blank" rel="noopener">🔗 ${esc(l.t)}${l.y?` <span class="muted">· ${ymTxt(l.y)}</span>`:""}</a>`).join("")}</div><span class="xp">${e.h} h · +${Math.round(e.h*10)} XP</span></label>`;}).join("")}</div>
+ ${m.exercises.map((e,i)=>{const k=m.id+":"+i,d=!!S.ex[k];return `<label class="ex ${d?"done":""}"><input type="checkbox" data-ex="${k}" ${d?"checked":""}><div><div class="et">${guideKeyEx(m).includes(i)?'<span class="pill p">Foundation</span> ':'<span class="pill">Deep dive</span> '}${esc(e.t)}</div><div class="small muted">${esc(e.d)}</div>${(e.u||[]).map(l=>`<a class="exl" href="${l.u}" target="_blank" rel="noopener">🔗 ${esc(l.t)}${l.y?` <span class="muted">· ${ymTxt(l.y)}</span>`:""}</a>`).join("")}</div><span class="xp">${e.h} h · +${Math.round(e.h*10)} XP</span></label>`;}).join("")}</div>
  <div class="card mt"><h3>🧪 Quiz ${q?`<span class="pill ${q.best>=80?"g":"y"}">best ${q.best}%</span>`:""} <span class="pill p">pass ≥ 80% · +XP</span></h3><div id="quiz">
  ${m.quiz.map((it,i)=>`<div class="q" data-q="${i}"><b>${i+1}. ${esc(it.q)}</b>${it.o.map((o,j)=>`<label class="opt"><input type="radio" name="q${i}" value="${j}"> ${esc(o)}</label>`).join("")}<div class="why">💬 ${esc(it.w)}</div></div>`).join("")}</div>
  <div class="mt"><button class="btn" id="qsub">Check my answers</button> <button class="btn ghost" id="qres">Reset</button> <span id="qscore" class="mt" style="font-weight:700;margin-left:10px"></span></div></div>
@@ -2300,7 +2384,7 @@ function settings(){$("#main").innerHTML=`<div class="hero"><h1>⚙️ Settings 
  $("#rst").onclick=()=>{if(confirm("Reset all progress?")){S=blank();save();renderSide();toast("Progress reset");}};}
 
 function route(){const r=location.hash||"#/";const sd=document.getElementById("side");if(sd)sd.classList.remove("open");renderSide();
- if(r.startsWith("#/m/"))moduleView(r.slice(4));else if(r==="#/roadmap")roadmap();else if(r==="#/projects")projects();else if(r==="#/career")career();else if(r==="#/market")market();else if(r==="#/certs")certs();else if(r==="#/review")review(true);else if(r==="#/interview")interview();else if(r==="#/coach")coach();else if(r==="#/proof")proof();
+ if(r==="#/today"){guideView=null;guidePage();}else if(r.startsWith("#/m/")){moduleView(r.slice(4).split("?")[0]);if(r.includes("?quiz")){const q=document.getElementById("quiz");if(q)q.scrollIntoView();}}else if(r==="#/roadmap")roadmap();else if(r==="#/projects")projects();else if(r==="#/career")career();else if(r==="#/market")market();else if(r==="#/certs")certs();else if(r==="#/review")review(true);else if(r==="#/interview")interview();else if(r==="#/coach")coach();else if(r==="#/proof")proof();
  else if(r==="#/english")english();else if(r==="#/badges")badges();else if(r==="#/settings")settings();else dashboard();}
 window.addEventListener("hashchange",route);route();
 </script></body></html>
