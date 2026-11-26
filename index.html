@@ -2135,7 +2135,12 @@ function dashboard(){const x=xpOf(),l=level(x),cw=currentWeek(),tp=totalPct();
  <div class="grid g2 mt"><div class="card"><h3>✅ What you already bring</h3><ul>${BASELINE.have.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div>
  <div class="card"><h3>🎯 What this track adds</h3><ul>${BASELINE.gaps.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div></div>
  <div class="card mt"><h3>🗺️ The year at a glance</h3><div class="tl">${PHASES.map(p=>`<span style="background:${p.color}">${p.icon} ${esc(p.name)}<br><small style="opacity:.85;font-weight:500">${p.weeks}</small></span>`).join("")}</div>
- <p class="small muted mt">⚠️ Start the Career kit (CV, LinkedIn, pipeline) at least 3 months before your current contract ends, in parallel with the technical track.</p></div>`;
+ <p class="small muted mt">⚠️ Start the Career kit (CV, LinkedIn, pipeline) at least 3 months before your current contract ends, in parallel with the technical track.</p></div>
+ <div class="card mt"><h3>🎯 Proof ready before the current contract ends</h3><p class="small muted">Plan B if the contract ends early: by then you must already be able to show you are good at AI engineering. Otherwise the full year plan continues.</p><ul>
+ <li><b>Mountain project live</b>: public demo, README explaining architecture, prompts and evals.</li>
+ <li><b>Leadrive "Nora" case study</b>: public write-up of the architecture (Spring AI + Claude), prompt testing on real scenarios, results.</li>
+ <li><b>One AI certification</b> passed at least two weeks before the contract ends (see Certifications page).</li>
+ <li><b>GitHub and LinkedIn</b> updated with these three proofs, pinned and linked from the CV.</li></ul></div>`;
  $("#main").innerHTML=h;$("#sdb").onclick=()=>{change(()=>{S.start=$("#sd").value;},"📅 Start date saved");dashboard();};}
 
 function roadmap(){let h=`<div class="hero"><h1>🗺️ Roadmap</h1><p>Five phases, twenty modules. Click a module to open it. Each module: theory, exercises, quiz, resources, coach tips and an English corner.</p></div>`;
