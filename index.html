@@ -3565,7 +3565,10 @@ function addDays(n){const d=new Date();d.setDate(d.getDate()+n);return d.toISOSt
 function cardOf(k){if(k.startsWith("c:")){const c=(S.cards||{})[k];const m=c&&M.find(x=>x.id===c.mid);return c&&m?{k,m,q:c}:null;}const [mid,qi]=k.split(":");const m=M.find(x=>x.id===mid);return m&&m.quiz[+qi]?{k,m,q:m.quiz[+qi]}:null;}
 function dueCards(){const t=today();return Object.keys(S.rev||{}).filter(k=>S.rev[k].d<=t).map(cardOf).filter(Boolean);}
 let revQ=[],revI=0,revOk=0;
-function review(start){if(start||!revQ.length){revQ=dueCards().sort(()=>Math.random()-.5).slice(0,15);revI=0;revOk=0;}
+function fixCardsOnce(){if(S.cardFix1)return;const ord={"première":0,"premiere":0,"deuxième":1,"deuxieme":1,"seconde":1,"troisième":2,"troisieme":2,"quatrième":3,"quatrieme":3,first:0,second:1,third:2,fourth:3};
+ const re=/(?:bonne r[ée]ponse est la|r[ée]ponse correcte est la|c'est la|correct (?:answer|option) is the|right answer is the|best answer is the|it is the)\s+(premi[èe]re|deuxi[èe]me|seconde|troisi[èe]me|quatri[èe]me|first|second|third|fourth)/i;let n=0;
+ Object.values(S.cards||{}).forEach(c=>{const mm=re.exec(c.w||"");if(mm){const i=ord[mm[1].toLowerCase()];if(i!==undefined&&i!==c.a&&c.o&&i<c.o.length){c.a=i;n++;}}});S.cardFix1=today();save();if(n)setTimeout(()=>toast("🔧 "+n+" review card"+(n>1?"s":"")+" with a wrong answer key fixed"),300);}
+function review(start){fixCardsOnce();if(start||!revQ.length){revQ=dueCards().sort(()=>Math.random()-.5).slice(0,15);revI=0;revOk=0;}
  const total=Object.keys(S.rev).length,mast=Object.values(S.rev).filter(r=>r.b>=5).length;
  let h=`<div class="hero"><h1>🔁 Review</h1><p>Spaced repetition: questions you missed come back tomorrow, then after 3, 7, 14 and 30 days as long as you get them right. Ten minutes, a few times a week, is enough to keep everything fresh.</p></div>
  <div class="grid g3 mt"><div class="card stat"><b>${dueCards().length}</b><span>due today</span></div><div class="card stat"><b>${total}</b><span>cards in your deck</span></div><div class="card stat"><b>${mast}</b><span>mastered (30-day box)</span></div></div>`;
@@ -3578,7 +3581,8 @@ function review(start){if(start||!revQ.length){revQ=dueCards().sort(()=>Math.ran
   document.querySelectorAll("#rq .opt").forEach((x,jj)=>{if(jj===c.q.a)x.classList.add("right");else if(jj===j)x.classList.add("wrong");});
   const r=S.rev[c.k];if(ok){revOk++;r.b=Math.min(5,r.b+1);}else r.b=1;r.d=addDays(BOX[r.b]);
   change(()=>{},ok?"🔁 Correct · next in "+BOX[r.b]+" d":"↩️ Back to box 1");
-  $("#rnext").innerHTML=`<button class="btn" id="rn">${revI+1<revQ.length?"Next card →":"Finish"}</button>`;$("#rn").onclick=()=>{revI++;review();};});}
+  $("#rnext").innerHTML=`<button class="btn" id="rn">${revI+1<revQ.length?"Next card →":"Finish"}</button>${!ok&&c.k.startsWith("c:")?` <button class="btn ghost" id="rfix">⚠️ Wrong correction? My answer was right</button>`:""}`;$("#rn").onclick=()=>{revI++;review();};
+  const fx=$("#rfix");if(fx)fx.onclick=()=>{c.q.a=j;revOk++;r.b=2;r.d=addDays(BOX[2]);change(()=>{},"✅ Card fixed: your answer is now the right one");document.querySelectorAll("#rq .opt").forEach((x,jj)=>{x.classList.remove("right","wrong");if(jj===j)x.classList.add("right");});fx.remove();};});}
 
 function interview(){const I=INTERVIEW;const ck=(id)=>!!S.iv[id];
  let h=`<div class="hero"><h1>🎤 Interview prep</h1><p>${esc(I.intro)}</p></div>
@@ -3645,7 +3649,7 @@ function sheets(){let h=`<div class="hero"><h1>📋 Revision sheets</h1><p>The s
  PHASES.forEach(p=>{h+=`<h3 class="mt2">${p.icon} Phase ${p.n} · ${esc(p.name)}</h3>`;M.filter(m=>m.phase===p.n).forEach(m=>{h+=`<details class="card mt sheet"><summary><b>${m.id.slice(1)}. ${esc(m.title)}</b> <a class="small" href="#/m/${m.id}">open the module</a></summary><div class="theory">${m.sheet||m.theory}</div></details>`;});});
  $("#main").innerHTML=h;}
 function route(){const r=location.hash||"#/";const sd=document.getElementById("side");if(sd)sd.classList.remove("open");renderSide();
- if(r==="#/today"){guideView=null;guidePage();}else if(r.startsWith("#/m/")){moduleView(r.slice(4).split("?")[0]);if(r.includes("?quiz")){const c=document.getElementById("coreQ");if(c)c.open=true;const q=document.getElementById("quiz");if(q)q.scrollIntoView();}if(r.includes("?ai")){const b=document.getElementById("aiQuizBox");if(b)b.scrollIntoView();}}else if(r==="#/roadmap")roadmap();else if(r==="#/projects")projects();else if(r==="#/career")career();else if(r==="#/market")market();else if(r==="#/certs")certs();else if(r==="#/review")review(true);else if(r==="#/sheets")sheets();else if(r==="#/interview")interview();else if(r==="#/coach")coach();else if(r==="#/proof")proof();
+ if(r==="#/today"){guideView=null;guidePage();}else if(r.startsWith("#/m/")){moduleView(r.slice(4).split("?")[0]);if(r.includes("?quiz")){const c=document.getElementById("coreQ");if(c)c.open=true;const q=document.getElementById("quiz");if(q)q.scrollIntoView();}if(r.includes("?ai")){const b=document.getElementById("aiQuizBox");if(b)b.scrollIntoView();}}else if(r==="#/roadmap")roadmap();else if(r==="#/projects")projects();else if(r==="#/career")career();else if(r==="#/market")market();else if(r==="#/certs")certs();else if(r==="#/review")review(false);else if(r==="#/sheets")sheets();else if(r==="#/interview")interview();else if(r==="#/coach")coach();else if(r==="#/proof")proof();
  else if(r==="#/english")english();else if(r==="#/badges")badges();else if(r==="#/settings")settings();else dashboard();}
 window.addEventListener("hashchange",route);route();
 </script></body></html>
