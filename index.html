@@ -98,6 +98,8 @@ details.sheet summary{cursor:pointer}details.sheet summary a{margin-left:8px}
 
 .resrow{display:flex;align-items:center;gap:8px}.resrow input{width:18px;height:18px;accent-color:var(--ok);flex:none;cursor:pointer}.resrow a{flex:1}.resrow.done a{opacity:.6}
 button[disabled]{opacity:.7;cursor:not-allowed}
+
+.theory .chkq{margin:8px 0 12px}.theory .chkq p{margin:2px 0}.theory details.ans summary{cursor:pointer;color:#7c3aed;font-weight:600;font-size:14px}.theory details.ans[open] p{background:#fff;border-radius:8px;padding:8px 10px;margin-top:6px}
 </style></head><body><div class="app"><aside id="side"></aside><main id="main"></main></div><div id="toast" class="toast"></div><script>// ===== GLOBAL DATA =====
 const M = [];
 const PHASES = [
@@ -1860,7 +1862,7 @@ const THEORY_V2 = {};
 const _bx=(c,l,s)=>`<div class="bx ${c}"><span class="bl">${l}</span>${s}</div>`;
 const ONE=s=>_bx("one","In one sentence",s), PIC=s=>_bx("pic","Picture it",s), HOW=s=>_bx("how","How it works",s),
  EG=s=>_bx("eg","Concrete example",s), YOU=s=>_bx("you","What it changes for you",s), TRAP=s=>_bx("trap","Common trap",s);
-const CHK=(...qa)=>`<details class="bx chk"><summary>✅ Check yourself (${qa.length} question${qa.length>1?"s":""}, answers hidden)</summary>${qa.map(([q,a])=>`<p><b>${q}</b><br>${a}</p>`).join("")}</details>`;
+const CHK=(...qa)=>`<div class="bx chk"><span class="bl">✅ Check yourself</span>${qa.map(([q,a],i)=>`<div class="chkq"><b>${i+1}. ${q}</b><p class="small muted">Answer it in your head (or out loud) first, then check.</p><details class="ans"><summary>Show the answer</summary><p>${a}</p></details></div>`).join("")}</div>`;
 
 THEORY_V2.m01 = `
 <h4>1. Tokens, not words</h4>
